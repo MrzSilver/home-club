@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <title>Home Club Foundation</title>
+  <rect width="32" height="32" rx="6" fill="#1f2421"/>
+  <path d="M9 9v14M23 9v14M9 16h14" stroke="#f3efe6" stroke-width="3" stroke-linecap="square" fill="none"/>
+</svg>

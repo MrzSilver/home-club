@@ -1,0 +1,101 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: true
+  NEXT_TELEMETRY_DISABLED: '1'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      # The pnpm version comes from the `packageManager` field in package.json.
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      # Dependency audit is a report only (SPEC 11); Dependabot handles the fixes.
+      - name: Audit dependencies (non-blocking)
+        run: pnpm audit
+        continue-on-error: true
+
+      # Generates next-env.d.ts and .next/types so typecheck sees the same ambient types as a
+      # local checkout (those files are git-ignored). Keeps the `typecheck` script contract.
+      - name: Generate Next.js types
+        run: pnpm exec next typegen
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format check
+        run: pnpm format:check
+
+      # Applies the coverage floors from RULES 12.3 (src/lib lines >= 90, global lines >= 75).
+      - name: Unit tests with coverage
+        run: pnpm test:coverage
+
+      - name: Build
+        run: pnpm build
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      # Reuses the build above; playwright.config.ts only runs `pnpm start` when CI is set.
+      - name: E2E and accessibility tests
+        run: pnpm test:e2e
+
+      # Uses the Chrome preinstalled on the runner; set CHROME_PATH to override.
+      - name: Lighthouse CI
+        run: pnpm lhci
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload coverage report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage
+          path: coverage
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload Lighthouse reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci
+          if-no-files-found: ignore
+          retention-days: 14
