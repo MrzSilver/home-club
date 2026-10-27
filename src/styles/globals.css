@@ -1,2 +1,259 @@
 @import 'tailwindcss';
 @import './tokens.css';
+
+@layer base {
+  html {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--stack-body);
+    font-size: 100%;
+    /* Never fake bold or italic: only the loaded weights (400, 500, 600) are used. */
+    font-synthesis: none;
+    /* Keep Thai (and all text) breaking at word boundaries; see .wrap-url for the one exception. */
+    word-break: normal;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Noto Sans Thai first for Thai pages (DESIGN 3); its unicode-range keeps Latin on Jost/Inter. */
+  html:lang(th) {
+    font-family: var(--stack-body-th);
+  }
+
+  body {
+    min-width: 0;
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-size: var(--type-body-size);
+    line-height: var(--type-body-leading);
+    letter-spacing: var(--type-body-tracking);
+  }
+
+  html:lang(th) body {
+    line-height: var(--type-body-leading-th);
+  }
+
+  /* Visible focus on every interactive element (RULES 8.2); never removed without a replacement. */
+  :focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  button:not(:disabled):not([aria-disabled='true']),
+  [role='button']:not([aria-disabled='true']),
+  summary {
+    cursor: pointer;
+  }
+}
+
+/*
+ * Typography roles (DESIGN 3.1). These live in the components layer so that any Tailwind utility
+ * (leading-*, font-semibold, text-muted, ...) can still adjust them without specificity fights.
+ * Thai values apply through :lang(th) (RULES 6.5). Casing is separate: use .uppercase-latin.
+ */
+@layer components {
+  .text-display {
+    font-family: var(--stack-display);
+    font-size: var(--type-display-size);
+    font-weight: 500;
+    line-height: var(--type-display-leading);
+    letter-spacing: var(--type-display-tracking);
+
+    &:lang(th) {
+      font-family: var(--stack-display-th);
+      line-height: var(--type-display-leading-th);
+    }
+  }
+
+  .text-h1 {
+    font-family: var(--stack-display);
+    font-size: var(--type-h1-size);
+    font-weight: 500;
+    line-height: var(--type-h1-leading);
+    letter-spacing: var(--type-h1-tracking);
+
+    &:lang(th) {
+      font-family: var(--stack-display-th);
+      line-height: var(--type-h1-leading-th);
+    }
+  }
+
+  .text-h2 {
+    font-family: var(--stack-display);
+    font-size: var(--type-h2-size);
+    font-weight: 500;
+    line-height: var(--type-h2-leading);
+    letter-spacing: var(--type-h2-tracking);
+
+    &:lang(th) {
+      font-family: var(--stack-display-th);
+      line-height: var(--type-h2-leading-th);
+    }
+  }
+
+  .text-h3 {
+    font-family: var(--stack-body);
+    font-size: var(--type-h3-size);
+    font-weight: 500;
+    line-height: var(--type-h3-leading);
+    letter-spacing: var(--type-h3-tracking);
+
+    &:lang(th) {
+      font-family: var(--stack-body-th);
+      line-height: var(--type-h3-leading-th);
+    }
+  }
+
+  .text-body {
+    font-family: var(--stack-body);
+    font-size: var(--type-body-size);
+    font-weight: 400;
+    line-height: var(--type-body-leading);
+    letter-spacing: var(--type-body-tracking);
+
+    &:lang(th) {
+      font-family: var(--stack-body-th);
+      line-height: var(--type-body-leading-th);
+    }
+  }
+
+  .text-small {
+    font-family: var(--stack-body);
+    font-size: var(--type-small-size);
+    font-weight: 400;
+    line-height: var(--type-small-leading);
+    letter-spacing: var(--type-small-tracking);
+
+    &:lang(th) {
+      font-family: var(--stack-body-th);
+      line-height: var(--type-small-leading-th);
+    }
+  }
+
+  .text-eyebrow {
+    font-family: var(--stack-body);
+    font-size: var(--type-eyebrow-size);
+    font-weight: 500;
+    line-height: var(--type-eyebrow-leading);
+    letter-spacing: var(--type-eyebrow-tracking);
+
+    &:lang(th) {
+      font-family: var(--stack-body-th);
+      font-size: var(--type-eyebrow-size-th);
+      line-height: var(--type-eyebrow-leading-th);
+    }
+  }
+
+  /* Button label: eyebrow size with the DESIGN 5.1 tracking of 0.14em. */
+  .text-button {
+    font-family: var(--stack-body);
+    font-size: var(--type-eyebrow-size);
+    font-weight: 500;
+    line-height: var(--type-eyebrow-leading);
+    letter-spacing: var(--type-button-tracking);
+
+    &:lang(th) {
+      font-family: var(--stack-body-th);
+      font-size: var(--type-eyebrow-size-th);
+      line-height: var(--type-eyebrow-leading-th);
+    }
+  }
+
+  /* Brand lockup. The brand name is Latin in both locales, so the Wordmark sets lang="en". */
+  .text-wordmark {
+    font-family: var(--stack-display);
+    font-size: var(--type-wordmark-size);
+    font-weight: 500;
+    line-height: var(--type-wordmark-leading);
+    letter-spacing: var(--type-wordmark-tracking);
+  }
+
+  .text-wordmark-sub {
+    font-family: var(--stack-body);
+    font-size: var(--type-wordmark-sub-size);
+    font-weight: 500;
+    line-height: var(--type-wordmark-leading);
+    letter-spacing: var(--type-wordmark-sub-tracking);
+  }
+
+  /* English labels are uppercase; Thai keeps normal case (RULES 6.5). */
+  .uppercase-latin:lang(en) {
+    text-transform: uppercase;
+  }
+
+  /* The one place where breaking inside a word is allowed (DESIGN 3 Thai rules). */
+  .wrap-url {
+    overflow-wrap: anywhere;
+  }
+}
+
+@utility font-display {
+  font-family: var(--stack-display);
+
+  &:lang(th) {
+    font-family: var(--stack-display-th);
+  }
+}
+
+@utility font-body {
+  font-family: var(--stack-body);
+
+  &:lang(th) {
+    font-family: var(--stack-body-th);
+  }
+}
+
+@utility duration-fast {
+  --tw-duration: var(--dur-fast);
+  transition-duration: var(--dur-fast);
+}
+
+@utility duration-base {
+  --tw-duration: var(--dur-base);
+  transition-duration: var(--dur-base);
+}
+
+@utility duration-slow {
+  --tw-duration: var(--dur-slow);
+  transition-duration: var(--dur-slow);
+}
+
+/*
+ * Deliberately outside any cascade layer: unlayered rules beat every utility, so Thai can never be
+ * uppercased or letter-spaced even if a component says `uppercase` or `tracking-*` (RULES 6.5).
+ * `:lang(th)` matches the element's own language, so lang="en" islands (the wordmark) keep theirs.
+ */
+*:lang(th) {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/*
+ * Reduced motion (DESIGN 7): nothing moves, fades stay at or under 100 ms and carousels never
+ * advance on their own. Transitions are restricted to opacity and colour, which also stops
+ * transform transitions without touching static transforms used for positioning. Durations are
+ * forced for every element, so a literal utility such as duration-500 cannot outlast the limit:
+ * this block is unlayered and therefore beats every utility.
+ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 80ms;
+    --dur-base: 100ms;
+    --dur-slow: 100ms;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto;
+    animation-duration: 1ms;
+    animation-delay: 0s;
+    animation-iteration-count: 1;
+    transition-duration: var(--dur-base);
+    transition-delay: 0s;
+    transition-property:
+      opacity, color, background-color, border-color, text-decoration-color, fill, stroke;
+  }
+}

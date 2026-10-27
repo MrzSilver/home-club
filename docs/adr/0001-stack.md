@@ -90,10 +90,54 @@ Deliberately **not** installed yet (later tasks add them with their own justific
 
 ### Fonts (implemented by T02)
 
-Google Fonts is not reachable from the build environment and RULES §9.5 / §14.4 forbid CDN fonts. Fonts are
-therefore self-hosted: the OFL-licensed `@fontsource/jost`, `@fontsource/inter` and `@fontsource/noto-sans-thai`
-packages (weights 400/500/600; `latin` and `thai` subsets only) are installed from npm and loaded through
-`next/font/local` with `display: swap`. T02 adds those packages and records their resolved versions here.
+Google Fonts is not reachable from the build environment, and RULES §9.5 / §14.4 require open-licensed,
+self-hosted fonts. The fonts are the `@fontsource` npm packages, loaded through `next/font/local`
+(`src/styles/fonts.ts`) so they are served from the site's own origin with `font-display: swap`.
+
+| Role (DESIGN §3)  | Family         | Package (exact version)            | Files used (woff2, from `node_modules/@fontsource/*/files/`)       | Licence |
+| ----------------- | -------------- | ---------------------------------- | ------------------------------------------------------------------ | ------- |
+| Display, wordmark | Jost           | `@fontsource/jost` 5.3.0           | `jost-latin-{400,500,600}-normal.woff2` (about 9 to 10 kB each)    | OFL-1.1 |
+| Body, UI          | Inter          | `@fontsource/inter` 5.3.0          | `inter-latin-{400,500,600}-normal.woff2` (about 23 to 24 kB each)  | OFL-1.1 |
+| Thai (both roles) | Noto Sans Thai | `@fontsource/noto-sans-thai` 5.3.0 | `noto-sans-thai-thai-{400,500,600}-normal.woff2` (about 9 kB each) | OFL-1.1 |
+
+All three are devDependencies: they are build inputs that `next build` copies (hashed) into `.next/static/media`,
+so nothing from them is executed in the browser. Only the `latin` and `thai` subsets and three weights per family
+are used (DESIGN §3: at most three weights). The `.woff` fallbacks and other subsets are never referenced.
+
+- **unicode-range.** Each `@font-face` carries the range @fontsource publishes for its subset. A page only downloads
+  Noto Sans Thai when it actually contains Thai characters (or the baht sign U+0E3F, which the Latin subsets lack),
+  so English pages stay at Jost and Inter.
+- **Stacks.** `next/font` exposes `--font-display`, `--font-body` and `--font-thai` on `<html>`. `tokens.css` builds the
+  stacks from them: Latin family, then Noto Sans Thai, then `system-ui, sans-serif`; under `:lang(th)` Noto Sans Thai
+  comes first. The `fallback` option of `next/font` is not used, because it would insert `system-ui` before Noto Sans
+  Thai and let the OS answer for Thai glyphs.
+- **Layout shift.** `adjustFontFallback: 'Arial'` makes `next/font` emit a size-adjusted local Arial in front of Jost and
+  Inter. It is off for Noto Sans Thai: Arial has no Thai glyphs, so there is no meaningful Arial metric to match.
+- **Preload.** Only Jost (3 files, about 30 kB) is preloaded. Inter and Noto Sans Thai are not.
+  - The performance budget leaves little headroom (about 140 ms TBT median on an empty page; LCP is noisy on the
+    2-CPU build machine). Measured on the temporary page, 2 sets of 3 Lighthouse CI runs per configuration:
+    preloading all three families (about 100 kB) gave LCP 1.87 to 2.00 s in every run; Jost only gave 1.0 to 1.9 s
+    (median-run 1.15 to 1.17 s in the T02 verification); no preload gave 1.0 to 1.9 s. TBT stayed 97 to 188 ms in all three.
+  - With no preload at all, the only layout shift on the page was the Jost display headline swapping in
+    (CLS 0.00067 in all six runs, the headline being the LCP element). Preloading Jost alone removed it (CLS 0 in
+    all runs) with no change in TBT or LCP beyond run-to-run noise.
+  - Inter text is small and its size-adjusted fallback is close, so it swaps in without a measurable shift.
+  - Open point for T03 and later: `next/font` preloads whatever the layout imports, so the preload set cannot depend on
+    the locale. Thai pages will swap system Thai to Noto Sans Thai without preload. Measure CLS on `/th`; if it shows,
+    either preload Noto Sans Thai for both locales (about 27 kB) or split the layouts per locale.
+- **Licence.** SIL Open Font License 1.1 permits embedding and redistribution with the site, provided the licence text
+  travels with the fonts and the fonts are not sold on their own. Each package ships its `LICENSE` file; record the
+  fonts in `docs/ASSETS.md` (RULES §14.1).
+
+### Design scale (implemented by T02)
+
+`src/styles/tokens.css` resets Tailwind's default colour, radius, shadow (also inset and drop shadow), blur,
+breakpoint, container, text-size, tracking, leading, font-family, easing and animation scales, so only DESIGN tokens
+produce utilities: `text-sm`, `leading-tight`, `tracking-wide`, `font-sans`, `ease-in-out`, `animate-spin`,
+`max-w-sm`, `bg-white`, `rounded-xl` and `shadow-md` generate nothing. Type roles are the `.text-*` classes in
+`globals.css`. Deliberately kept because they are open-ended or structural: spacing steps, z-index, opacity,
+transition-duration, font-weight, the `ch`/fixed widths such as `max-w-prose`, and `transparent`/`current`.
+`tests/unit/design-tokens.test.ts` compiles the stylesheet with Tailwind and asserts both lists.
 
 ### Version notes
 

@@ -1,4 +1,182 @@
 /*
- * Design tokens (colour, type, spacing, radius, motion) live here.
- * Task T02 fills this file from DESIGN.md; keep raw values in this file only.
+ * Design tokens (DESIGN.md section 2 to 7). This is the only file that may contain raw colour,
+ * pixel or font values; components and globals.css reference tokens, never literals.
+ *
+ * Structure
+ *  - `@theme static` publishes tokens to Tailwind v4. `static` emits every variable even if no
+ *    utility uses it yet, so the file is also the complete runtime token map. Utilities compile
+ *    to `var(--color-*)` (nothing is inlined), so a future dark theme is one block that overrides
+ *    the `--color-*` variables under a `[data-theme='dark']` selector. No component changes are
+ *    needed as long as components never hard-code a light value (DESIGN 2.2).
+ *  - `:root` holds tokens that should not become Tailwind utilities (type scale, motion, stacks).
+ *
+ * If a colour changes, recompute DESIGN.md 2.3; tests/unit/design-tokens.test.ts enforces it.
  */
+
+@theme static {
+  /*
+   * Remove Tailwind's default design scales so only DESIGN tokens exist: no text-sm/text-2xl,
+   * leading-*, tracking-*, font-sans/mono, ease-in/out, animate-* (spin, ping and pulse loop forever,
+   * which DESIGN 7 forbids), blur or extra shadows. Type roles are the .text-* classes in globals.css;
+   * spacing, z-index, opacity and transition-duration utilities stay because they are open-ended.
+   * Container sizes (max-w-sm ...) are reset too: only max-w-page exists, plus Tailwind's
+   * ch/fixed widths such as max-w-prose.
+   */
+  --color-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+  --blur-*: initial;
+  --breakpoint-*: initial;
+  --container-*: initial;
+  --text-*: initial;
+  --tracking-*: initial;
+  --leading-*: initial;
+  --font-sans: initial;
+  --font-serif: initial;
+  --font-mono: initial;
+  --ease-*: initial;
+  --animate-*: initial;
+
+  /* Colour, light theme (DESIGN 2.1) */
+  --color-canvas: #f7f4ef;
+  --color-surface: #ede6db;
+  --color-ink: #141412;
+  --color-muted: #5e584e;
+  --color-line: #cfc7ba;
+  --color-field: #857c6e;
+  --color-sand: #d6bf9c;
+  --color-forest: #2b372d;
+  --color-danger: #a3261f;
+  --color-success: #2f6b3f;
+  --color-focus: #1f4fd8;
+  --color-overlay: rgb(20 20 18 / 0.45);
+
+  /* Radius (DESIGN 4) */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.25rem;
+  --radius-full: 9999px;
+
+  /* The single elevation token, for floating layers only: drawer, menu (DESIGN 4) */
+  --shadow-float: 0 8px 32px rgb(20 20 18 / 0.12);
+
+  /* Motion easing (DESIGN 7); durations live in :root below */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --default-font-family: var(--stack-body);
+  --default-mono-font-family: ui-monospace, monospace;
+  --default-transition-duration: var(--dur-base);
+  --default-transition-timing-function: var(--ease-standard);
+
+  /*
+   * Spacing: 4px base unit. The DESIGN scale 4, 8, 12, 16, 24, 32, 48, 64, 96, 128 is the Tailwind
+   * steps 1, 2, 3, 4, 6, 8, 12, 16, 24, 32 (for example p-4 = 16px). Prefer those steps.
+   * Named, responsive spacing follows.
+   */
+  --spacing: 0.25rem;
+  --spacing-gutter: var(--gutter);
+  --spacing-section: var(--section-y);
+
+  /* Container and breakpoints (DESIGN 4) */
+  --container-page: 80rem;
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+
+  /* Aspect ratios (DESIGN 4) */
+  --aspect-card: 1 / 1;
+  --aspect-gallery: 4 / 5;
+  --aspect-tile: 16 / 9;
+  --aspect-tile-lg: 3 / 2;
+  --aspect-vibe: 4 / 5;
+  --aspect-vibe-lg: 3 / 4;
+}
+
+:root {
+  color-scheme: light;
+
+  /* Motion durations (DESIGN 7). Reduced-motion overrides are in globals.css. */
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 400ms;
+
+  /* Focus ring (DESIGN 11): 2px ring in --color-focus, 2px offset, on every interactive element */
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+
+  /* Container side padding and section rhythm (DESIGN 4): 16/24/40 and 64/96/128 */
+  --gutter: 1rem;
+  --section-y: 4rem;
+
+  /*
+   * Font stacks. --font-display, --font-body and --font-thai are set on <html> by next/font
+   * (src/styles/fonts.ts). They carry the loaded family plus its metric-adjusted fallback only,
+   * so system-ui must come last here: a system font earlier in the list would answer for Thai
+   * glyphs before Noto Sans Thai gets a chance. Thai text puts Noto Sans Thai first.
+   */
+  --stack-display: var(--font-display), var(--font-thai), system-ui, sans-serif;
+  --stack-body: var(--font-body), var(--font-thai), system-ui, sans-serif;
+  --stack-display-th: var(--font-thai), var(--font-display), system-ui, sans-serif;
+  --stack-body-th: var(--font-thai), var(--font-body), system-ui, sans-serif;
+
+  /* Type scale, fluid between 375px and 1280px viewports (DESIGN 3.1). */
+  --type-display-size: clamp(2.25rem, 1.3177rem + 3.9779vw, 4.5rem);
+  --type-display-leading: 1.05;
+  --type-display-leading-th: 1.25;
+  --type-display-tracking: 0.01em;
+
+  --type-h1-size: clamp(1.75rem, 1.3356rem + 1.768vw, 2.75rem);
+  --type-h1-leading: 1.1;
+  --type-h1-leading-th: 1.3;
+  --type-h1-tracking: 0.02em;
+
+  --type-h2-size: clamp(1.25rem, 1.0428rem + 0.884vw, 1.75rem);
+  --type-h2-leading: 1.2;
+  --type-h2-leading-th: 1.4;
+  --type-h2-tracking: 0.06em;
+
+  --type-h3-size: clamp(1rem, 0.8964rem + 0.442vw, 1.25rem);
+  --type-h3-leading: 1.3;
+  --type-h3-leading-th: 1.5;
+  --type-h3-tracking: 0.04em;
+
+  --type-body-size: 1rem;
+  --type-body-leading: 1.6;
+  --type-body-leading-th: 1.75;
+  --type-body-tracking: 0;
+
+  --type-small-size: 0.875rem;
+  --type-small-leading: 1.5;
+  --type-small-leading-th: 1.65;
+  --type-small-tracking: 0.01em;
+
+  --type-eyebrow-size: clamp(0.6875rem, 0.6616rem + 0.1105vw, 0.75rem);
+  --type-eyebrow-size-th: 0.75rem;
+  --type-eyebrow-leading: 1.4;
+  --type-eyebrow-leading-th: 1.6;
+  --type-eyebrow-tracking: 0.18em;
+
+  --type-button-tracking: 0.14em;
+
+  --type-wordmark-size: clamp(1.25rem, 1.0428rem + 0.884vw, 1.75rem);
+  --type-wordmark-leading: 1;
+  --type-wordmark-tracking: 0.3em;
+  --type-wordmark-sub-size: 0.375em;
+  --type-wordmark-sub-tracking: 0.62em;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --gutter: 1.5rem;
+    --section-y: 6rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --gutter: 2.5rem;
+    --section-y: 8rem;
+  }
+}
