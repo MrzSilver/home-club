@@ -285,7 +285,7 @@ Budgets (enforced in Lighthouse CI and a bundle-size check):
 | INP | < 200 ms |
 | CLS | < 0.1 |
 | TBT (lab) | < 200 ms |
-| First-load JS (gzip) per route | Home ≤ 130 kB · Collection ≤ 130 kB · Product ≤ 150 kB |
+| First-load JS (gzip) per route | Home ≤ 175 kB · Collection ≤ 175 kB · Product ≤ 195 kB total, of which application code ≤ 40 / 40 / 60 kB (ADR-0004: the React 19 + Next 16 runtime alone is ~135 kB) |
 | Hero image | ≤ 150 kB at delivered size (AVIF/WebP) |
 
 Tactics:

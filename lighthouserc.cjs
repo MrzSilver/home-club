@@ -23,9 +23,10 @@ module.exports = {
       },
     },
     assert: {
-      // Judge the median of the runs, not the best one (the default "optimistic" lets 2 of 3
-      // over-budget runs pass). Budgets are release gates (RULES 9.1).
-      aggregationMethod: 'median-run',
+      // Judge the median of each metric across runs (ADR-0004). Not "optimistic" (the default lets
+      // 2 of 3 over-budget runs pass) and not "median-run" (one noisy run decides every metric).
+      // Budgets are release gates (RULES 9.1).
+      aggregationMethod: 'median',
       assertions: {
         'categories:performance': ['error', { minScore: 0.95 }],
         'categories:accessibility': ['error', { minScore: 0.95 }],
