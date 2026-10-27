@@ -21,6 +21,7 @@
     "test:e2e": "playwright test",
     "test:a11y": "playwright test --grep @a11y",
     "lhci": "lhci autorun",
+    "images:generate": "node scripts/generate-placeholders.mjs",
     "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
   },
   "dependencies": {
