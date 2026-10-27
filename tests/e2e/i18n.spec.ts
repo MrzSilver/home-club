@@ -204,11 +204,14 @@ test.describe('translated chrome (FR-004, FR-070)', () => {
     page,
   }) => {
     await page.goto('/en');
+    await page.getByRole('button', { name: 'Open menu' }).click();
     await expect(page.getByText('ไทย', { exact: true })).toHaveAttribute('lang', 'th');
 
     await page.goto('/th');
+    await page.getByRole('button', { name: 'เปิดเมนู' }).click();
     await expect(page.getByText('English', { exact: true })).toHaveAttribute('lang', 'en');
-    const brand = page.locator('[lang="en"]', { hasText: 'Home Club' }).first();
+    await page.keyboard.press('Escape');
+    const brand = page.getByRole('banner').locator('[lang="en"]', { hasText: 'Home Club' }).first();
     await expect(brand).toHaveCSS('text-transform', 'uppercase');
     await expect(page.getByRole('heading', { level: 1 })).toHaveCSS('text-transform', 'none');
   });
@@ -231,7 +234,7 @@ test.describe('pathname on rewritten pages (ADR-0003)', () => {
     ['en', 'th'],
     ['th', 'en'],
   ] as const) {
-    test(`/${locale}: a client island reading usePathname renders public hrefs, in the server HTML and after hydration, with no hydration error`, async ({
+    test(`/${locale}: islands that read usePathname agree between the server HTML and the browser, with no hydration error`, async ({
       page,
       request,
     }) => {
@@ -243,13 +246,16 @@ test.describe('pathname on rewritten pages (ADR-0003)', () => {
       });
       page.on('pageerror', (error) => problems.push(error.message));
 
-      // Server HTML: the rewritten internal path (/en/usd, /th/thb) must not leak into hrefs.
+      // The header island reads the pathname: if the server saw the rewritten path (/usd) it would
+      // disagree with the browser and hydration would fail.
       const html = await (await request.get(`/${locale}`)).text();
-      expect(html).toContain(`href="/${other}"`);
+      expect(html).toContain('data-header-sentinel');
       expect(html).not.toMatch(/href="\/(en|th)\/(usd|thb)/);
 
       await page.goto(`/${locale}`);
       await page.waitForLoadState('networkidle');
+      await expect(page.getByRole('banner')).not.toHaveAttribute('data-past-hero');
+      await page.getByRole('button', { name: locale === 'en' ? 'Open menu' : 'เปิดเมนู' }).click();
       await expect(page.locator(`ul a[lang="${other}"]`)).toHaveAttribute('href', `/${other}`);
       await expect(page.locator(`ul a[lang="${locale}"]`)).toHaveAttribute('href', `/${locale}`);
       await expect(page.locator(`ul a[lang="${locale}"]`)).toHaveAttribute('aria-current', 'true');
@@ -264,6 +270,7 @@ test.describe('pathname on rewritten pages (ADR-0003)', () => {
   }) => {
     await context.addCookies([{ name: 'hc_currency', value: 'THB', url: baseURL ?? '' }]);
     await page.goto('/en');
+    await page.getByRole('button', { name: 'Open menu' }).click();
     await page.locator('ul a[lang="th"]').click();
     await expect(page).toHaveURL(/\/th$/);
     await expect(price(page)).toHaveText(THB_PRICE);

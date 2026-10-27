@@ -41,20 +41,27 @@ test.describe('base styles', () => {
     expect(loaded.some((family) => /inter/i.test(family))).toBe(true);
   });
 
-  test('English pages only fetch the one Noto Sans Thai weight their Thai locale label needs (FR-073)', async ({
+  test('English pages fetch no Noto Sans Thai until the menu shows the Thai locale label, then only one weight (FR-073)', async ({
     page,
   }) => {
     await page.goto(ROUTE);
     await page.evaluate(() => document.fonts.ready);
+    const loadedNoto = (): Promise<string[]> =>
+      page.evaluate(() =>
+        [...document.fonts]
+          .filter((font) => font.status === 'loaded' && /noto/i.test(font.family))
+          .map((font) => font.weight),
+      );
 
-    // The page shows the locale name "ไทย" (lang="th"), which is the only Thai text on /en. The
-    // unicode-range split means no other Noto file is requested.
-    const thaiWeights = await page.evaluate(() =>
-      [...document.fonts]
-        .filter((font) => font.status === 'loaded' && /noto/i.test(font.family))
-        .map((font) => font.weight),
-    );
-    expect(thaiWeights).toEqual(['400']);
+    // The locale name "ไทย" (lang="th") is the only Thai text on /en and it lives in the menu drawer,
+    // so nothing Thai is on the page, and no Noto file is requested, until the drawer opens.
+    expect(await loadedNoto()).toEqual([]);
+
+    await page.getByRole('button', { name: 'Open menu' }).click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    // The unicode-range split means no other Noto file is requested.
+    await expect.poll(loadedNoto).toEqual(['400']);
   });
 
   test('English labels are uppercase and tracked; Thai text is neither (RULES 6.5, FR-073)', async ({

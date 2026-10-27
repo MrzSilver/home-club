@@ -113,7 +113,9 @@ are used (DESIGN §3: at most three weights). The `.woff` fallbacks and other su
   Thai and let the OS answer for Thai glyphs.
 - **Layout shift.** `adjustFontFallback: 'Arial'` makes `next/font` emit a size-adjusted local Arial in front of Jost and
   Inter. It is off for Noto Sans Thai: Arial has no Thai glyphs, so there is no meaningful Arial metric to match.
-- **Preload.** Only Jost (3 files, about 30 kB) is preloaded. Inter and Noto Sans Thai are not.
+- **Preload.** Only Jost is preloaded (Inter and Noto Sans Thai are not). `next/font` preloads every face of a family, so
+  Jost ships only the faces in use: since T06 that is 500 alone (about 10 kB); 400 and 600 were preloaded but unused
+  (about 21 kB per page) and are added back when the hero needs them.
   - The performance budget leaves little headroom (about 140 ms TBT median on an empty page; LCP is noisy on the
     2-CPU build machine). Measured on the temporary page, 2 sets of 3 Lighthouse CI runs per configuration:
     preloading all three families (about 100 kB) gave LCP 1.87 to 2.00 s in every run; Jost only gave 1.0 to 1.9 s

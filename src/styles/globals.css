@@ -41,6 +41,17 @@
     outline-offset: var(--focus-ring-offset);
   }
 
+  /*
+   * Dark and over-photography surfaces (the transparent header, forest or ink sections): the default
+   * ring is 2.8:1 on ink and 1.9:1 on forest there, below the 3:1 minimum. Mark the surface with
+   * `data-on-dark` and every control inside, or the surface itself, gets the light ring (DESIGN 2.3).
+   * Never put it on a light surface: it is 1.8:1 on canvas.
+   */
+  [data-on-dark]:focus-visible,
+  [data-on-dark] :focus-visible {
+    outline-color: var(--color-focus-on-dark);
+  }
+
   button:not(:disabled):not([aria-disabled='true']),
   [role='button']:not([aria-disabled='true']),
   summary {
@@ -178,6 +189,77 @@
     letter-spacing: var(--type-wordmark-sub-tracking);
   }
 
+  /*
+   * Letter-spacing is added after the last letter too, which pushes a centred lockup half a tracking
+   * step to the left. A negative end margin of the same size takes that trailing space back.
+   */
+  .wordmark-line {
+    margin-inline-end: calc(-1 * var(--type-wordmark-tracking));
+  }
+
+  .wordmark-line-sub {
+    margin-inline-end: calc(-1 * var(--type-wordmark-sub-tracking));
+  }
+
+  /*
+   * Site header (DESIGN 5.2). Solid ink-on-canvas by default. A page that opens with a hero carries an
+   * element with `data-header-sentinel` at the hero's bottom edge; the stylesheet sees it through
+   * `:has()`, so the transparent state is right in the server HTML, with no path list to keep in sync.
+   * The scroll island only adds `data-past-hero` once that edge has scrolled under the header.
+   */
+  .site-header {
+    height: var(--header-height);
+    color: var(--color-ink);
+  }
+
+  .site-header-solid {
+    opacity: 1;
+  }
+
+  .site-header-scrim {
+    opacity: 0;
+  }
+
+  body:has([data-header-sentinel]) .site-header {
+    /* The hero slides under the header instead of being pushed down by it. */
+    margin-bottom: calc(-1 * var(--header-height));
+  }
+
+  body:has([data-header-sentinel]) .site-header:not([data-past-hero]) {
+    color: var(--color-canvas);
+
+    & .site-header-solid {
+      opacity: 0;
+    }
+
+    & .site-header-scrim {
+      opacity: 1;
+    }
+
+    & :focus-visible {
+      outline-color: var(--color-focus-on-dark);
+    }
+  }
+
+  /* Drawer and scrim (Radix Dialog keeps the node mounted until the animation ends). */
+  .drawer-overlay {
+    &[data-state='open'] {
+      animation: fade-in var(--dur-base) var(--ease-standard);
+    }
+    &[data-state='closed'] {
+      animation: fade-out var(--dur-base) var(--ease-standard);
+    }
+  }
+
+  .drawer-panel-start {
+    &[data-state='open'] {
+      animation: slide-in-start var(--dur-slow) var(--ease-standard);
+    }
+    &[data-state='closed'] {
+      animation: slide-out-start var(--dur-base) var(--ease-standard);
+    }
+  }
+
   /* English labels are uppercase; Thai keeps normal case (RULES 6.5). */
   .uppercase-latin:lang(en) {
     text-transform: uppercase;
@@ -205,6 +287,14 @@
   }
 }
 
+/* Focus ring on a wrapper whose real focus target is a visually hidden input (segmented radios). */
+@utility focus-ring-within {
+  &:has(:focus-visible) {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+}
+
 @utility duration-fast {
   --tw-duration: var(--dur-fast);
   transition-duration: var(--dur-fast);
@@ -218,6 +308,31 @@
 @utility duration-slow {
   --tw-duration: var(--dur-slow);
   transition-duration: var(--dur-slow);
+}
+
+/* Keyframes animate opacity and transform only (DESIGN 7). */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slide-in-start {
+  from {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes slide-out-start {
+  to {
+    transform: translateX(-100%);
+  }
 }
 
 /*

@@ -64,7 +64,7 @@ home-club/
 │  │  ├─ layout.tsx             # pass-through root layout (html lives in [locale]/layout)
 │  │  ├─ not-found.tsx          # bilingual server-rendered 404 for every unknown URL
 │  │  └─ [locale]/
-│  │     ├─ layout.tsx          # html lang, fonts, providers, skip link (header/footer: T06)
+│  │     ├─ layout.tsx          # html lang, fonts, providers, skip link, Header, Footer
 │  │     └─ [currency]/         # HIDDEN segment: usd | thb. Never in a public URL (ADR-0003)
 │  │        ├─ layout.tsx       # validates the segment
 │  │        ├─ page.tsx         # Home
@@ -257,7 +257,9 @@ Behaviour:
 | `LookBuilder` | Client | Four `LookSlot`s, `LookSummary`, atomic add |
 | `LocaleSwitcher` / `CurrencySwitcher` | Client | Real links/buttons; announce change |
 
-UI primitives wrap accessible patterns (prefer a headless library such as Radix UI for Dialog/Drawer/Popover instead of hand-rolling focus management).
+UI primitives wrap accessible patterns. Dialog/Drawer/Popover use Radix UI (`@radix-ui/react-dialog`, ADR-0005), loaded on demand (`next/dynamic`) so overlay code stays off the first-load path; never hand-roll focus management.
+
+Shell as built (T06): `Header` is a server component inside the locale layout; its client islands are `HeaderSurface` (transparent over a hero, solid after; transparency comes from CSS `body:has([data-header-sentinel])` so the server HTML is already right, and the island only flags `data-past-hero` via an IntersectionObserver) and `MobileNav` (hamburger at every viewport size; the drawer holds the main links, `LocaleSwitcher` and `CurrencySwitcher`). `Footer` is a server component; the newsletter form is server HTML whose interactive island loads on first focus, press or submit. `LocaleSwitcher` and `CurrencySwitcher` live in the menu drawer; the currency switcher reads the current value from the route segment with `useParams`, so it needs no cookie read and no store.
 
 ## 10. SEO and structured data
 

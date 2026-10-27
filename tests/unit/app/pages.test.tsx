@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { createTranslator, NextIntlClientProvider } from 'next-intl';
 import type { ReactElement } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -23,15 +23,6 @@ vi.mock('next-intl/server', () => ({
         namespace: namespace as never,
       }),
     ),
-}));
-
-// LocaleLinks (a client island) reads the router. The page runs behind the proxy rewrite, so the
-// server-side pathname still carries the currency segment, exactly as on a prerendered page.
-vi.mock('next/navigation', async (importOriginal) => ({
-  ...(await importOriginal<Record<string, unknown>>()),
-  usePathname: () => '/en/usd',
-  useRouter: () => ({}),
-  useParams: () => ({}),
 }));
 
 async function renderPage(locale: 'en' | 'th', currency: string): Promise<void> {
@@ -76,26 +67,19 @@ describe('temporary home page (FR-070, FR-071, FR-072)', () => {
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 
-  it('renders the Thai h1 and tags the locale names and the Latin wordmark with their own lang', async () => {
+  it('renders the Thai h1 from the catalogue and leaves the chrome to the layout', async () => {
     await renderPage('th', 'thb');
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(th.home.title);
-
-    const names = within(screen.getByRole('list'));
-    expect(names.getByText('English')).toHaveAttribute('lang', 'en');
-    expect(names.getByText('ไทย')).toHaveAttribute('lang', 'th');
-    expect(screen.getByText(en.common.wordmark.name).closest('[lang]')).toHaveAttribute(
-      'lang',
-      'en',
-    );
+    // The header and footer come from the locale layout, never from a page.
+    expect(screen.queryByRole('banner')).not.toBeInTheDocument();
+    expect(screen.queryByRole('contentinfo')).not.toBeInTheDocument();
   });
 
-  it('links to the same public page in each locale without the currency segment (usePathname wrapper)', async () => {
+  it('marks the bottom edge of its dark intro band for the transparent header', async () => {
     await renderPage('en', 'usd');
-    const names = within(screen.getByRole('list'));
-    expect(names.getByRole('link', { name: 'English' })).toHaveAttribute('href', '/en');
-    expect(names.getByRole('link', { name: 'ไทย' })).toHaveAttribute('href', '/th');
-    expect(names.getByRole('link', { name: 'English' })).toHaveAttribute('aria-current', 'true');
-    expect(names.getByRole('link', { name: 'ไทย' })).not.toHaveAttribute('aria-current');
+    const sentinel = document.querySelector('[data-header-sentinel]');
+    expect(sentinel).toBeInTheDocument();
+    expect(sentinel).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('never renders an unlisted locale or currency on demand', () => {

@@ -3,8 +3,6 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { ReactElement } from 'react';
 
 import { Container } from '@/components/ui/container';
-import { LocaleLinks } from '@/components/ui/locale-links';
-import { Wordmark } from '@/components/ui/wordmark';
 import { localeFromParam, resolveRouteParams } from '@/i18n/params';
 import { languageAlternates } from '@/lib/locale-path';
 import { convertFromUsdCents, formatMoney } from '@/lib/money';
@@ -30,7 +28,6 @@ export default async function HomePage({ params }: HomePageProps): Promise<React
   const { locale, currency } = await resolveRouteParams(params);
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: 'home' });
-  const common = await getTranslations({ locale, namespace: 'common' });
   const price = formatMoney(
     convertFromUsdCents(SAMPLE_PRICE_USD_CENTS, currency),
     currency,
@@ -39,23 +36,25 @@ export default async function HomePage({ params }: HomePageProps): Promise<React
 
   return (
     <main id="main">
+      {/*
+        Stand-in for T07's hero: a dark band the transparent header sits over. The sentinel marks the
+        hero's bottom edge; once it scrolls away the header turns solid (components/layout/header-surface).
+      */}
+      <section className="bg-forest pt-24 pb-16 text-canvas md:pt-32 md:pb-24">
+        <Container>
+          <p className="text-eyebrow uppercase-latin">{t('eyebrow')}</p>
+          <h1 className="mt-2 max-w-prose text-display uppercase-latin">{t('title')}</h1>
+          <p className="mt-4 max-w-prose text-body">{t('intro')}</p>
+        </Container>
+        <div data-header-sentinel="" aria-hidden="true" className="h-px" />
+      </section>
       <Container className="py-section">
-        <Wordmark
-          name={common('wordmark.name')}
-          descriptor={common('wordmark.descriptor')}
-          align="start"
-        />
-        <p className="mt-8 text-eyebrow uppercase-latin text-muted">{t('eyebrow')}</p>
-        <h1 className="mt-2 max-w-prose text-display uppercase-latin">{t('title')}</h1>
-        <p className="mt-4 max-w-prose text-body text-muted">{t('intro')}</p>
-        <p className="mt-6 text-body">
+        <p className="text-body">
           <span className="text-muted">{t('samplePriceLabel')}</span>{' '}
           <span data-testid="sample-price" data-currency={currency} className="font-semibold">
             {price}
           </span>
         </p>
-        <p className="mt-6 text-body text-muted">{common('locale.label')}</p>
-        <LocaleLinks labels={{ en: common('locale.en'), th: common('locale.th') }} />
       </Container>
     </main>
   );

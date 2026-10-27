@@ -35,5 +35,53 @@
     "title": "We could not find that page",
     "body": "The page may have moved, or the address may be mistyped.",
     "backHome": "Back to the home page"
+  },
+  "nav": {
+    "homeLink": "Home Club Foundation, home page",
+    "menu": {
+      "open": "Open menu",
+      "close": "Close menu",
+      "title": "Menu",
+      "mainLabel": "Main"
+    },
+    "links": {
+      "home": "Home",
+      "shopAll": "Shop all",
+      "categoriesHeading": "Shop by category"
+    },
+    "search": {
+      "label": "Search",
+      "reason": "Search is coming soon."
+    },
+    "cart": {
+      "label": "Cart",
+      "reason": "The cart is coming soon."
+    },
+    "currencyChanged": {
+      "USD": "Prices are now shown in US dollars (USD).",
+      "THB": "Prices are now shown in Thai baht (THB)."
+    }
+  },
+  "footer": {
+    "navLabel": "Footer",
+    "tagline": "Your vibe. Our club. Welcome to Home Club.",
+    "newsletter": {
+      "title": "Join the Club",
+      "description": "Occasional notes on new pieces. This is a demo: nothing is sent or stored.",
+      "emailLabel": "Email address",
+      "submit": "Join the Club",
+      "errors": {
+        "required": "Enter your email address.",
+        "invalid": "Enter a valid email address, like name@example.com."
+      },
+      "success": "Thanks — this is a demo, nothing was sent."
+    },
+    "legal": {
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "note": "Placeholders: this demo store has no legal pages."
+    },
+    "demoNotice": "Demo store — nothing is sold. No payment is taken.",
+    "copyright": "© {year} Home Club Foundation. A demo project."
   }
 }

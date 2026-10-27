@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
+  buildCurrencyCookie,
   CURRENCIES,
+  CURRENCY_COOKIE_MAX_AGE,
   CURRENCY_COOKIE,
   CURRENCY_SEGMENTS,
   currencyToSegment,
   defaultCurrencyFor,
   parseCurrency,
+  readCurrencyCookie,
   resolveCurrency,
   segmentToCurrency,
 } from '@/lib/currency';
@@ -59,5 +62,45 @@ describe('currency cookie and resolution (SPEC 6, FR-002, owner decision 8)', ()
     expect(resolveCurrency(undefined, 'en')).toBe('USD');
     expect(resolveCurrency(undefined, 'th')).toBe('THB');
     expect(resolveCurrency('garbage', 'th')).toBe('THB');
+  });
+});
+
+describe('buildCurrencyCookie (FR-002)', () => {
+  it('stores the currency for a year, site-wide, SameSite=Lax', () => {
+    expect(buildCurrencyCookie('THB')).toBe(
+      `hc_currency=THB; Path=/; Max-Age=${CURRENCY_COOKIE_MAX_AGE}; SameSite=Lax`,
+    );
+    expect(CURRENCY_COOKIE_MAX_AGE).toBe(31_536_000);
+  });
+
+  it('adds Secure only when asked, so http localhost keeps working', () => {
+    expect(buildCurrencyCookie('USD')).not.toContain('Secure');
+    expect(buildCurrencyCookie('USD', { secure: true })).toMatch(/; Secure$/);
+  });
+
+  it('round-trips through the proxy resolver', () => {
+    const value = buildCurrencyCookie('THB').split(';')[0]?.split('=')[1];
+    expect(resolveCurrency(value, 'en')).toBe('THB');
+  });
+});
+
+describe('readCurrencyCookie', () => {
+  it.each([
+    ['hc_currency=THB', 'THB'],
+    ['a=1; hc_currency=USD; b=2', 'USD'],
+    ['  hc_currency=THB  ', 'THB'],
+  ])('reads %j as %s', (cookies, expected) => {
+    expect(readCurrencyCookie(cookies)).toBe(expected);
+  });
+
+  it.each([
+    [''],
+    ['a=1; b=2'],
+    ['hc_currency=EUR'],
+    ['hc_currency='],
+    ['xhc_currency=THB'],
+    ['hc_currency=thb'],
+  ])('ignores %j', (cookies) => {
+    expect(readCurrencyCookie(cookies)).toBeNull();
   });
 });

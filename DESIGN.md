@@ -33,6 +33,7 @@ All tokens are CSS variables in `src/styles/tokens.css`, exposed to Tailwind. **
 | `--color-danger` | `#A3261F` | Errors |
 | `--color-success` | `#2F6B3F` | Confirmations |
 | `--color-focus` | `#1F4FD8` | Focus ring (2 px + 2 px offset) |
+| `--color-focus-on-dark` | `#9DB8FF` | Focus ring on ink, forest and photography (transparent header, dark sections). Applied by putting `data-on-dark` on the surface |
 | `--color-overlay` | `rgb(20 20 18 / 0.45)` | Scrim over photography for text |
 
 Product swatch colours (`sand`, `black`, `forest`, `grey`, `white`) come from catalogue data, not from tokens. Swatches always have a 1 px `--color-field` ring so light colours stay visible.
@@ -53,6 +54,10 @@ Out of scope for P1–P4. Tokens are structured so a `[data-theme="dark"]` map c
 | danger on canvas | 6.7:1 | AA text |
 | success on canvas | 5.8:1 | AA text |
 | focus on canvas | 6.0:1 | AA non-text |
+| focus-on-dark on ink | 9.4:1 | AA non-text |
+| focus-on-dark on forest | 6.4:1 | AA non-text |
+| `--color-focus` on ink / forest | 2.8:1 / 1.9:1 | Fails (< 3:1): never use the default ring on dark surfaces |
+| focus-on-dark on canvas | 1.8:1 | Fails: the light ring must never be used on a light surface |
 | field border on canvas / surface | 3.8:1 / 3.3:1 | AA non-text (≥ 3:1) |
 | white text on `--color-overlay` over photography | Verify per image (see §9) | — |
 
@@ -108,6 +113,7 @@ Hover: invert or shift tone ≤ 8%; no scale jumps. Disabled: 40% opacity + `ari
 
 ### 5.2 Header
 Transparent over hero (text `canvas`), switches to `canvas` background + `ink` text once scrolled past the hero or on non-hero pages. Hamburger left, wordmark centred, search and cart right. Cart badge: 16–18 px pill, `ink` on `canvas` over hero / inverse when solid. Height 64 (mobile) / 80 (desktop).
+Built (T06): the hamburger stays at every viewport size, as in the mock-up; it opens a left drawer with Home, Shop all, the four categories, the language links and the currency radios. The same category links are real links in the footer, which is also the no-JavaScript way into the catalogue. A page that opens with a hero puts an element with `data-header-sentinel` on the hero's bottom edge; the stylesheet reads it with `body:has([data-header-sentinel])`, so the header is transparent (canvas text, top-to-transparent `--color-overlay` scrim, light focus ring from §2.3) in the server HTML, and the hero slides under it. A small island sets `data-past-hero` once that edge has scrolled up under the header, which turns it solid canvas/ink. Pages without a sentinel are solid from the first paint. Without JavaScript a hero page keeps the transparent header, so the hero must be taller than the viewport. Search and cart are present but inert (`aria-disabled`, still focusable, with a spoken reason, 8 px apart) until their features exist; the cart badge box is reserved so the count adds no layout shift. The lockup gives back its trailing letter-spacing (`wordmark-line`) so it is optically centred, and its sub-line is at least 11 px.
 
 ### 5.3 Hero
 Full-bleed photograph, text block bottom-left, headline in `text-display` uppercase with a bolder first line and lighter second line (as in the mock-up), single on-image button, slide indicators bottom-left (three short bars; active is longer/solid). A rounded-top content sheet overlaps the hero's lower edge. Text must sit on a scrim (`--color-overlay` gradient) that keeps contrast ≥ 4.5:1 for the headline.

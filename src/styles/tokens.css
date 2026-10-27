@@ -51,6 +51,8 @@
   --color-danger: #a3261f;
   --color-success: #2f6b3f;
   --color-focus: #1f4fd8;
+  /* Focus ring on ink, forest and photography (DESIGN 2.3): --color-focus is too dark there. */
+  --color-focus-on-dark: #9db8ff;
   --color-overlay: rgb(20 20 18 / 0.45);
 
   /* Radius (DESIGN 4) */
@@ -110,6 +112,9 @@
   --gutter: 1rem;
   --section-y: 4rem;
 
+  /* Site header height (DESIGN 5.2): 64 / 80 */
+  --header-height: 4rem;
+
   /*
    * Font stacks. --font-display, --font-body and --font-thai are set on <html> by next/font
    * (src/styles/fonts.ts). They carry the loaded family plus its metric-adjusted fallback only,
@@ -163,7 +168,8 @@
   --type-wordmark-size: clamp(1.25rem, 1.0428rem + 0.884vw, 1.75rem);
   --type-wordmark-leading: 1;
   --type-wordmark-tracking: 0.3em;
-  --type-wordmark-sub-size: 0.375em;
+  /* Fixed, not relative to the name: 7.5px on mobile was unreadable. 11px mobile, 12px desktop. */
+  --type-wordmark-sub-size: clamp(0.6875rem, 0.6616rem + 0.1105vw, 0.75rem);
   --type-wordmark-sub-tracking: 0.62em;
 }
 
@@ -171,6 +177,7 @@
   :root {
     --gutter: 1.5rem;
     --section-y: 6rem;
+    --header-height: 5rem;
   }
 }
 

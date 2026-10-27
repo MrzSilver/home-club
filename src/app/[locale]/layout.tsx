@@ -3,6 +3,8 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { ReactElement, ReactNode } from 'react';
 
+import { Footer } from '@/components/layout/footer';
+import { Header } from '@/components/layout/header';
 import { SkipLink } from '@/components/ui/skip-link';
 import type { Locale } from '@/data/schema';
 import { localeFromParam } from '@/i18n/params';
@@ -48,13 +50,15 @@ export default async function LocaleLayout({
     <html lang={locale} className={fontVariables}>
       <body>
         {/*
-          Gives client components (the i18n Link, later the header islands) their locale. Messages stay
+          Gives client components (the i18n Link, the header and footer islands) their locale. Messages stay
           out of the client bundle: a client component that needs strings receives just those
           (`messages={pick(...)}` on its own provider, or props).
         */}
         <NextIntlClientProvider locale={locale} messages={{}}>
           <SkipLink label={t('skipToContent')} />
+          <Header locale={locale} />
           {children}
+          <Footer locale={locale} />
         </NextIntlClientProvider>
       </body>
     </html>

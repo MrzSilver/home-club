@@ -13,22 +13,15 @@ import localFont from 'next/font/local';
 // swap from fallback to web font does not shift layout.
 
 // Display and wordmark: Jost. The only preloaded family (ADR-0001 "Fonts"): it draws the hero headline,
-// so preloading removes the swap shift there for about 30 kB.
+// so preloading removes the swap shift there. Only the 500 face exists for now: every display role,
+// the wordmark and the hero use weight 500, and next/font preloads every face of a family, so the
+// unused 400 and 600 cost about 21 kB per page for nothing. T07 adds a face back when the hero's
+// lighter second line (DESIGN 5.3) or a bolder first line really needs one.
 export const jost = localFont({
   src: [
     {
-      path: '../../node_modules/@fontsource/jost/files/jost-latin-400-normal.woff2',
-      weight: '400',
-      style: 'normal',
-    },
-    {
       path: '../../node_modules/@fontsource/jost/files/jost-latin-500-normal.woff2',
       weight: '500',
-      style: 'normal',
-    },
-    {
-      path: '../../node_modules/@fontsource/jost/files/jost-latin-600-normal.woff2',
-      weight: '600',
       style: 'normal',
     },
   ],

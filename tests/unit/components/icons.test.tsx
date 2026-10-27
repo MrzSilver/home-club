@@ -11,6 +11,7 @@ import { ChevronRightIcon } from '@/components/ui/icons/chevron-right-icon';
 import { CloseIcon } from '@/components/ui/icons/close-icon';
 import { GlobeIcon } from '@/components/ui/icons/globe-icon';
 import type { IconProps } from '@/components/ui/icons/icon-base';
+import { InfoIcon } from '@/components/ui/icons/info-icon';
 import { LeafIcon } from '@/components/ui/icons/leaf-icon';
 import { MenuIcon } from '@/components/ui/icons/menu-icon';
 import { MinusIcon } from '@/components/ui/icons/minus-icon';
@@ -37,6 +38,7 @@ const ICONS: Array<[string, (props: IconProps) => ReactElement]> = [
   ['leaf', LeafIcon],
   ['truck', TruckIcon],
   ['globe', GlobeIcon],
+  ['info', InfoIcon],
 ];
 
 describe.each(ICONS)('%s icon', (_name, Icon) => {

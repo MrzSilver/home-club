@@ -14,7 +14,7 @@ module.exports = {
       startServerReadyPattern: 'Ready',
       startServerReadyTimeout: 60000,
       url: ROUTES.map((route) => `${BASE_URL}${route}`),
-      numberOfRuns: 3,
+      numberOfRuns: 5,
       settings: {
         // Lighthouse's default is the mobile preset (Moto G Power emulation, slow 4G throttling).
         formFactor: 'mobile',

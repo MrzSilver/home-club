@@ -2,6 +2,7 @@
 import { NextRequest } from 'next/server';
 import { describe, expect, it } from 'vitest';
 
+import { LOCALE_COOKIE_MAX_AGE } from '@/i18n/routing';
 import { config, proxy } from '@/proxy';
 
 const ORIGIN = 'http://localhost:3000';
@@ -69,6 +70,21 @@ describe('proxy: currency rewrite (FR-072, ADR-0003)', () => {
     expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=th');
     // The rewrite header replaced next-intl's pass-through marker.
     expect(response.headers.get('x-middleware-next')).toBeNull();
+  });
+
+  it('keeps the locale choice for a year (FR-002): a persistent, site-wide, SameSite=Lax cookie', () => {
+    const cookie = proxy(request('/th/shop')).headers.get('set-cookie') ?? '';
+    expect(cookie).toContain('NEXT_LOCALE=th');
+    expect(cookie).toContain('Path=/');
+    expect(cookie).toMatch(/SameSite=lax/i);
+    expect(cookie).toContain(`Max-Age=${LOCALE_COOKIE_MAX_AGE}`);
+    expect(LOCALE_COOKIE_MAX_AGE).toBe(31_536_000);
+    // Not a session cookie: it also has an absolute expiry about a year away.
+    const expires = /Expires=([^;]+)/i.exec(cookie)?.[1];
+    expect(expires).toBeDefined();
+    const days = (Date.parse(expires ?? '') - Date.now()) / 86_400_000;
+    expect(days).toBeGreaterThan(360);
+    expect(days).toBeLessThan(366);
   });
 
   it('forwards the original request headers (cookie included) to the rewritten request', () => {

@@ -50,6 +50,7 @@ describe('colour tokens (DESIGN 2.1)', () => {
       danger: '#a3261f',
       success: '#2f6b3f',
       focus: '#1f4fd8',
+      'focus-on-dark': '#9db8ff',
     });
   });
 
@@ -76,6 +77,20 @@ const CONTRAST_TABLE: ReadonlyArray<{
   { name: 'danger on canvas', foreground: 'danger', background: 'canvas', listed: 6.7, min: 4.5 },
   { name: 'success on canvas', foreground: 'success', background: 'canvas', listed: 5.8, min: 4.5 },
   { name: 'focus on canvas', foreground: 'focus', background: 'canvas', listed: 6.0, min: 3 },
+  {
+    name: 'focus-on-dark on ink',
+    foreground: 'focus-on-dark',
+    background: 'ink',
+    listed: 9.4,
+    min: 3,
+  },
+  {
+    name: 'focus-on-dark on forest',
+    foreground: 'focus-on-dark',
+    background: 'forest',
+    listed: 6.4,
+    min: 3,
+  },
   { name: 'field on canvas', foreground: 'field', background: 'canvas', listed: 3.8, min: 3 },
   { name: 'field on surface', foreground: 'field', background: 'surface', listed: 3.3, min: 3 },
 ];
@@ -154,6 +169,34 @@ describe('Thai and motion rules in globals.css (RULES 6.5, DESIGN 7)', () => {
       const block = globalsCss.match(new RegExp(`\\.text-${role}\\s*\\{[\\s\\S]*?\\n  \\}\\n`));
       expect(block?.[0], `.text-${role}`).toContain('&:lang(th)');
     }
+  });
+
+  it('swaps in the light focus ring inside [data-on-dark] surfaces and on the surface itself', () => {
+    const block = globalsCss.match(
+      /\[data-on-dark\]:focus-visible,\s*\[data-on-dark\] :focus-visible\s*\{([^}]*)\}/,
+    );
+
+    expect(block?.[1]).toMatch(/outline-color:\s*var\(--color-focus-on-dark\)/);
+  });
+
+  it('keeps the wordmark sub-line readable on mobile: at least 11px, not relative to the name', () => {
+    expect(tokensCss).toMatch(/--type-wordmark-sub-size:\s*clamp\(0\.6875rem,/);
+    expect(globalsCss).toMatch(
+      /\.wordmark-line\s*\{[^}]*margin-inline-end:\s*calc\(-1 \* var\(--type-wordmark-tracking\)\)/,
+    );
+    expect(globalsCss).toMatch(
+      /\.wordmark-line-sub\s*\{[^}]*calc\(-1 \* var\(--type-wordmark-sub-tracking\)\)/,
+    );
+  });
+
+  it('makes the header transparent from the page itself (:has sentinel), with the light ring, and solid otherwise', () => {
+    expect(globalsCss).toMatch(
+      /body:has\(\[data-header-sentinel\]\) \.site-header:not\(\[data-past-hero\]\)\s*\{[\s\S]*?color:\s*var\(--color-canvas\)[\s\S]*?outline-color:\s*var\(--color-focus-on-dark\)/,
+    );
+    expect(globalsCss).toMatch(/\.site-header\s*\{[^}]*color:\s*var\(--color-ink\)/);
+    expect(globalsCss).toMatch(/margin-bottom:\s*calc\(-1 \* var\(--header-height\)\)/);
+    expect(tokensCss).toMatch(/--header-height:\s*4rem/);
+    expect(tokensCss).toMatch(/--header-height:\s*5rem/);
   });
 
   it('has a visible focus-visible ring and reduced-motion handling', () => {

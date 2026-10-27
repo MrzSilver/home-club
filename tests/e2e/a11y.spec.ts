@@ -29,3 +29,31 @@ for (const route of ROUTES) {
     },
   );
 }
+
+// The menu drawer is part of every page (T06): axe sweeps it open, in both locales.
+for (const locale of ['en', 'th'] as const) {
+  test(
+    `axe: /${locale} with the menu open has no critical or serious violations`,
+    { tag: '@a11y' },
+    async ({ page }) => {
+      await page.goto(`/${locale}`);
+      await page.getByRole('button', { name: locale === 'en' ? 'Open menu' : 'เปิดเมนู' }).click();
+      await expect(page.getByRole('dialog')).toBeVisible();
+
+      const results = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+        .analyze();
+
+      const blocking = results.violations.filter(
+        (violation) => violation.impact === 'critical' || violation.impact === 'serious',
+      );
+      expect(
+        blocking.map((violation) => ({
+          id: violation.id,
+          impact: violation.impact,
+          nodes: violation.nodes.length,
+        })),
+      ).toEqual([]);
+    },
+  );
+}

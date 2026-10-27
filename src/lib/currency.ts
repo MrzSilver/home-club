@@ -39,3 +39,37 @@ export function segmentToCurrency(segment: unknown): Currency | null {
 export function resolveCurrency(cookieValue: unknown, locale: Locale): Currency {
   return parseCurrency(cookieValue) ?? defaultCurrencyFor(locale);
 }
+
+/** One year, in seconds: the currency choice is a preference, not a session. */
+export const CURRENCY_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
+
+/**
+ * Value for `document.cookie` that stores the visitor's currency (SPEC 6). Not personal data; not
+ * HttpOnly because the switcher writes it from the browser. `Secure` is only added over https, so
+ * local `next start` over http keeps working.
+ */
+export function buildCurrencyCookie(
+  currency: Currency,
+  options: { secure?: boolean } = {},
+): string {
+  const parts = [
+    `${CURRENCY_COOKIE}=${currency}`,
+    'Path=/',
+    `Max-Age=${CURRENCY_COOKIE_MAX_AGE}`,
+    'SameSite=Lax',
+  ];
+  if (options.secure === true) parts.push('Secure');
+  return parts.join('; ');
+}
+
+/**
+ * The currency stored in a `document.cookie` string, or null when absent or invalid. The cookie is
+ * untrusted input like any other, so the value goes through `parseCurrency`.
+ */
+export function readCurrencyCookie(cookieString: string): Currency | null {
+  for (const part of cookieString.split(';')) {
+    const [name, ...rest] = part.trim().split('=');
+    if (name === CURRENCY_COOKIE) return parseCurrency(rest.join('='));
+  }
+  return null;
+}

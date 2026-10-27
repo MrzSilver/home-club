@@ -23,4 +23,11 @@ describe('Wordmark (FR-073)', () => {
 
     expect(container.querySelectorAll('span > span')).toHaveLength(1);
   });
+
+  it("gives back each line's trailing letter-spacing so the lockup is optically centred", () => {
+    render(<Wordmark name="Home Club" descriptor="Foundation" />);
+
+    expect(screen.getByText('Home Club')).toHaveClass('wordmark-line');
+    expect(screen.getByText('Foundation')).toHaveClass('wordmark-line-sub');
+  });
 });
