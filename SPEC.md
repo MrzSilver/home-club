@@ -59,26 +59,29 @@ home-club/
 │  ├─ en.json
 │  └─ th.json
 ├─ src/
+│  ├─ proxy.ts                  # next-intl locale routing + hidden currency rewrite (ADR-0003)
 │  ├─ app/
+│  │  ├─ layout.tsx             # pass-through root layout (html lives in [locale]/layout)
+│  │  ├─ not-found.tsx          # bilingual server-rendered 404 for every unknown URL
 │  │  └─ [locale]/
-│  │     ├─ layout.tsx          # html lang, fonts, providers, header/footer
-│  │     ├─ page.tsx            # Home
-│  │     ├─ shop/page.tsx       # All products
-│  │     ├─ collections/[category]/page.tsx
-│  │     ├─ products/[slug]/page.tsx
-│  │     ├─ looks/page.tsx      # Look builder (index of looks)
-│  │     ├─ looks/[slug]/page.tsx
-│  │     ├─ vibes/page.tsx
-│  │     ├─ vibes/[slug]/page.tsx
-│  │     ├─ journal/page.tsx
-│  │     ├─ journal/[slug]/page.tsx
-│  │     ├─ search/page.tsx
-│  │     ├─ cart/page.tsx
-│  │     ├─ checkout/page.tsx
-│  │     ├─ checkout/success/page.tsx
-│  │     ├─ case-study/page.tsx
-│  │     └─ not-found.tsx
-│  ├─ app/sitemap.ts  app/robots.ts  app/manifest.ts
+│  │     ├─ layout.tsx          # html lang, fonts, providers, skip link (header/footer: T06)
+│  │     └─ [currency]/         # HIDDEN segment: usd | thb. Never in a public URL (ADR-0003)
+│  │        ├─ layout.tsx       # validates the segment
+│  │        ├─ page.tsx         # Home
+│  │        ├─ shop/page.tsx       # All products
+│  │        ├─ collections/[category]/page.tsx
+│  │        ├─ products/[slug]/page.tsx
+│  │        ├─ looks/page.tsx      # Look builder (index of looks)
+│  │        ├─ looks/[slug]/page.tsx
+│  │        ├─ vibes/page.tsx
+│  │        ├─ vibes/[slug]/page.tsx
+│  │        ├─ journal/page.tsx
+│  │        ├─ journal/[slug]/page.tsx
+│  │        ├─ search/page.tsx
+│  │        ├─ cart/page.tsx
+│  │        ├─ checkout/page.tsx
+│  │        ├─ checkout/success/page.tsx
+│  │        └─ case-study/page.tsx
 │  ├─ components/
 │  │  ├─ ui/                    # primitives: Button, Badge, Swatch, Dialog, Drawer…
 │  │  ├─ layout/                # Header, Footer, MobileNav, LocaleSwitcher, CurrencySwitcher
@@ -98,11 +101,13 @@ home-club/
 │  │  ├─ catalogue.ts           # filter/sort/query helpers
 │  │  ├─ search.ts
 │  │  ├─ seo.ts                 # metadata + JSON-LD builders
+│  │  ├─ locale-path.ts         # public <-> internal (currency segment) path helpers, hreflang paths
+│  │  ├─ currency.ts            # cookie name, segment <-> currency, defaults
 │  │  └─ env.ts                 # validated env
 │  ├─ store/
 │  │  ├─ cart.ts  preferences.ts
 │  ├─ i18n/
-│  │  ├─ routing.ts  request.ts  navigation.ts
+│  │  ├─ routing.ts  request.ts  navigation.ts  params.ts  types.d.ts
 │  ├─ styles/
 │  │  ├─ globals.css  tokens.css
 │  └─ content/journal/{en,th}/*.mdx
@@ -116,13 +121,19 @@ Rules: `lib/` has **no React and no browser APIs**. `data/` has no logic beyond 
 
 ## 4. Routing and i18n
 
-- Locales: `en` (default), `th`. `localePrefix: "always"`. Root `/` redirects to the preferred locale (cookie → `Accept-Language` → default).
-- Use next-intl's routing helpers (`Link`, `redirect`, `usePathname`) from `src/i18n/navigation.ts`. Never hand-concatenate locale prefixes.
+- Locales: `en` (default), `th`. `localePrefix: "always"`. Root `/` redirects to the preferred locale (cookie `NEXT_LOCALE` → `Accept-Language` → default).
+- Use next-intl's routing helpers (`Link`, `redirect`, `usePathname`, `useRouter`) from `src/i18n/navigation.ts`; ESLint forbids `next/link` and the matching `next/navigation` exports. Never hand-concatenate locale prefixes. Paths passed to and returned from these helpers are **public** paths: `usePathname` is a wrapper that strips the hidden currency segment (`stripCurrencySegment` in `lib/locale-path.ts`), because next-intl's own hook reports `/usd/shop` during server rendering and `/shop` in the browser, a hydration mismatch. Import `next-intl/navigation` only from `src/i18n/navigation.ts` (ESLint).
+- **Currency segment (ADR-0003).** Routes live under `src/app/[locale]/[currency]/…`, where `[currency]` is `usd` or `thb`. Visitors never see it. `src/proxy.ts` runs the next-intl middleware first (locale redirects), then **rewrites** the public URL to the internal one using the `hc_currency` cookie (default `en → usd`, `th → thb`): `/en/shop` is served from `/en/usd/shop`. A direct request for an internal path (`/en/usd/shop`) is redirected (308) to the public path and does not touch the cookie. Query strings are preserved. The proxy skips `/_next`, `/api`, `/images`, `/_vercel` and any path with a file extension (`icon.svg`, `robots.txt`, `sitemap.xml`, fonts).
+- Every page is prerendered: `generateStaticParams` returns locale × currency (× slug). Route pages call `setRequestLocale(locale)` and validate their params with `src/i18n/params.ts` (`notFound()` for anything else).
+- Every dynamic segment (`[locale]`, `[currency]`, `products/[slug]`, `collections/[category]`, …) exports `dynamicParams = false`, so an unlisted URL is never rendered on demand or written to the cache. Unknown URLs get the root `src/app/not-found.tsx`: server-rendered, status 404, `noindex`, English block (`lang="en"`) and Thai block (`lang="th"`) with links to `/en` and `/th`, no JavaScript needed. There is no catch-all route and no per-locale `not-found.tsx`.
+- Switching currency = write the `hc_currency` cookie, then `router.refresh()` (T06). Switching locale = navigate to the same public path under the other locale.
 - Route params and search params are asynchronous in current Next.js: `await` them in server components and metadata functions.
 - Localised slugs are **not** used; slugs are English and shared across locales. Product names are localised via data.
-- `generateStaticParams` returns locale × slug for all products, categories, looks, vibes, articles.
-- `generateMetadata` on every route: title template, description, canonical, `alternates.languages` (`en`, `th`, `x-default`), Open Graph.
-- Message catalogues: `messages/{en,th}.json`, namespaced by feature (`nav`, `home`, `product`, `cart`, `look`, `checkout`, `common`, `a11y`, `seo`). Keys are typed from the `en` file; CI fails if key sets differ.
+- `generateStaticParams` returns locale × currency × slug for all products, categories, looks, vibes, articles.
+- `generateMetadata` on every page: title template `%s · Home Club Foundation`, localized description, `metadataBase` from `NEXT_PUBLIC_SITE_URL`, `alternates.canonical` and `alternates.languages` (`en`, `th`, `x-default`) built from **public** paths (`lib/locale-path.ts`), Open Graph. Metadata never contains the currency segment.
+- Message catalogues: `messages/{en,th}.json`, namespaced by feature (`nav`, `home`, `product`, `cart`, `look`, `checkout`, `common`, `a11y`, `seo`, `notFound`). Keys are typed from the `en` file (`AppConfig` augmentation in `src/i18n/types.d.ts`); `tests/unit/i18n/parity.test.ts` fails if key sets, empty strings or ICU placeholders differ, and runs in `pnpm test`.
+- Client components get strings from props or a provider scoped with `messages={pick(...)}`; the locale layout's `NextIntlClientProvider` carries no messages so catalogues stay out of the client bundle.
+- Text in another language than the page (the locale switcher's "ไทย" on an English page, the Latin wordmark on a Thai page) carries its own `lang` (`NativeLabel`, `Wordmark`) so the Thai typography rules apply (RULES 6.5).
 - Plurals and numbers use ICU message syntax. No string concatenation for sentences.
 - Product/look/vibe text lives in data as `{ en: string; th: string }`.
 
@@ -195,7 +206,7 @@ Seed catalogue: 12–16 products across 4 categories (see PRD §11). Initial set
 - Source of truth currency is USD. THB is derived: `thb = round(usdCents/100 * FX_USD_THB)` in whole baht. `FX_USD_THB` is a named constant with a comment stating it is a fixed demo value, not live data.
 - Display only through `formatMoney(amount, currency, locale)` using `Intl.NumberFormat` (`currency` style). No manual symbols.
 - Discount: `discountCents = round(subtotalCents * pct / 100)` using a single rounding rule (half away from zero), applied once on the set subtotal, never per line.
-- Currency choice: cookie `hc_currency` (`USD|THB`), default by locale (`en→USD`, `th→THB`). The server reads it so prices render correctly in the first HTML.
+- Currency choice: cookie `hc_currency` (`USD|THB`), default by locale (`en→USD`, `th→THB`). The proxy reads it and selects the prerendered `[currency]` variant of the page (§4, ADR-0003), so prices are in the first HTML without any page becoming dynamic. Pages never read the cookie themselves; they receive the currency from the route segment. A currency change is a cookie write plus `router.refresh()`.
 
 ## 7. State
 

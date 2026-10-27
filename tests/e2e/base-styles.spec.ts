@@ -1,8 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 // T02: tokens, fonts and base styles as the browser actually computes them (FR-004, FR-073).
-// T03 moves the page to /en; update ROUTE then.
-const ROUTE = '/';
+const ROUTE = '/en';
 
 test.describe('base styles', () => {
   test('the skip link is the first tab stop, appears on focus and shows the focus ring (FR-004)', async ({
@@ -40,7 +39,22 @@ test.describe('base styles', () => {
     );
     expect(loaded.some((family) => /jost/i.test(family))).toBe(true);
     expect(loaded.some((family) => /inter/i.test(family))).toBe(true);
-    expect(loaded.some((family) => /noto/i.test(family))).toBe(false);
+  });
+
+  test('English pages only fetch the one Noto Sans Thai weight their Thai locale label needs (FR-073)', async ({
+    page,
+  }) => {
+    await page.goto(ROUTE);
+    await page.evaluate(() => document.fonts.ready);
+
+    // The page shows the locale name "ไทย" (lang="th"), which is the only Thai text on /en. The
+    // unicode-range split means no other Noto file is requested.
+    const thaiWeights = await page.evaluate(() =>
+      [...document.fonts]
+        .filter((font) => font.status === 'loaded' && /noto/i.test(font.family))
+        .map((font) => font.weight),
+    );
+    expect(thaiWeights).toEqual(['400']);
   });
 
   test('English labels are uppercase and tracked; Thai text is neither (RULES 6.5, FR-073)', async ({

@@ -58,7 +58,9 @@ pnpm dev                     # http://localhost:3000
 ## Project structure
 
 ```
-src/app/[locale]/   routes (home, shop, collections, products, looks, vibes, journal, cart, checkout, case-study)
+src/app/[locale]/[currency]/   routes (home, shop, collections, products, looks, vibes, journal, cart, checkout, case-study); [currency] is hidden, see docs/adr/0003
+src/proxy.ts        locale redirects + currency rewrite
+src/i18n/           next-intl routing, navigation helpers, request config, typed messages
 src/components/     ui · layout · home · catalogue · product · cart · look
 src/lib/            pure business logic (money, pricing, stock, look, catalogue, search, seo)
 src/data/           typed seed catalogue + Zod schema

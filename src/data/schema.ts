@@ -1,7 +1,10 @@
 import { z } from 'zod';
 
+import { LOCALES } from '@/data/locales';
+
+export { LOCALES };
+
 // Ordered const tuples are the single source for every literal union below (RULES 2.4: no enums).
-export const LOCALES = ['en', 'th'] as const;
 export const CATEGORIES = ['foundations', 'performance', 'lifestyle', 'accessories'] as const;
 export const VIBES = ['performance', 'outdoor', 'lazy', 'skate', 'hockey'] as const;
 export const SLOTS = ['top', 'bottom', 'cap', 'socks'] as const;

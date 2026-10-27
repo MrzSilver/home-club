@@ -1,2 +1,5 @@
 ignoredBuiltDependencies:
   - unrs-resolver
+  # next-intl's message-extraction tooling (unused here: messages are hand-written JSON).
+  - '@parcel/watcher'
+  - '@swc/core'

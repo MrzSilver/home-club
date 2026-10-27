@@ -8,6 +8,9 @@ export default defineConfig({
     environment: 'jsdom',
     include: ['tests/unit/**/*.test.{ts,tsx}'],
     setupFiles: ['tests/unit/setup.ts'],
+    // next-intl's ESM build imports "next/server" without the .js extension, which plain Node cannot
+    // resolve. Inlining it lets Vite resolve those imports the way Next.js's bundler does.
+    server: { deps: { inline: ['next-intl'] } },
     restoreMocks: true,
     coverage: {
       // Thresholds only apply to `pnpm test:coverage`; plain `pnpm test` never fails on them.

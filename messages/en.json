@@ -1,0 +1,39 @@
+{
+  "common": {
+    "brandName": "Home Club Foundation",
+    "wordmark": {
+      "name": "Home Club",
+      "descriptor": "Foundation"
+    },
+    "locale": {
+      "label": "Language",
+      "en": "English",
+      "th": "ไทย"
+    },
+    "currency": {
+      "label": "Currency",
+      "USD": "US dollar (USD)",
+      "THB": "Thai baht (THB)"
+    }
+  },
+  "a11y": {
+    "skipToContent": "Skip to content"
+  },
+  "seo": {
+    "titleTemplate": "%s · Home Club Foundation",
+    "siteDescription": "Home Club Foundation is a demo online clothing store built as a portfolio project. Nothing is sold.",
+    "homeTitle": "Home Club Foundation (demo store)",
+    "notFoundTitle": "Page not found"
+  },
+  "home": {
+    "eyebrow": "Demo store",
+    "title": "Quiet basics, made to be worn every day.",
+    "intro": "This is a temporary home page. Nothing is sold here.",
+    "samplePriceLabel": "Sample price"
+  },
+  "notFound": {
+    "title": "We could not find that page",
+    "body": "The page may have moved, or the address may be mistyped.",
+    "backHome": "Back to the home page"
+  }
+}

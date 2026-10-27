@@ -1,0 +1,39 @@
+{
+  "common": {
+    "brandName": "Home Club Foundation",
+    "wordmark": {
+      "name": "Home Club",
+      "descriptor": "Foundation"
+    },
+    "locale": {
+      "label": "ภาษา",
+      "en": "English",
+      "th": "ไทย"
+    },
+    "currency": {
+      "label": "สกุลเงิน",
+      "USD": "ดอลลาร์สหรัฐ (USD)",
+      "THB": "บาทไทย (THB)"
+    }
+  },
+  "a11y": {
+    "skipToContent": "ข้ามไปยังเนื้อหาหลัก"
+  },
+  "seo": {
+    "titleTemplate": "%s · Home Club Foundation",
+    "siteDescription": "Home Club Foundation เป็นร้านเสื้อผ้าออนไลน์ตัวอย่าง สร้างขึ้นเป็นผลงานในพอร์ตโฟลิโอ ไม่มีการขายสินค้าจริง",
+    "homeTitle": "Home Club Foundation (ร้านตัวอย่าง)",
+    "notFoundTitle": "ไม่พบหน้าที่คุณต้องการ"
+  },
+  "home": {
+    "eyebrow": "ร้านตัวอย่าง",
+    "title": "เสื้อผ้าเบสิกเรียบง่าย ใส่ได้ทุกวัน",
+    "intro": "นี่คือหน้าแรกชั่วคราว เว็บไซต์นี้ไม่ได้ขายสินค้าจริง",
+    "samplePriceLabel": "ราคาตัวอย่าง"
+  },
+  "notFound": {
+    "title": "ไม่พบหน้าที่คุณต้องการ",
+    "body": "หน้านี้อาจถูกย้ายไปแล้ว หรืออาจพิมพ์ที่อยู่เว็บไม่ถูกต้อง",
+    "backHome": "กลับไปหน้าแรก"
+  }
+}

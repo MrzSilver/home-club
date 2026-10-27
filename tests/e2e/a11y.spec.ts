@@ -1,8 +1,9 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
-// Routes under test. Later tasks extend this list (route x locale, RULES 8.8).
-const ROUTES = ['/'];
+// Public URLs under test: every route in both locales (RULES 8.8), plus the bilingual 404 page.
+// Later tasks extend this list.
+const ROUTES = ['/en', '/th', '/en/does-not-exist'];
 
 for (const route of ROUTES) {
   test(

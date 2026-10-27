@@ -3,9 +3,9 @@
 // otherwise chrome-launcher falls back to a system-installed Chrome/Chromium.
 const BASE_URL = 'http://localhost:3000';
 
-// Routes under test. The home route is `/` while the scaffold has no locale routing;
-// T03 changes it to `/en`, and later tasks add the Collection and Product pages.
-const ROUTES = ['/'];
+// Routes under test: every page in both locales (RULES 8.8 and SPEC 12 apply to Thai too).
+// Later tasks add the Collection, Product and Look builder pages.
+const ROUTES = ['/en', '/th'];
 
 module.exports = {
   ci: {

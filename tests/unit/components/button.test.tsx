@@ -156,7 +156,7 @@ describe('Button', () => {
 
   it('lets a link wear the button look through buttonClasses', () => {
     render(
-      <a href="/shop" className={buttonClasses({ variant: 'on-image', fullWidth: true })}>
+      <a href="#shop" className={buttonClasses({ variant: 'on-image', fullWidth: true })}>
         Shop
       </a>,
     );

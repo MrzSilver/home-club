@@ -10,6 +10,27 @@ const DEEP_RELATIVE = {
   message: 'Use the "@/" alias instead of deep relative imports (RULES 3.8).',
 };
 
+// SPEC 4: navigation helpers come from "@/i18n/navigation" so every link and redirect carries the
+// locale prefix. Flat config replaces `no-restricted-imports` options block by block, so every block
+// that sets the rule must spread these in as well.
+const I18N_NAVIGATION_PATHS = [
+  {
+    name: 'next/link',
+    message: 'Import Link from "@/i18n/navigation" so the locale prefix is added (SPEC 4).',
+  },
+  {
+    name: 'next/navigation',
+    importNames: ['redirect', 'permanentRedirect', 'usePathname', 'useRouter', 'Link'],
+    message:
+      'Import redirect, permanentRedirect, usePathname and useRouter from "@/i18n/navigation" so the locale prefix is handled (SPEC 4). notFound and useSearchParams may still come from "next/navigation".',
+  },
+  {
+    name: 'next-intl/navigation',
+    message:
+      'Import from "@/i18n/navigation": its usePathname also strips the hidden currency segment, which next-intl\'s own does not (ADR-0003).',
+  },
+];
+
 // Files where Next.js (or a tool) requires a default export (RULES 2.5).
 const DEFAULT_EXPORT_ALLOWED = [
   'src/app/**/{page,layout,not-found,error,loading,template,default,global-error}.{ts,tsx}',
@@ -55,7 +76,10 @@ const eslintConfig = defineConfig([
     rules: {
       // RULES 3.6
       'no-console': ['error', { allow: ['warn', 'error'] }],
-      'no-restricted-imports': ['error', { patterns: [DEEP_RELATIVE] }],
+      'no-restricted-imports': [
+        'error',
+        { paths: I18N_NAVIGATION_PATHS, patterns: [DEEP_RELATIVE] },
+      ],
     },
   },
 
@@ -82,6 +106,15 @@ const eslintConfig = defineConfig([
         { prefer: 'type-imports', fixStyle: 'separate-type-imports' },
       ],
     },
+  },
+
+  {
+    // RULES 2.4: exhaustive switches. This rule needs type information, so it is scoped to the
+    // TypeScript sources and tests (the config files are plain JS and are not type-checked).
+    name: 'home-club/switch-exhaustiveness',
+    files: ['src/**/*.{ts,tsx}', 'tests/**/*.{ts,tsx}'],
+    languageOptions: { parserOptions: { projectService: true } },
+    rules: { '@typescript-eslint/switch-exhaustiveness-check': 'error' },
   },
 
   {
@@ -134,6 +167,21 @@ const eslintConfig = defineConfig([
   },
 
   {
+    // RULES 6.1: no hard-coded user-visible text in components. The rule sees JSX text only, which is
+    // the common slip; string attributes (aria-label, alt, title) cannot be told apart from className
+    // and data-* values without a flood of false positives, so those stay a review item. Tests are
+    // excluded because their fixtures are literal by design. Punctuation separators are allowed.
+    name: 'home-club/no-hard-coded-text',
+    files: ['src/**/*.tsx'],
+    rules: {
+      'react/jsx-no-literals': [
+        'error',
+        { noStrings: false, allowedStrings: ['·', '•', '/', '|', '–', '—'] },
+      ],
+    },
+  },
+
+  {
     // RULES 2.5: explicit return types on exported functions.
     name: 'home-club/explicit-return-types',
     files: ['src/**/*.{ts,tsx}'],
@@ -159,6 +207,7 @@ const eslintConfig = defineConfig([
       'no-restricted-imports': [
         'error',
         {
+          paths: I18N_NAVIGATION_PATHS,
           patterns: [
             DEEP_RELATIVE,
             {
@@ -182,8 +231,18 @@ const eslintConfig = defineConfig([
           patterns: [
             DEEP_RELATIVE,
             {
-              group: ['react', 'react/*', 'react-dom', 'react-dom/*', 'next', 'next/*'],
-              message: 'src/lib must stay framework-free: no React or Next.js imports (RULES 3.4).',
+              group: [
+                'react',
+                'react/*',
+                'react-dom',
+                'react-dom/*',
+                'next',
+                'next/*',
+                'next-intl',
+                'next-intl/*',
+              ],
+              message:
+                'src/lib must stay framework-free: no React, Next.js or next-intl imports (RULES 3.4).',
             },
             {
               group: [
@@ -230,6 +289,26 @@ const eslintConfig = defineConfig([
     // only the app-specific return-type rule is skipped (scoped above to src/**).
     name: 'home-club/tests',
     files: ['tests/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        { paths: I18N_NAVIGATION_PATHS, patterns: [DEEP_RELATIVE] },
+      ],
+    },
+  },
+
+  {
+    // The 404 page renders outside any locale layout, so there is no locale context for the i18n Link;
+    // it links to "/en" and "/th" explicitly. Only the navigation rules are lifted.
+    name: 'home-club/root-not-found',
+    files: ['src/app/not-found.tsx'],
+    rules: { 'no-restricted-imports': ['error', { patterns: [DEEP_RELATIVE] }] },
+  },
+
+  {
+    // The one module that wraps next-intl's navigation helpers (so it may import them directly).
+    name: 'home-club/i18n-navigation',
+    files: ['src/i18n/navigation.ts'],
     rules: { 'no-restricted-imports': ['error', { patterns: [DEEP_RELATIVE] }] },
   },
 

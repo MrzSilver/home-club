@@ -122,9 +122,26 @@ are used (DESIGN §3: at most three weights). The `.woff` fallbacks and other su
     (CLS 0.00067 in all six runs, the headline being the LCP element). Preloading Jost alone removed it (CLS 0 in
     all runs) with no change in TBT or LCP beyond run-to-run noise.
   - Inter text is small and its size-adjusted fallback is close, so it swaps in without a measurable shift.
-  - Open point for T03 and later: `next/font` preloads whatever the layout imports, so the preload set cannot depend on
-    the locale. Thai pages will swap system Thai to Noto Sans Thai without preload. Measure CLS on `/th`; if it shows,
-    either preload Noto Sans Thai for both locales (about 27 kB) or split the layouts per locale.
+  - **Thai pages (T03).** `next/font` preloads whatever a layout imports, and the single `[locale]` layout serves both
+    languages, so `next/font` cannot preload per locale. A per-locale split is possible but not worth it: it would
+    mean separate root layouts (duplicating the route tree under `app/en` and `app/th`) or a conditional resource
+    preload of a hashed font URL that `next/font` does not expose. The alternatives were: preload Noto Sans Thai for both
+    locales (about 30 kB of unused bytes on every English page, for a gain of at most the 0.00027 CLS measured below),
+    or leave it unpreloaded. Decision: **not preloaded**. Measured on the
+    temporary home page with `pnpm build && pnpm start`:
+    - `/th` CLS 0.00027 in all 6 Lighthouse CI runs (2 sets of 3), `/en` CLS 0 in all 6. The only shift is the
+      semibold baht price (the baht sign U+0E3F comes from Noto Sans Thai): the paragraph grows by 1 px
+      (main 492 to 493 px at 375 px) when the 600 weight arrives. The Thai headline does not shift.
+    - The same page driven with Chromium over a throttled connection (150 ms latency, 1.6 Mbit/s, no cache) gave the
+      identical single shift (total 0.00028 on `/th`, 0 on `/en`). With every `.woff2` held back for 2.5 s, the Thai
+      `h1` is 90 px tall both before and after the swap at 375 and 1280 px (the earlier 135 px to 90 px reflow seen
+      with a different fallback font no longer occurs here).
+    - Both values are far below the 0.1 budget and the 0.01 limit in `tests/e2e/i18n.spec.ts`, which fails the build
+      if `/th` or `/en` regresses. Lighthouse medians stay inside the budgets (see the T03 report for the numbers).
+    - Caveat: the sandbox falls back to the Loma Thai font while Noto Sans Thai loads; iOS (Thonburi) and Windows
+      (Leelawadee UI) have different widths, so a real Thai hero headline may wrap differently before the swap. T07
+      must re-measure `/th` with the real hero; if it shifts, preload only the weight the headline uses (one file,
+      about 10 kB) for both locales rather than all three.
 - **Licence.** SIL Open Font License 1.1 permits embedding and redistribution with the site, provided the licence text
   travels with the fonts and the fonts are not sold on their own. Each package ships its `LICENSE` file; record the
   fonts in `docs/ASSETS.md` (RULES §14.1).

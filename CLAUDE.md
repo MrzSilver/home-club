@@ -30,7 +30,7 @@ pnpm format         # Prettier
 
 ## Layout
 
-- `src/app/[locale]/…` routes · `src/components/{ui,layout,home,catalogue,product,cart,look}`
+- `src/app/[locale]/[currency]/…` routes (`[currency]` is a hidden segment, see below) · `src/proxy.ts` · `src/i18n/` · `src/components/{ui,layout,home,catalogue,product,cart,look}`
 - `src/lib/` pure business logic (money, pricing, stock, look, catalogue, search, seo) — no React/browser APIs
 - `src/data/` typed seed catalogue + Zod schema · `src/store/` cart + preferences
 - `messages/{en,th}.json` UI strings · `src/content/journal/` MDX · `docs/` ADRs and `ASSETS.md`
@@ -59,7 +59,7 @@ pnpm format         # Prettier
 
 ## Known decisions and assumptions
 
-- Default locale `en`; locale prefix always in URL; currency stored in cookie `hc_currency`.
+- Default locale `en`; locale prefix always in URL; currency stored in cookie `hc_currency` and applied through a **hidden route segment**: `src/proxy.ts` rewrites the public `/en/shop` to the prerendered `/en/usd/shop` (`/th/thb/…` for baht), so every page stays static and public URLs never contain the currency (ADR-0003). Pages get `currency` from route params, never from the cookie. Import `Link`, `redirect`, `usePathname`, `useRouter` from `@/i18n/navigation` (ESLint enforces it).
 - Look discount default 10% (configurable per look). Mock-up's `$226` look total is wrong; compute from items.
 - Mock-up imagery is illustrative/AI; every shipped image must be logged in `docs/ASSETS.md`.
 - French copy and "Canada" shipping text from the mock-up are not carried over.
