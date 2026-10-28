@@ -19,6 +19,9 @@ const BASE_URL = remote === '' ? LOCAL_URL : remote;
 // Later tasks add the Collection, Product and Look builder pages.
 const ROUTES = ['/en', '/th'];
 
+// Vercel Deployment Protection: send the automation bypass header when the secret is provided.
+const bypass = (process.env.VERCEL_AUTOMATION_BYPASS_SECRET ?? '').trim();
+
 // Machine-dependent metrics: errors against a deployment, warnings against the local server.
 const machineLevel = remote === '' ? 'warn' : 'error';
 
@@ -39,6 +42,9 @@ module.exports = {
         formFactor: 'mobile',
         // The sandbox cannot start inside containers / as root.
         chromeFlags: '--headless=new --no-sandbox',
+        ...(remote !== '' && bypass !== ''
+          ? { extraHeaders: JSON.stringify({ 'x-vercel-protection-bypass': bypass }) }
+          : {}),
       },
     },
     assert: {

@@ -94,3 +94,8 @@ React/Next is out of the question (RULES §17).
   performance gate has no automatic enforcement: the local medians in each build report are the only evidence.
   If the preview sits behind Vercel deployment protection, Lighthouse would audit the login page; keep Preview
   deployments public for this repository or add a protection-bypass header (not configured here).
+
+Operational note: Vercel protects preview deployments by default. For the preview gate to reach the
+page, either disable Deployment Protection for previews or create a "Protection Bypass for
+Automation" secret and store it as the `VERCEL_AUTOMATION_BYPASS_SECRET` repository secret;
+`lighthouserc.cjs` then sends it as the `x-vercel-protection-bypass` header.

@@ -17,7 +17,7 @@ jobs:
     # Only a successful Preview deployment; production and failed deployments are skipped.
     if: >-
       github.event.deployment_status.state == 'success' &&
-      github.event.deployment.environment == 'Preview'
+      startsWith(github.event.deployment.environment, 'Preview')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -41,6 +41,9 @@ jobs:
         run: pnpm lhci
         env:
           LHCI_BASE_URL: ${{ github.event.deployment_status.target_url }}
+          # Vercel protects previews by default; this secret (Project → Settings → Deployment
+          # Protection → Protection Bypass for Automation) lets Lighthouse through. Optional.
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
       - name: Upload Lighthouse reports
         if: ${{ !cancelled() }}
