@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { FormEvent, ReactElement } from 'react';
 
 import { NewsletterFields, type NewsletterCopy } from '@/components/layout/newsletter-fields';
@@ -55,8 +55,12 @@ export function NewsletterForm({ copy, handoff }: NewsletterFormProps): ReactEle
     setStatus(next);
   }
 
-  // Put focus back where it was when the server-rendered form gave way to this one.
-  useEffect(() => {
+  // Put focus back where it was when the server-rendered form gave way to this one. A layout effect,
+  // not a passive one: removing the old field drops focus to <body>, and a passive effect runs a
+  // frame or more later, so a key pressed in that gap (Enter, right after the click that started the
+  // swap) went to <body> and was lost (the flaky e2e "newsletter: loads on first use"). A layout effect
+  // runs inside the same commit, before the browser can dispatch another input event.
+  useLayoutEffect(() => {
     if (handoff.focus === 'input') inputRef.current?.focus();
     if (handoff.focus === 'button') buttonRef.current?.focus();
     // Once, on mount: the handoff is a snapshot.

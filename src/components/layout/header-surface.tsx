@@ -18,8 +18,8 @@ type HeaderSurfaceProps = { children: ReactNode };
  * IntersectionObserver (no scroll listener). The observer's top margin is the live header height
  * (64 or 80 px), re-measured when it changes.
  *
- * Without JavaScript a hero page keeps the transparent header all the way down; the hero must be
- * taller than the viewport or the page needs a dark top region (T07).
+ * Without JavaScript a hero page's header is absolutely positioned over the hero and scrolls away with
+ * it (`data-js` is what makes it sticky), so it is never transparent over the canvas-coloured page.
  */
 export function HeaderSurface({ children }: HeaderSurfaceProps): ReactElement {
   const pathname = usePathname();
@@ -32,6 +32,8 @@ export function HeaderSurface({ children }: HeaderSurfaceProps): ReactElement {
   useEffect(() => {
     const header = headerRef.current;
     if (header === null) return undefined;
+    // Switches a hero page's header from "scrolls away with the hero" to sticky (see .site-header).
+    header.setAttribute('data-js', '');
     const resize = new ResizeObserver(() => setHeaderHeight(header.offsetHeight));
     resize.observe(header);
     return () => resize.disconnect();
@@ -58,11 +60,7 @@ export function HeaderSurface({ children }: HeaderSurfaceProps): ReactElement {
   }, [pathname, headerHeight]);
 
   return (
-    <header
-      ref={headerRef}
-      data-past-hero={pastHero ? '' : undefined}
-      className="site-header sticky top-0 z-40"
-    >
+    <header ref={headerRef} data-past-hero={pastHero ? '' : undefined} className="site-header z-40">
       {/* Two cross-faded layers: only opacity animates (DESIGN 7). */}
       <div
         aria-hidden="true"

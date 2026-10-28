@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 // T06: header, menu drawer, locale and currency switchers, footer and newsletter (FR-001 to FR-004).
-// The sample price on the temporary home page is the essential tee: $49.00 = THB 1,715.
+// The first Essentials card on the home page is the essential tee: $49.00 = THB 1,715.
 const LOCALES = ['en', 'th'] as const;
 type Locale = (typeof LOCALES)[number];
 
@@ -54,7 +54,7 @@ async function chooseCurrency(drawer: Locator, name: RegExp): Promise<void> {
   await drawer.locator('label', { hasText: name }).click();
 }
 
-const price = (page: Page): Locator => page.getByTestId('sample-price');
+const price = (page: Page): Locator => page.getByTestId('product-price').first();
 const menuButton = (page: Page, locale: Locale): Locator =>
   page.getByRole('button', { name: COPY[locale].openMenu });
 const dialog = (page: Page, locale: Locale): Locator =>
@@ -228,7 +228,7 @@ for (const locale of LOCALES) {
 
     test('does not shift the layout when the header changes state or the menu loads (CLS)', async ({
       page,
-    }) => {
+    }, testInfo) => {
       await page.addInitScript(() => {
         const holder = window as unknown as { __shift: number };
         holder.__shift = 0;
@@ -247,7 +247,10 @@ for (const locale of LOCALES) {
       await page.keyboard.press('Escape');
 
       const shift = await page.evaluate(() => (window as unknown as { __shift: number }).__shift);
-      expect(shift).toBeLessThan(0.01);
+      // ADR-0001 (T07 r2): /th on desktop may shift by about 0.018 when Noto Sans Thai swaps in under
+      // the display headline (no headline preload); the budget is 0.1. Everything else stays under 0.01.
+      const limit = locale === 'th' && testInfo.project.name === 'desktop' ? 0.02 : 0.01;
+      expect(shift).toBeLessThan(limit);
     });
 
     test('menu: opens from the keyboard, traps focus, hides the page, locks scroll, closes on Escape and returns focus (RULES 8.6)', async ({
@@ -580,17 +583,22 @@ test.describe('header without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
 
   for (const locale of LOCALES) {
-    test(`/${locale}: transparent over the hero from the first paint, by CSS alone`, async ({
+    test(`/${locale}: transparent over the hero from the first paint and scrolls away with it, by CSS alone`, async ({
       page,
     }) => {
       await page.goto(`/${locale}`);
+      const header = page.getByRole('banner');
 
-      await expect(page.getByRole('banner')).toHaveCSS('color', 'rgb(247, 244, 239)');
-      const width = page.viewportSize()?.width ?? 0;
-      await expect(page.getByRole('banner')).toHaveCSS(
-        'margin-bottom',
-        width < 768 ? '-64px' : '-80px',
-      );
+      await expect(header).toHaveCSS('color', 'rgb(247, 244, 239)');
+      // Not sticky without the island: a transparent header that followed the visitor would be
+      // canvas-coloured text over the canvas-coloured page once the hero has gone.
+      await expect(header).toHaveCSS('position', 'absolute');
+      expect((await header.boundingBox())?.y).toBe(0);
+      const hero = page.locator('[aria-roledescription="carousel"]');
+      expect((await hero.boundingBox())?.y).toBe(0);
+
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      expect((await header.boundingBox())?.y ?? 0).toBeLessThan(0);
     });
   }
 });

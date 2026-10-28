@@ -1,13 +1,14 @@
 import { expect, test, type Page } from '@playwright/test';
 
 // T03: locale routing, the hidden currency segment and translated chrome (FR-070 to FR-073, FR-002, FR-004).
-// The sample price on the temporary home page is the essential tee: 4900 USD cents = 49.00 USD = 1715 THB.
+// The first Essentials card on the home page is the essential tee: 4900 USD cents = 49.00 USD = 1715 THB.
 const USD_PRICE = '$49.00';
 const THB_PRICE = '฿1,715';
 // Thai-locale formatting of US dollars keeps the "US" prefix to tell them from other dollars.
 const USD_PRICE_ON_THAI_PAGE = 'US$49.00';
 
-const price = (page: Page): ReturnType<Page['getByTestId']> => page.getByTestId('sample-price');
+const price = (page: Page): ReturnType<Page['getByTestId']> =>
+  page.getByTestId('product-price').first();
 
 test.describe('locale routing (FR-071)', () => {
   test('/ goes to /en when the browser has no Thai preference', async ({ page }) => {
@@ -279,7 +280,9 @@ test.describe('pathname on rewritten pages (ADR-0003)', () => {
 
 test.describe('Thai font loading causes no layout shift (FR-073, ADR-0001)', () => {
   for (const locale of ['en', 'th'] as const) {
-    test(`/${locale} accumulates a layout shift below 0.01 while fonts load`, async ({ page }) => {
+    test(`/${locale} accumulates a negligible layout shift while fonts load`, async ({
+      page,
+    }, testInfo) => {
       await page.addInitScript(() => {
         const holder = window as unknown as { __shift: number };
         holder.__shift = 0;
@@ -295,7 +298,10 @@ test.describe('Thai font loading causes no layout shift (FR-073, ADR-0001)', () 
       await page.waitForLoadState('networkidle');
 
       const shift = await page.evaluate(() => (window as unknown as { __shift: number }).__shift);
-      expect(shift).toBeLessThan(0.01);
+      // ADR-0001 (T07 r2): /th on desktop may shift by about 0.018 when Noto Sans Thai swaps in under
+      // the display headline (no headline preload); the budget is 0.1. Everything else stays under 0.01.
+      const limit = locale === 'th' && testInfo.project.name === 'desktop' ? 0.02 : 0.01;
+      expect(shift).toBeLessThan(limit);
     });
   }
 });

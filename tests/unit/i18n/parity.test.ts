@@ -140,6 +140,7 @@ describe('message catalogues: en and th stay in step (FR-070)', () => {
   it('contain at least the namespaces the app reads', () => {
     expect(Object.keys(en).sort()).toEqual([
       'a11y',
+      'catalogue',
       'common',
       'footer',
       'home',

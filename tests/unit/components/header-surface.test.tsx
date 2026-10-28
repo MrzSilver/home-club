@@ -88,11 +88,17 @@ const header = (): HTMLElement => screen.getByRole('banner');
 const past = (): boolean => header().hasAttribute('data-past-hero');
 
 describe('HeaderSurface (DESIGN 5.2)', () => {
-  it('is a sticky banner styled by the site-header rules (transparency comes from CSS, not from a path list)', () => {
+  it('is a banner styled by the site-header rules (transparency comes from CSS, not from a path list)', () => {
     render(<HeaderSurface>content</HeaderSurface>);
 
-    expect(header()).toHaveClass('site-header', 'sticky', 'top-0');
+    expect(header()).toHaveClass('site-header');
     expect(past()).toBe(false);
+  });
+
+  it('marks itself data-js once the island runs, which is what makes a hero page header sticky', () => {
+    render(<HeaderSurface>content</HeaderSurface>);
+
+    expect(header()).toHaveAttribute('data-js', '');
   });
 
   it('observes the page sentinel with the live header height as the top margin', () => {

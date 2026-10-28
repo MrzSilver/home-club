@@ -12,7 +12,7 @@ import localFont from 'next/font/local';
 // system-ui, sans-serif instead. adjustFontFallback keeps a size-adjusted Arial in front of it so the
 // swap from fallback to web font does not shift layout.
 
-// Display and wordmark: Jost. The only preloaded family (ADR-0001 "Fonts"): it draws the hero headline,
+// Display and wordmark: Jost. Preloaded (ADR-0001 "Fonts"): it draws the hero headline,
 // so preloading removes the swap shift there. Only the 500 face exists for now: every display role,
 // the wordmark and the hero use weight 500, and next/font preloads every face of a family, so the
 // unused 400 and 600 cost about 21 kB per page for nothing. T07 adds a face back when the hero's

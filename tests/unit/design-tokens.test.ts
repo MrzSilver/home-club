@@ -199,6 +199,16 @@ describe('Thai and motion rules in globals.css (RULES 6.5, DESIGN 7)', () => {
     expect(tokensCss).toMatch(/--header-height:\s*5rem/);
   });
 
+  it('keeps a hero page header out of the flow, absolute, until the island sets data-js (no JavaScript, first paint)', () => {
+    expect(globalsCss).toMatch(
+      /body:has\(\[data-header-sentinel\]\) \.site-header:not\(\[data-js\]\)\s*\{[^}]*position:\s*absolute/,
+    );
+    expect(globalsCss).toMatch(/\.site-header\s*\{[^}]*position:\s*sticky/);
+    expect(globalsCss).toMatch(
+      /body:has\(\[data-header-sentinel\]\) \.site-header\[data-js\]\s*\{[^}]*margin-bottom/,
+    );
+  });
+
   it('has a visible focus-visible ring and reduced-motion handling', () => {
     expect(globalsCss).toMatch(/:focus-visible\s*\{[^}]*outline:[^;]*var\(--color-focus\)/);
     expect(globalsCss).toMatch(/@media \(prefers-reduced-motion: reduce\)/);

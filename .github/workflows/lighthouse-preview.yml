@@ -1,0 +1,52 @@
+name: Lighthouse (Vercel preview)
+
+# The real performance gate (ADR-0004 amendment): Lighthouse runs against the deployed Vercel preview,
+# where timings are realistic. The verify job in ci.yml also runs `pnpm lhci` against a local server,
+# but there performance score, LCP and TBT are warnings only.
+on:
+  deployment_status:
+
+permissions:
+  contents: read
+
+env:
+  CI: true
+
+jobs:
+  lighthouse:
+    # Only a successful Preview deployment; production and failed deployments are skipped.
+    if: >-
+      github.event.deployment_status.state == 'success' &&
+      github.event.deployment.environment == 'Preview'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # The deployed commit, so lighthouserc.cjs and the budgets match what was deployed.
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.deployment.sha }}
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      # LHCI_BASE_URL switches lighthouserc.cjs to "no local server, every assertion is an error".
+      - name: Lighthouse CI against the preview
+        run: pnpm lhci
+        env:
+          LHCI_BASE_URL: ${{ github.event.deployment_status.target_url }}
+
+      - name: Upload Lighthouse reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: lighthouse-preview-reports
+          path: .lighthouseci
+          if-no-files-found: ignore
+          retention-days: 14

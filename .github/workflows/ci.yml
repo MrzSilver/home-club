@@ -67,8 +67,9 @@ jobs:
       - name: E2E and accessibility tests
         run: pnpm test:e2e
 
-      # Uses the Chrome preinstalled on the runner; set CHROME_PATH to override.
-      - name: Lighthouse CI
+      # Uses the Chrome preinstalled on the runner; set CHROME_PATH to override. Against the local
+      # server, performance score, LCP and TBT are warnings; the gate is lighthouse-preview.yml (ADR-0004).
+      - name: Lighthouse CI (local, informational for performance)
         run: pnpm lhci
 
       - name: Upload Playwright report

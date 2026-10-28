@@ -68,3 +68,29 @@ React/Next is out of the question (RULES §17).
   pruned; the slow mode moved LCP by about 0.5 s without any change in the real paint (4x CPU, slow 4G in Chromium
   itself: LCP = FCP = about 230-700 ms for both builds). Treat a single simulated LCP as an upper bound, and
   compare builds with alternating runs, not with one run each. The budgets themselves are not loosened.
+
+## Amendment: where the Lighthouse gates run (T07 round 2, owner decision 2026-10-28)
+
+- **Context.** The Home page's Lighthouse LCP gate failed intermittently on the 2-vCPU sandbox even for pages
+  whose real paint is fast. Lighthouse's mobile LCP is a Lantern simulation fed by an unthrottled localhost trace,
+  so it depends on how much of the page's early requests and CPU work lands before the observed first paint, and
+  that varies with machine load. T07 review: simulated LCP for the same build spanned 1.9-3.6 s, and the T06 build
+  (before the Home page existed) also exceeded 2.5 s in some runs. With applied (devtools) throttling the same
+  pages measured LCP 1.6 s with a 60-180 ms spread (4 runs per build, T07 review). The page was not the problem;
+  the measuring place was.
+- **Decision.** The performance gates (score >= 0.95, LCP < 2.5 s, TBT < 200 ms) are enforced by Lighthouse against
+  the **deployed Vercel preview**, not against the sandbox. The thresholds are unchanged.
+  - `lighthouserc.cjs` reads `LHCI_BASE_URL`. Set: no local server, the routes load from that base and **every**
+    assertion is an `error`. Unset (sandbox, local, the `verify` job in `ci.yml`): `pnpm start` serves the build;
+    accessibility, best-practices and SEO scores and CLS stay `error` (deterministic), while performance score, LCP
+    and TBT are `warn` (informational).
+  - `.github/workflows/lighthouse-preview.yml` runs on `deployment_status` (state `success`, environment `Preview`),
+    checks out the deployed SHA and runs `pnpm lhci` with `LHCI_BASE_URL` set to the deployment's `target_url`. It is
+    the real release gate for those three metrics; make it a required check on `main` once the repository exists.
+  - Builders still run `pnpm lhci` locally, report the per-metric medians every task and must not regress them
+    knowingly. `aggregationMethod: 'median'` and 5 runs per URL apply in both modes.
+- **Consequences.** A local `pnpm lhci` exits 0 on a slow machine and shows the perf warnings; a regression in the
+  deterministic categories still fails locally. Until the repository and Vercel project exist (owner task) the
+  performance gate has no automatic enforcement: the local medians in each build report are the only evidence.
+  If the preview sits behind Vercel deployment protection, Lighthouse would audit the login page; keep Preview
+  deployments public for this repository or add a protection-bypass header (not configured here).
