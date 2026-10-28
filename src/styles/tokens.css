@@ -115,6 +115,9 @@
   /* Site header height (DESIGN 5.2): 64 / 80 */
   --header-height: 4rem;
 
+  /* Hero height (DESIGN 5.3): tall on phones like the mock-up, never shorter than the copy needs */
+  --hero-height: max(32rem, 88svh);
+
   /*
    * Font stacks. --font-display, --font-body and --font-thai are set on <html> by next/font
    * (src/styles/fonts.ts). They carry the loaded family plus its metric-adjusted fallback only,
@@ -178,6 +181,7 @@
     --gutter: 1.5rem;
     --section-y: 6rem;
     --header-height: 5rem;
+    --hero-height: max(36rem, 84svh);
   }
 }
 

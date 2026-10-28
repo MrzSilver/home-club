@@ -38,7 +38,7 @@ pnpm dev                     # http://localhost:3000
 | `pnpm test:coverage`                | Unit tests with coverage thresholds (`src/lib` lines ≥ 90, global lines ≥ 75)                 |
 | `pnpm test:e2e`                     | End-to-end journeys (Playwright, `tests/e2e`; builds and starts the production server itself) |
 | `pnpm test:a11y`                    | Accessibility sweep (axe, tests tagged `@a11y`)                                               |
-| `pnpm lhci`                         | Lighthouse CI against budgets (needs a prior `pnpm build`)                                    |
+| `pnpm lhci`                         | Lighthouse CI against budgets (needs a prior `pnpm build`; see below for the preview gate)    |
 | `pnpm check`                        | typecheck + lint + test + build                                                               |
 
 ### Browsers for e2e and Lighthouse
@@ -52,6 +52,8 @@ pnpm dev                     # http://localhost:3000
   ```
 
   Reports are written to `.lighthouseci/` (git-ignored).
+
+- Where the gates run (ADR-0004 amendment): locally, performance score, LCP and TBT are warnings (they depend on the machine); accessibility, best-practices, SEO and CLS stay errors. Set `LHCI_BASE_URL=https://<deployment>` to audit a deployment instead of a local server; then every assertion is an error. The `lighthouse-preview` workflow does exactly that for each successful Vercel Preview deployment and is the real performance gate.
 
 - If `pnpm typecheck` complains about missing `.next/types` or `next-env.d.ts` (both are git-ignored and generated), run `pnpm exec next typegen`; CI does the same before typechecking.
 

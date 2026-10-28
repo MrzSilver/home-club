@@ -23,13 +23,60 @@
     "titleTemplate": "%s · Home Club Foundation",
     "siteDescription": "Home Club Foundation is a demo online clothing store built as a portfolio project. Nothing is sold.",
     "homeTitle": "Home Club Foundation (demo store)",
-    "notFoundTitle": "Page not found"
+    "notFoundTitle": "Page not found",
+    "homeDescription": "Quiet essentials for every day. Home Club Foundation is a demo online clothing store built as a portfolio project. Nothing is sold."
   },
   "home": {
-    "eyebrow": "Demo store",
-    "title": "Quiet basics, made to be worn every day.",
-    "intro": "This is a temporary home page. Nothing is sold here.",
-    "samplePriceLabel": "Sample price"
+    "hero": {
+      "label": "Featured",
+      "previous": "Previous slide",
+      "next": "Next slide",
+      "play": "Start automatic slide change",
+      "pause": "Pause automatic slide change",
+      "playUnavailable": "Automatic slide change is off because your device asks for less motion.",
+      "slide": "{n} of {total}",
+      "indicator": "Slide {n} of {total}",
+      "announce": "Slide {n} of {total}",
+      "slides": {
+        "discover": {
+          "line1": "Start with the essential.",
+          "line2": "Live your vibe.",
+          "cta": "Discover"
+        },
+        "performance": {
+          "line1": "Made to move.",
+          "line2": "Built to last.",
+          "cta": "Shop performance"
+        },
+        "lifestyle": {
+          "line1": "Easy days.",
+          "line2": "Quiet style.",
+          "cta": "Shop lifestyle"
+        }
+      }
+    },
+    "categories": {
+      "heading": "Shop by category"
+    },
+    "essentials": {
+      "title": "Essentials",
+      "seeAll": "See all"
+    },
+    "trust": {
+      "heading": "Why Home Club",
+      "quality": {
+        "title": "Premium quality",
+        "caption": "Designed to last."
+      },
+      "materials": {
+        "title": "Responsible materials",
+        "caption": "Chosen with the future in mind."
+      },
+      "delivery": {
+        "title": "Fast delivery",
+        "caption": "Quick to your door."
+      }
+    }
   },
   "notFound": {
     "title": "We could not find that page",
@@ -83,5 +130,10 @@
     },
     "demoNotice": "Demo store — nothing is sold. No payment is taken.",
     "copyright": "© {year} Home Club Foundation. A demo project."
+  },
+  "catalogue": {
+    "card": {
+      "colors": "Available in {names}"
+    }
   }
 }

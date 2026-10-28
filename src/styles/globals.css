@@ -210,6 +210,8 @@
   .site-header {
     height: var(--header-height);
     color: var(--color-ink);
+    position: sticky;
+    top: 0;
   }
 
   .site-header-solid {
@@ -220,7 +222,19 @@
     opacity: 0;
   }
 
-  body:has([data-header-sentinel]) .site-header {
+  /*
+   * Before the header island has run (no JavaScript, or the first paint) a hero page's header is
+   * absolutely positioned over the top of the hero, so it scrolls away with it: a transparent
+   * header that stayed sticky would end up as canvas-coloured text over the canvas-coloured page
+   * once the visitor scrolls past the hero, whatever the hero's height. The island sets `data-js`
+   * and the header becomes sticky; at scroll 0 both states are pixel-identical, so nothing moves.
+   */
+  body:has([data-header-sentinel]) .site-header:not([data-js]) {
+    position: absolute;
+    inset-inline: 0;
+  }
+
+  body:has([data-header-sentinel]) .site-header[data-js] {
     /* The hero slides under the header instead of being pushed down by it. */
     margin-bottom: calc(-1 * var(--header-height));
   }
@@ -239,6 +253,77 @@
     & :focus-visible {
       outline-color: var(--color-focus-on-dark);
     }
+  }
+
+  /*
+   * Hero (DESIGN 5.3). Every slide is stacked in the same box. The active one fades in on top; the
+   * others stay fully opaque underneath until the fade has finished and then disappear (opacity and
+   * visibility switch after --dur-slow), so the picture never dips to the backdrop mid-fade.
+   * `visibility: hidden` also takes inactive slides out of the accessibility tree and the tab order;
+   * `content-visibility: hidden` keeps them out of style, layout and paint.
+   */
+  .hero {
+    height: var(--hero-height);
+  }
+
+  .hero-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    visibility: hidden;
+    /* Inactive slides skip style, layout and paint, so they cost nothing before the first frame and
+       their lazy images stay unrequested until the slide is shown. The discrete transition delays
+       the switch by --dur-slow, so the outgoing slide stays rendered through the cross-fade. */
+    content-visibility: hidden;
+    transition:
+      opacity 0s linear var(--dur-slow),
+      visibility 0s linear var(--dur-slow),
+      content-visibility 0s linear var(--dur-slow);
+    transition-behavior: allow-discrete;
+
+    &[data-active] {
+      z-index: 1;
+      opacity: 1;
+      visibility: visible;
+      content-visibility: visible;
+      transition: opacity var(--dur-slow) var(--ease-standard);
+    }
+  }
+
+  /*
+   * Keeps hero copy and the header readable on any photograph (DESIGN 5.3, 9). Every layer is the one
+   * --color-overlay token; layers stack: a flat veil over the whole picture, a band at the top for the
+   * header, and a denser region where the headline sits (the bottom on a phone, where the copy spans
+   * the width; the left from md, where it sits in the left half). Measured on the real slides, worst
+   * pixel, in tests/e2e/home-contrast.spec.ts: headline 4.5:1 or better at 375 and 1280 px.
+   */
+  .hero-scrim {
+    background:
+      linear-gradient(to bottom, var(--color-overlay), var(--color-overlay) 10%, transparent 32%),
+      linear-gradient(to top, var(--color-overlay) 0%, var(--color-overlay) 40%, transparent 85%),
+      linear-gradient(to top, var(--color-overlay) 0%, var(--color-overlay) 55%, transparent 90%),
+      linear-gradient(var(--color-overlay), var(--color-overlay));
+
+    @media (min-width: 48rem) {
+      background:
+        linear-gradient(to bottom, var(--color-overlay), var(--color-overlay) 10%, transparent 32%),
+        linear-gradient(to top, var(--color-overlay) 0%, transparent 60%),
+        linear-gradient(
+          to right,
+          var(--color-overlay) 0%,
+          var(--color-overlay) 40%,
+          transparent 80%
+        ),
+        linear-gradient(var(--color-overlay), var(--color-overlay));
+    }
+  }
+
+  /* Under the text of a category tile: a dense band at the bottom, where the copy sits. */
+  .tile-scrim {
+    background:
+      linear-gradient(to top, var(--color-overlay) 0%, var(--color-overlay) 45%, transparent 100%),
+      linear-gradient(to top, var(--color-overlay) 0%, var(--color-overlay) 30%, transparent 80%),
+      linear-gradient(to top, var(--color-overlay), transparent 65%);
   }
 
   /* Drawer and scrim (Radix Dialog keeps the node mounted until the animation ends). */

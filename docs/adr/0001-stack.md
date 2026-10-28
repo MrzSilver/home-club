@@ -144,6 +144,18 @@ are used (DESIGN §3: at most three weights). The `.woff` fallbacks and other su
       (Leelawadee UI) have different widths, so a real Thai hero headline may wrap differently before the swap. T07
       must re-measure `/th` with the real hero; if it shifts, preload only the weight the headline uses (one file,
       about 10 kB) for both locales rather than all three.
+    - **T07 result.** The real hero shifted: with the Thai headline at display size, the line count changes when
+      Noto Sans Thai replaces the fallback (layout-shift 0.018 on `/th` at 1280 px, 4 lines to 3, in 3 of 3 loads).
+      T07 round 1 followed the note above and preloaded a separate Noto Sans Thai 500 family
+      (`notoSansThaiHeadline`), which brought that shift to 0. Review showed the price: a ~10 kB High-priority request
+      on every page, `/en` included (`next/font` cannot preload per locale), where it competes with the LCP image and is
+      never used, and a second download of the same face on `/th` (the preload family has its own URL). **Round 2
+      decision: the headline preload is removed** and `--stack-display-th` is `var(--font-thai), var(--font-display), ...`
+      again. Trade-off, accepted: a first visit to `/th` at 1280 px can show a layout shift of about 0.018 when the Thai
+      face swaps in (budget: CLS < 0.1, SPEC §12). `/th` on a phone stays at 0 (the headline wraps the same before and
+      after the swap), and `/en` and `/th` both save ~10 kB of early requests. Not chosen: keeping the family and
+      sending every weight-500 Thai role through it, which removes the double download but leaves the 10 kB on `/en`.
+      The e2e CLS test asserts 0 everywhere except `/th` on desktop, where it asserts < 0.02.
 - **Licence.** SIL Open Font License 1.1 permits embedding and redistribution with the site, provided the licence text
   travels with the fonts and the fonts are not sold on their own. Each package ships its `LICENSE` file; record the
   fonts in `docs/ASSETS.md` (RULES §14.1).
