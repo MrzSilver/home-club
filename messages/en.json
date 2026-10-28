@@ -104,8 +104,7 @@
       "reason": "Search is coming soon."
     },
     "cart": {
-      "label": "Cart",
-      "reason": "The cart is coming soon."
+      "label": "Cart"
     },
     "currencyChanged": {
       "USD": "Prices are now shown in US dollars (USD).",
@@ -192,5 +191,35 @@
       "body": "Try removing a filter, or start again from the full list.",
       "action": "Clear filters"
     }
+  },
+  "cart": {
+    "title": "Cart",
+    "count": "Cart: {count, plural, one {# item} other {# items}}",
+    "close": "Close cart",
+    "empty": "Your cart is empty. Find your everyday essentials.",
+    "continue": "Continue shopping",
+    "loading": "Loading your cart…",
+    "quantityFor": "Quantity for {name}",
+    "removeFor": "Remove {name}",
+    "remove": "Remove",
+    "subtotal": "Subtotal",
+    "demo": "Demo store — nothing is sold. No payment is taken.",
+    "view": "View cart",
+    "oneSize": "One size"
+  },
+  "product": {
+    "gallery": "Product images",
+    "swipe": "Swipe or scroll to view product images",
+    "image": "View image {number}",
+    "color": "Colour",
+    "size": "Size",
+    "oneSize": "One size",
+    "unavailable": "Unavailable",
+    "choose": "Choose an available colour and size.",
+    "soldOut": "Sold out",
+    "lowStock": "Only {count, plural, one {# left} other {# left}}",
+    "inStock": "In stock",
+    "quantity": "Quantity",
+    "add": "Add to cart"
   }
 }

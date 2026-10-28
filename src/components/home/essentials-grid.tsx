@@ -1,7 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import type { ReactElement } from 'react';
 
-import { prefetchFor } from '@/components/catalogue/prefetch';
 import { ProductCard } from '@/components/catalogue/product-card';
 import { buttonClasses } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
@@ -29,7 +28,7 @@ export async function EssentialsGrid({
           </h2>
           <Link
             href="/shop"
-            prefetch={prefetchFor('shop')}
+            prefetch={false}
             className={buttonClasses({ variant: 'link', size: 'sm', className: 'gap-1' })}
           >
             {t('essentials.seeAll')}

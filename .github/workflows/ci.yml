@@ -63,6 +63,9 @@ jobs:
       - name: Install Playwright browser
         run: pnpm exec playwright install --with-deps chromium
 
+      - name: JavaScript budgets (ADR-0004)
+        run: pnpm bundle:check
+
       # Reuses the build above; playwright.config.ts only runs `pnpm start` when CI is set.
       - name: E2E and accessibility tests
         run: pnpm test:e2e

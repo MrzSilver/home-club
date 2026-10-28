@@ -2,7 +2,6 @@ import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 import type { ReactElement } from 'react';
 
-import { prefetchFor } from '@/components/catalogue/prefetch';
 import { Swatch } from '@/components/ui/swatch';
 import { VisuallyHidden } from '@/components/ui/visually-hidden';
 import type { Locale, Product } from '@/data/schema';
@@ -21,6 +20,8 @@ type ProductCardProps = {
   sizes?: string;
   /** Fetch the first picture eagerly: for the one card that can be the page's largest paint. */
   priority?: boolean;
+  /** Collection filters reveal cards without fetching unrelated product routes. */
+  prefetch?: boolean;
 };
 
 /**
@@ -36,6 +37,7 @@ export async function ProductCard({
   currency,
   sizes = PRODUCT_CARD_SIZES,
   priority = false,
+  prefetch = false,
 }: ProductCardProps): Promise<ReactElement> {
   const t = await getTranslations({ locale, namespace: 'catalogue' });
   const colorId = defaultColorFor(product);
@@ -48,11 +50,7 @@ export async function ProductCard({
   const imageClass = 'absolute inset-0 size-full object-cover';
 
   return (
-    <Link
-      href={`/products/${product.slug}`}
-      prefetch={prefetchFor('products')}
-      className="group block rounded-md"
-    >
+    <Link href={`/products/${product.slug}`} prefetch={prefetch} className="group block rounded-md">
       <div className="relative aspect-card overflow-hidden rounded-md bg-surface">
         {primary === undefined ? null : (
           <Image

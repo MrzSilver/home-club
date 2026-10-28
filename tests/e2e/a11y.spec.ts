@@ -4,6 +4,10 @@ import { expect, test } from '@playwright/test';
 // Public URLs under test: every route in both locales (RULES 8.8), plus the bilingual 404 page.
 // Later tasks extend this list.
 const ROUTES = [
+  '/en/products/essential-tee',
+  '/th/products/essential-tee',
+  '/en/cart',
+  '/th/cart',
   '/en',
   '/th',
   '/en/does-not-exist',

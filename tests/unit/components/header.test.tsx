@@ -2,6 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { CartProvider } from '@/components/cart/cart-provider';
 import { Header } from '@/components/layout/header';
 import en from '@messages/en.json';
 import th from '@messages/th.json';
@@ -20,8 +21,13 @@ vi.mock('next/navigation', () => ({ useParams: () => ({ currency: 'usd' }) }));
 async function renderHeader(locale: 'en' | 'th'): Promise<void> {
   const header = await Header({ locale });
   render(
-    <NextIntlClientProvider locale={locale} messages={{}}>
-      {header}
+    <NextIntlClientProvider
+      locale={locale}
+      messages={{ cart: locale === 'en' ? en.cart : th.cart }}
+    >
+      <CartProvider products={[]} locale={locale}>
+        {header}
+      </CartProvider>
     </NextIntlClientProvider>,
   );
 }
@@ -74,17 +80,17 @@ describe('Header (FR-001)', () => {
     expect(within(screen.getByRole('banner')).getByText('Foundation')).toBeInTheDocument();
   });
 
-  it.each([
-    ['search', en.nav.search],
-    ['cart', en.nav.cart],
-  ])('keeps %s focusable but inert and explains why (arrives later)', async (_name, copy) => {
-    await renderHeader('en');
+  it.each([['search', en.nav.search]])(
+    'keeps %s focusable but inert and explains why (arrives later)',
+    async (_name, copy) => {
+      await renderHeader('en');
 
-    const button = screen.getByRole('button', { name: copy.label });
-    expect(button).not.toBeDisabled();
-    expect(button).toHaveAttribute('aria-disabled', 'true');
-    expect(button).toHaveAccessibleDescription(copy.reason);
-  });
+      const button = screen.getByRole('button', { name: copy.label });
+      expect(button).not.toBeDisabled();
+      expect(button).toHaveAttribute('aria-disabled', 'true');
+      expect(button).toHaveAccessibleDescription(copy.reason);
+    },
+  );
 
   it('reserves a fixed-size, out-of-flow box for the cart count badge (T10 fills it, nothing shifts)', async () => {
     await renderHeader('en');

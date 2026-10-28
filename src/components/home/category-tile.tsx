@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import type { ReactElement } from 'react';
 
-import { prefetchFor } from '@/components/catalogue/prefetch';
 import { ArrowRightIcon } from '@/components/ui/icons/arrow-right-icon';
 import type { CategoryEntry, Locale } from '@/data/schema';
 import { Link } from '@/i18n/navigation';
@@ -24,7 +23,7 @@ export function CategoryTile({ category, locale }: CategoryTileProps): ReactElem
   return (
     <Link
       href={`/collections/${category.id}`}
-      prefetch={prefetchFor('collections')}
+      prefetch={false}
       className="group relative block aspect-tile overflow-hidden rounded-md bg-forest text-canvas md:aspect-tile-lg"
       data-on-dark=""
     >

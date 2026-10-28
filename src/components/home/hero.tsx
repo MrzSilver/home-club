@@ -2,7 +2,6 @@ import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 import type { ReactElement } from 'react';
 
-import { prefetchFor } from '@/components/catalogue/prefetch';
 import { HeroCarousel, type HeroSlideEntry } from '@/components/home/hero-carousel';
 import { buttonClasses } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
@@ -13,16 +12,14 @@ import { Link } from '@/i18n/navigation';
 // Slide order matches HERO_IMAGES. `focus` keeps the figure in frame when a phone crops the 16:9
 // picture to a tall box; from md the box is wide enough to show the whole width.
 const SLIDES = [
-  { id: 'discover', route: 'shop', href: '/shop', focus: 'object-[55%_50%] md:object-center' },
+  { id: 'discover', href: '/shop', focus: 'object-[55%_50%] md:object-center' },
   {
     id: 'performance',
-    route: 'collections',
     href: '/collections/performance',
     focus: 'object-[66%_50%] md:object-center',
   },
   {
     id: 'lifestyle',
-    route: 'collections',
     href: '/collections/lifestyle',
     focus: 'object-[76%_50%] md:object-center',
   },
@@ -85,7 +82,7 @@ export async function Hero({ locale }: HeroProps): Promise<ReactElement> {
               </Headline>
               <Link
                 href={slide.href}
-                prefetch={prefetchFor(slide.route)}
+                prefetch={false}
                 className={buttonClasses({ variant: 'on-image', className: 'mt-6' })}
               >
                 {text.cta}

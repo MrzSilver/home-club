@@ -21,7 +21,14 @@ function load(baseUrl: string | undefined): Config {
 }
 
 // Home and one Collection page per locale (T08).
-const ROUTES = ['/en', '/th', '/en/shop', '/th/collections/foundations'];
+const ROUTES = [
+  '/en',
+  '/th',
+  '/en/shop',
+  '/th/collections/foundations',
+  '/en/products/essential-tee',
+  '/th/products/essential-tee',
+];
 
 const MACHINE_DEPENDENT = [
   'categories:performance',
