@@ -1,4 +1,4 @@
-import type { ComponentPropsWithoutRef, ReactElement } from 'react';
+import type { ComponentPropsWithoutRef, ReactElement, Ref } from 'react';
 
 import { ArrowRightIcon } from './icons/arrow-right-icon';
 
@@ -51,6 +51,7 @@ export type ButtonProps = ComponentPropsWithoutRef<'button'> &
     withArrow?: boolean;
     /** Id of the element that explains why the button is unavailable; linked with aria-describedby. */
     disabledReasonId?: string;
+    ref?: Ref<HTMLButtonElement>;
   };
 
 /**

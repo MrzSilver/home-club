@@ -86,19 +86,21 @@ home-club/
 │  │  ├─ ui/                    # primitives: Button, Badge, Swatch, Dialog, Drawer…
 │  │  ├─ layout/                # Header, Footer, MobileNav, LocaleSwitcher, CurrencySwitcher
 │  │  ├─ home/                  # Hero, CategoryTiles, EssentialsGrid, LookTeaser, TrustStrip, VibesRow
-│  │  ├─ catalogue/             # ProductCard, ProductGrid, Filters, SortSelect
+│  │  ├─ catalogue/             # ProductCard, CatalogueExplorer (grid + Filters, SortSelect, chips, drawer)
 │  │  ├─ product/               # Gallery, VariantPicker, AddToCart, SizeGuide
 │  │  ├─ cart/                  # CartDrawer, CartLine, CartSummary
 │  │  └─ look/                  # LookBuilder, LookSlot, LookSummary
 │  ├─ data/
 │  │  ├─ products.ts  looks.ts  vibes.ts  categories.ts
+│  │  ├─ taxonomy.ts            # category/size/slot/vibe tuples (Zod-free, usable in the browser)
 │  │  └─ schema.ts              # Zod schemas, shared types
 │  ├─ lib/
 │  │  ├─ money.ts               # cents math, FX, formatting
 │  │  ├─ pricing.ts             # line totals, look discount
 │  │  ├─ stock.ts               # availability checks
 │  │  ├─ look.ts                # look-builder pure logic
-│  │  ├─ catalogue.ts           # filter/sort/query helpers
+│  │  ├─ catalogue.ts           # seed-bound lookups and parsers (server)
+│  │  ├─ catalogue-query.ts     # URL query, filter, sort, facets: no seed data, no Zod (runs in the browser)
 │  │  ├─ search.ts
 │  │  ├─ seo.ts                 # metadata + JSON-LD builders
 │  │  ├─ locale-path.ts         # public <-> internal (currency segment) path helpers, hreflang paths
@@ -222,7 +224,8 @@ Seed catalogue: 12–16 products across 4 categories (see PRD §11). Initial set
 - Currency (mirrors cookie). Locale is **not** stored; the URL is the source of truth.
 
 ### 7.3 URL state
-- Catalogue filters/sort and look selections live in the query string, parsed and validated with Zod on the server; invalid values fall back to defaults.
+- Catalogue filters and sort live in the query string. The collection pages stay **static** (ADR-0006), so the query is not read on the server: the server renders the default view, and the client island (`CatalogueExplorer`) parses `location.search` with `lib/catalogue-query` (plain TypeScript; a unit test runs every parse result through the Zod `catalogueQuerySchema`, and invalid values fall back to defaults) and writes changes back with the History API (`replaceState`, no history entries, no server round trip); it re-reads the URL after Back/Forward and after Next.js navigations to the same page (`CatalogueUrlWatcher`). Price bounds carry a `priceCurrency` tag (ADR-0003).
+- Look selections (P2, FR-044) are in the query string too. They follow the same pattern unless that page is allowed to render per request (decide in its own ADR); parse and validate with Zod wherever the parsing runs.
 
 ## 8. Look builder logic (`lib/look.ts`)
 
@@ -250,7 +253,7 @@ Behaviour:
 | `Header` | Server shell + client islands | Sticky; cart badge is a client island |
 | `Hero` | Client | `slides[]`; arrows, dots, pause; no autoplay unless explicitly enabled; reduced-motion safe; first slide image is `priority` |
 | `ProductCard` | Server | Link wraps whole card; swatches are decorative + `aria-label`; no nested interactive elements |
-| `Filters` | Client | Writes to URL via router; debounced price slider; drawer on mobile |
+| `CatalogueExplorer` (`Filters`, `SortSelect`, chips) | Client | Reads and writes the URL (History API, ADR-0006); filters a server-rendered card list; price = two debounced inputs; sidebar from `lg`, Radix drawer (lazy) below |
 | `Gallery` | Client | Keyboard + swipe; `sizes` tuned; only first image eager |
 | `VariantPicker` | Client | Radio groups (`role="radiogroup"`), disabled combos have `aria-disabled` + reason text |
 | `CartDrawer` | Client | Focus trap, `Esc` closes, returns focus to trigger, `aria-live` for updates |

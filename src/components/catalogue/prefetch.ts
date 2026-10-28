@@ -5,13 +5,13 @@ export type PrefetchRoute = 'shop' | 'collections' | 'products' | 'cart';
  * Whether links into each route prefetch their page. A prefetch of a URL with no page is a 404 in the
  * console of every visit (Lighthouse best-practices, RULES 10, "no console errors"), so a route
  * prefetches only once its page exists. Flip the switch in the task that adds the page:
- * TODO(T08) `shop` and `collections`; TODO(T09) `products`; TODO(T10) `cart`.
+ * TODO(T09) `products`; TODO(T10) `cart`.
  * tests/unit/components/prefetch.test.ts fails whenever a switch disagrees with the filesystem, so a
  * new route cannot ship without its switch.
  */
 export const PREFETCH: Readonly<Record<PrefetchRoute, boolean>> = {
-  shop: false,
-  collections: false,
+  shop: true,
+  collections: true,
   products: false,
   cart: false,
 };

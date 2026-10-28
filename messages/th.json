@@ -24,7 +24,10 @@
     "siteDescription": "Home Club Foundation เป็นร้านเสื้อผ้าออนไลน์ตัวอย่าง สร้างขึ้นเป็นผลงานในพอร์ตโฟลิโอ ไม่มีการขายสินค้าจริง",
     "homeTitle": "Home Club Foundation (ร้านตัวอย่าง)",
     "notFoundTitle": "ไม่พบหน้าที่คุณต้องการ",
-    "homeDescription": "เสื้อผ้าเบสิกเรียบง่ายสำหรับทุกวัน Home Club Foundation เป็นร้านเสื้อผ้าออนไลน์ตัวอย่าง สร้างขึ้นเป็นผลงานในพอร์ตโฟลิโอ ไม่มีการขายสินค้าจริง"
+    "homeDescription": "เสื้อผ้าเบสิกเรียบง่ายสำหรับทุกวัน Home Club Foundation เป็นร้านเสื้อผ้าออนไลน์ตัวอย่าง สร้างขึ้นเป็นผลงานในพอร์ตโฟลิโอ ไม่มีการขายสินค้าจริง",
+    "shopTitle": "สินค้าทั้งหมด",
+    "shopDescription": "ดูสินค้าทุกชิ้นในร้านตัวอย่าง Home Club Foundation ทั้งเสื้อยืด ฮู้ดดี้ กางเกงขาสั้น หมวก และถุงเท้า ไม่มีการขายสินค้าจริง",
+    "collectionDescription": "{subtitle} ดูสินค้า {count} รายการในหมวด{name} ของ Home Club Foundation ร้านตัวอย่างที่ไม่มีการขายสินค้าจริง"
   },
   "home": {
     "hero": {
@@ -133,7 +136,61 @@
   },
   "catalogue": {
     "card": {
-      "colors": "มีสี {names}"
+      "colors": "มีสี {names}",
+      "soldOut": "สินค้าหมด"
+    },
+    "page": {
+      "shopTitle": "สินค้าทั้งหมด",
+      "shopSubtitle": "ทุกชิ้นของเรา รวมไว้ในที่เดียว",
+      "breadcrumbLabel": "เส้นทางหน้าเว็บ",
+      "home": "หน้าแรก",
+      "shop": "สินค้า",
+      "resultsHeading": "สินค้า"
+    },
+    "count": "{count, plural, other {# รายการ}}",
+    "sort": {
+      "label": "เรียงตาม",
+      "featured": "แนะนำ",
+      "price-asc": "ราคา: ต่ำไปสูง",
+      "price-desc": "ราคา: สูงไปต่ำ",
+      "newest": "ใหม่ล่าสุด"
+    },
+    "filters": {
+      "title": "ตัวกรอง",
+      "open": "ตัวกรอง",
+      "openWithCount": "ตัวกรอง ({count})",
+      "close": "ปิดตัวกรอง",
+      "category": {
+        "legend": "หมวดหมู่",
+        "all": "ทั้งหมด"
+      },
+      "color": {
+        "legend": "สี"
+      },
+      "size": {
+        "legend": "ไซซ์",
+        "one": "ฟรีไซซ์"
+      },
+      "price": {
+        "legend": "ราคา ({currency})",
+        "min": "ต่ำสุด",
+        "max": "สูงสุด",
+        "error": "ราคาต่ำสุดต้องไม่มากกว่าราคาสูงสุด"
+      },
+      "showResults": "{count, plural, other {ดู # รายการ}}",
+      "clearAll": "ล้างทั้งหมด",
+      "activeLabel": "ตัวกรองที่ใช้อยู่",
+      "remove": "ลบตัวกรอง: {name}",
+      "chip": {
+        "priceFrom": "ตั้งแต่ {min}",
+        "priceUpTo": "ไม่เกิน {max}",
+        "priceBetween": "{min} ถึง {max}"
+      }
+    },
+    "empty": {
+      "title": "ไม่พบสินค้าที่ตรงกับตัวกรอง",
+      "body": "ลองลบตัวกรองบางอย่างออก หรือเริ่มใหม่จากรายการทั้งหมด",
+      "action": "ล้างตัวกรอง"
     }
   }
 }

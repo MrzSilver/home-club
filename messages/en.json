@@ -24,7 +24,10 @@
     "siteDescription": "Home Club Foundation is a demo online clothing store built as a portfolio project. Nothing is sold.",
     "homeTitle": "Home Club Foundation (demo store)",
     "notFoundTitle": "Page not found",
-    "homeDescription": "Quiet essentials for every day. Home Club Foundation is a demo online clothing store built as a portfolio project. Nothing is sold."
+    "homeDescription": "Quiet essentials for every day. Home Club Foundation is a demo online clothing store built as a portfolio project. Nothing is sold.",
+    "shopTitle": "Shop all",
+    "shopDescription": "Browse every piece in the Home Club Foundation demo store: tees, hoodies, shorts, caps and socks. Nothing is sold.",
+    "collectionDescription": "{subtitle}. Browse {count, plural, one {# product} other {# products}} in {name} at Home Club Foundation, a demo store. Nothing is sold."
   },
   "home": {
     "hero": {
@@ -133,7 +136,61 @@
   },
   "catalogue": {
     "card": {
-      "colors": "Available in {names}"
+      "colors": "Available in {names}",
+      "soldOut": "Sold out"
+    },
+    "page": {
+      "shopTitle": "Shop all",
+      "shopSubtitle": "Everything we make, in one place.",
+      "breadcrumbLabel": "Breadcrumb",
+      "home": "Home",
+      "shop": "Shop",
+      "resultsHeading": "Products"
+    },
+    "count": "{count, plural, one {# product} other {# products}}",
+    "sort": {
+      "label": "Sort by",
+      "featured": "Featured",
+      "price-asc": "Price: low to high",
+      "price-desc": "Price: high to low",
+      "newest": "Newest"
+    },
+    "filters": {
+      "title": "Filters",
+      "open": "Filters",
+      "openWithCount": "Filters ({count})",
+      "close": "Close filters",
+      "category": {
+        "legend": "Category",
+        "all": "All"
+      },
+      "color": {
+        "legend": "Colour"
+      },
+      "size": {
+        "legend": "Size",
+        "one": "One size"
+      },
+      "price": {
+        "legend": "Price ({currency})",
+        "min": "Min",
+        "max": "Max",
+        "error": "The minimum cannot be higher than the maximum."
+      },
+      "showResults": "{count, plural, one {Show # result} other {Show # results}}",
+      "clearAll": "Clear all",
+      "activeLabel": "Active filters",
+      "remove": "Remove filter: {name}",
+      "chip": {
+        "priceFrom": "From {min}",
+        "priceUpTo": "Up to {max}",
+        "priceBetween": "{min} to {max}"
+      }
+    },
+    "empty": {
+      "title": "No products match these filters",
+      "body": "Try removing a filter, or start again from the full list.",
+      "action": "Clear filters"
     }
   }
 }

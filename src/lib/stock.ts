@@ -1,4 +1,5 @@
-import { MAX_QTY_PER_LINE, SIZES, type Product, type Size, type Variant } from '@/data/schema';
+import type { Product, Size, Variant } from '@/data/schema';
+import { MAX_QTY_PER_LINE, SIZES } from '@/data/taxonomy';
 
 // Re-exported so the cart cap has one definition shared with the CartLine schema (RULES 7.4).
 export { MAX_QTY_PER_LINE };
@@ -27,6 +28,11 @@ export function findVariant(
 
 export function isInStock(variant: Pick<Variant, 'stock'> | undefined): boolean {
   return variant !== undefined && variant.stock > 0;
+}
+
+/** True when no variant of the product has stock: the card says "Sold out" instead of inviting a click. */
+export function isSoldOut(product: Pick<Product, 'variants'>): boolean {
+  return !product.variants.some(isInStock);
 }
 
 export function isLowStock(variant: Pick<Variant, 'stock'> | undefined): boolean {

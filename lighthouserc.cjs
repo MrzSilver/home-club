@@ -15,9 +15,10 @@ const LOCAL_URL = 'http://localhost:3000';
 const remote = (process.env.LHCI_BASE_URL ?? '').trim().replace(/\/+$/, '');
 const BASE_URL = remote === '' ? LOCAL_URL : remote;
 
-// Routes under test: every page in both locales (RULES 8.8 and SPEC 12 apply to Thai too).
-// Later tasks add the Collection, Product and Look builder pages.
-const ROUTES = ['/en', '/th'];
+// Routes under test: Home in both locales and one Collection page in each (RULES 8.8 and SPEC 12 apply
+// to Thai too): "Shop all" in English, a category page in Thai. Later tasks add the Product and Look
+// builder pages.
+const ROUTES = ['/en', '/th', '/en/shop', '/th/collections/foundations'];
 
 // Vercel Deployment Protection: send the automation bypass header when the secret is provided.
 const bypass = (process.env.VERCEL_AUTOMATION_BYPASS_SECRET ?? '').trim();

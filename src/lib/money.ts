@@ -166,3 +166,16 @@ export function formatMoney(amountMinor: number, currency: Currency, locale: Loc
   const decimal = `${sign}${major}.${minor}` as `${number}`;
   return formatterFor(currency, locale).format(decimal);
 }
+
+/**
+ * The currency's own sign as `locale` writes it: "$" for dollars in English, "US$" for dollars in
+ * Thai (where "$" alone is ambiguous), "฿" for baht. Taken from Intl, so no symbol is hard-coded.
+ * Compute it on the server and pass it down: Node and browser ICU data can differ (ADR-0003).
+ */
+export function currencySymbol(currency: Currency, locale: Locale): string {
+  return (
+    formatterFor(currency, locale)
+      .formatToParts(0)
+      .find((part) => part.type === 'currency')?.value ?? currency
+  );
+}
