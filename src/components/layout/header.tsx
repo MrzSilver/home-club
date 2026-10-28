@@ -6,7 +6,7 @@ import { HeaderSurface } from '@/components/layout/header-surface';
 import { MobileNav } from '@/components/layout/mobile-nav';
 import type { MobileNavContent } from '@/components/layout/mobile-nav-types';
 import { categoryLinks, primaryLinks } from '@/components/layout/nav-links';
-import { BagIcon } from '@/components/ui/icons/bag-icon';
+import { CartTrigger } from '@/components/cart/cart-trigger';
 import { SearchIcon } from '@/components/ui/icons/search-icon';
 import { IconButton } from '@/components/ui/icon-button';
 import { Wordmark } from '@/components/ui/wordmark';
@@ -16,7 +16,6 @@ import { Link } from '@/i18n/navigation';
 type HeaderProps = { locale: Locale };
 
 const SEARCH_REASON_ID = 'header-search-reason';
-const CART_REASON_ID = 'header-cart-reason';
 
 /**
  * Site header (FR-001): hamburger left, wordmark centred, search and cart right. Server-rendered; the
@@ -71,22 +70,7 @@ export async function Header({ locale }: HeaderProps): Promise<ReactElement> {
             {nav('search.reason')}
           </span>
 
-          <IconButton label={nav('cart.label')} disabled disabledReasonId={CART_REASON_ID}>
-            <BagIcon className="size-6" />
-            {/*
-              TODO(T10): the item-count badge island renders into this box. The box is reserved now
-              (fixed size, absolutely positioned, out of flow) so adding the count later cannot shift
-              the header.
-            */}
-            <span
-              aria-hidden="true"
-              data-slot="cart-badge"
-              className="pointer-events-none absolute end-0 top-0 size-4"
-            />
-          </IconButton>
-          <span id={CART_REASON_ID} hidden>
-            {nav('cart.reason')}
-          </span>
+          <CartTrigger />
         </div>
       </div>
     </HeaderSurface>

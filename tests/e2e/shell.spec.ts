@@ -141,7 +141,7 @@ for (const locale of LOCALES) {
       expect(box?.height).toBe(width < 768 ? 64 : 80);
     });
 
-    test('search and cart are focusable but inert, and say why (FR-001)', async ({ page }) => {
+    test('search explains its disabled state; cart is available (FR-001)', async ({ page }) => {
       await page.goto(`/${locale}`);
 
       const search = page.getByRole('button', { name: copy.search });
@@ -150,7 +150,7 @@ for (const locale of LOCALES) {
       await search.focus();
       await expect(search).toBeFocused();
       const cart = page.getByRole('button', { name: copy.cart });
-      await expect(cart).toHaveAttribute('aria-disabled', 'true');
+      await expect(cart).not.toHaveAttribute('aria-disabled', 'true');
       for (const control of [search, cart, menuButton(page, locale)]) {
         const box = await control.boundingBox();
         expect(box?.width).toBeGreaterThanOrEqual(44);

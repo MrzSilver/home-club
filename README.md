@@ -38,6 +38,7 @@ pnpm dev                     # http://localhost:3000
 | `pnpm test:coverage`                | Unit tests with coverage thresholds (`src/lib` lines ≥ 90, global lines ≥ 75)                 |
 | `pnpm test:e2e`                     | End-to-end journeys (Playwright, `tests/e2e`; builds and starts the production server itself) |
 | `pnpm test:a11y`                    | Accessibility sweep (axe, tests tagged `@a11y`)                                               |
+| `pnpm bundle:check`                 | Enforce total and application JavaScript gzip budgets against a fresh production build        |
 | `pnpm lhci`                         | Lighthouse CI against budgets (needs a prior `pnpm build`; see below for the preview gate)    |
 | `pnpm check`                        | typecheck + lint + test + build                                                               |
 
@@ -97,7 +98,7 @@ Brand, products and copy are fictional. Imagery is placeholder/illustrative unti
 
 ## Status
 
-Phase P1 (MVP) — in progress. T01 (scaffold, tooling, CI, ADR-0001) is done; the app is still a placeholder page. See [PRD.md §6](./PRD.md) for the roadmap.
+P1 T01–T10 are implemented: Home, Collection filters/sort, product gallery and stock-aware variants, plus a persisted cart with drawer and full page, in Thai/English and THB/USD. T11 adds product/cart axe coverage, product Lighthouse targets and the CI JavaScript-budget gate. See [P1 validation](./docs/p1-validation.md) for measured results and phase-exit limitations. Search, Look builder and checkout remain P2 (see [PRD.md §6](./PRD.md)).
 
 ## Author
 

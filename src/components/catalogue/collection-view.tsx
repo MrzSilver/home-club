@@ -54,6 +54,7 @@ export async function CollectionView({
         locale={locale}
         currency={currency}
         sizes={GRID_SIZES}
+        prefetch={false}
         // The first card is what a visitor sees first, so it is the only image fetched eagerly.
         priority={index === 0}
       />

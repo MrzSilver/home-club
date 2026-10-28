@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
-import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import type { ReactElement, ReactNode } from 'react';
 
+import { CartProvider } from '@/components/cart/cart-provider';
+import { getAllProducts } from '@/lib/catalogue';
 import { Footer } from '@/components/layout/footer';
 import { Header } from '@/components/layout/header';
 import { SkipLink } from '@/components/ui/skip-link';
@@ -45,6 +47,18 @@ export default async function LocaleLayout({
   // from request headers.
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: 'a11y' });
+  const messages = await getMessages({ locale });
+  const products = getAllProducts().map(({ slug, name, priceCents, colors, variants, images }) => ({
+    slug,
+    name,
+    priceCents,
+    colors,
+    variants,
+    images: colors.flatMap((color) => {
+      const image = images.find((item) => item.colorId === color.id);
+      return image ? [image] : [];
+    }),
+  }));
 
   return (
     <html lang={locale} className={fontVariables}>
@@ -54,11 +68,13 @@ export default async function LocaleLayout({
           out of the client bundle: a client component that needs strings receives just those
           (`messages={pick(...)}` on its own provider, or props).
         */}
-        <NextIntlClientProvider locale={locale} messages={{}}>
-          <SkipLink label={t('skipToContent')} />
-          <Header locale={locale} />
-          {children}
-          <Footer locale={locale} />
+        <NextIntlClientProvider locale={locale} messages={{ cart: messages.cart }}>
+          <CartProvider products={products} locale={locale}>
+            <SkipLink label={t('skipToContent')} />
+            <Header locale={locale} />
+            {children}
+            <Footer locale={locale} />
+          </CartProvider>
         </NextIntlClientProvider>
       </body>
     </html>

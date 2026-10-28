@@ -213,12 +213,11 @@ Seed catalogue: 12–16 products across 4 categories (see PRD §11). Initial set
 ## 7. State
 
 ### 7.1 Cart (`store/cart.ts`)
-- Zustand with `persist` to `localStorage` key `hc:cart:v1`.
-- Rehydrate through a Zod schema; on failure, reset to empty (never throw).
-- Actions: `add(sku, qty, lookId?)`, `setQty(sku, qty)`, `remove(sku)`, `clear()`, `addMany(lines)` (atomic).
-- Every action clamps qty to `[1, min(stock, 10)]` using `lib/stock.ts`.
-- **Hydration safety:** UI that depends on persisted state renders after mount (e.g. `useHydrated()` hook); the server HTML shows no count badge. No hydration warnings allowed.
-- Selectors derive totals; totals are never stored.
+- Zustand `persist`, version 1, under `hc:cart:v1`. P1 persists only SKU/quantity; look grouping and atomic `addMany` are P2.
+- Strict Zod mini validation rejects unsupported/malformed envelope versions, extra fields and invalid lines. The validator loads asynchronously only when storage contains a cart, with JIT disabled for the CSP. Invalid data resets safely; empty carts remove the key, and storage failures preserve in-memory use.
+- `add(sku, qty)` returns whether the add is accepted; `setQty`, `remove`, and `clear` clamp quantities with `lib/stock.ts` and discard stale or sold-out SKUs on rehydration. Duplicate SKUs merge within stock/max-10 limits.
+- A per-tree `CartProvider` gets a compact catalogue projection from the server. No seed catalogue or full data schema is imported into global client code. Persisted lines and the header badge are exposed only after hydration/validation; totals are never stored and are recomputed from current catalogue prices and the current currency segment.
+- Radix drawer content loads on interaction, traps focus and restores focus to the originating header/add control. `/cart` shares the line/subtotal UI. Checkout is deliberately deferred to P2.
 
 ### 7.2 Preferences (`store/preferences.ts`)
 - Currency (mirrors cookie). Locale is **not** stored; the URL is the source of truth.
