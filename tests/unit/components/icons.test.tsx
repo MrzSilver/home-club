@@ -9,6 +9,7 @@ import { CheckIcon } from '@/components/ui/icons/check-icon';
 import { ChevronLeftIcon } from '@/components/ui/icons/chevron-left-icon';
 import { ChevronRightIcon } from '@/components/ui/icons/chevron-right-icon';
 import { CloseIcon } from '@/components/ui/icons/close-icon';
+import { FiltersIcon } from '@/components/ui/icons/filters-icon';
 import { GlobeIcon } from '@/components/ui/icons/globe-icon';
 import type { IconProps } from '@/components/ui/icons/icon-base';
 import { InfoIcon } from '@/components/ui/icons/info-icon';
@@ -39,6 +40,7 @@ const ICONS: Array<[string, (props: IconProps) => ReactElement]> = [
   ['truck', TruckIcon],
   ['globe', GlobeIcon],
   ['info', InfoIcon],
+  ['filters', FiltersIcon],
 ];
 
 describe.each(ICONS)('%s icon', (_name, Icon) => {

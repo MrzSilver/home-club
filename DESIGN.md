@@ -124,7 +124,7 @@ Built (T07): three slides stacked in one box (height `--hero-height`: `max(32rem
 Image with dark gradient, uppercase title + muted subtitle, trailing line-arrow. Whole tile is one link. Hover: image scale ≤ 1.03 over 300 ms, arrow shifts 4 px.
 
 ### 5.5 Product card
-1:1 image on `surface` backdrop, name in `text-eyebrow` uppercase, price below, swatches (16 px circles with ring) row. Entire card is one link; swatches are non-interactive on cards in P1. Hover: swap to alternate image if available.
+1:1 image on `surface` backdrop, name in `text-eyebrow` uppercase, price below, swatches (16 px circles with ring) row. Entire card is one link; swatches are non-interactive on cards in P1. Hover: swap to alternate image if available. A product with no stock in any variant shows the text "Sold out" beside the price (never colour alone) and stays a link.
 
 ### 5.6 Look banner and builder
 `surface` panel: left column with eyebrow ("LOOK COMPLET" / "Complete look"), headline, short copy, dark button with the computed total underneath; right column shows four product cut-outs joined by `+` glyphs with name and price captions. Mobile stacks vertically. In the builder each slot shows the product image, colour swatches (interactive), size selector, and a per-slot status line; the summary shows list total, discount (with "You save …"), and final total. Out-of-stock state: slot outlined in `danger`, message with icon (never colour alone), alternatives offered inline.
@@ -164,7 +164,7 @@ Line icons, 1.5 px stroke, 20/24 px grid, `currentColor`. One library (`lucide-r
 ## 8. Layout notes per page (from the mock-up)
 
 **Home order:** Hero → Category tiles → Essentials (4-up) → Look banner → Editorial + Trust → Vibes row → Footer band ("Join the Club").
-**Collection:** page title + count, filter/sort bar (sticky on mobile), 2-up grid mobile / 3-up tablet / 4-up desktop.
+**Collection:** breadcrumb, page title and subtitle, filter/sort bar (sticky under the header below `lg`), result count, removable filter chips, 2-up grid mobile / 3-up tablet / 4-up desktop (`xl`). Built (T08): below `lg` the bar holds a "Filters (n)" button and the sort select; the filters open in a left drawer (same panel as the menu drawer, "Show N results" closes it, filters apply live). From `lg` the same panel is a 14rem sidebar beside the grid and the button disappears. Groups: category (Shop all only), colour (swatch plus visible name), size (chips with a check when selected), price (two labelled inputs, whole units of the active currency, debounced). The empty state replaces the grid with a heading, one sentence and a primary "Clear filters" button. Product count is the page's `role="status"`, so every change is announced politely.
 **Product:** gallery left (sticky on desktop), details right: name, price, colour, size + guide, add-to-cart, accordion for description/materials/care, "Goes well with".
 **Look builder:** four slot cards in a 2×2 (mobile 1-col), sticky summary on desktop, bottom sheet summary on mobile.
 **Checkout:** single column form + order summary; demo notice at top.

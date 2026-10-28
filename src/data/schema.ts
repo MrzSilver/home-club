@@ -1,18 +1,12 @@
 import { z } from 'zod';
 
 import { LOCALES } from '@/data/locales';
+import { CATEGORIES, MAX_QTY_PER_LINE, SIZES, SLOTS, VIBES } from '@/data/taxonomy';
 
 export { LOCALES };
 
-// Ordered const tuples are the single source for every literal union below (RULES 2.4: no enums).
-export const CATEGORIES = ['foundations', 'performance', 'lifestyle', 'accessories'] as const;
-export const VIBES = ['performance', 'outdoor', 'lazy', 'skate', 'hockey'] as const;
-export const SLOTS = ['top', 'bottom', 'cap', 'socks'] as const;
-// Canonical display order: apparel XS to XXL, then the one-size value.
-export const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'ONE'] as const;
-
-// RULES 7.4 / SPEC 7.1: the cart cap. Lives next to CartLine so the schema and lib/stock share it.
-export const MAX_QTY_PER_LINE = 10;
+// The vocabularies live in taxonomy.ts (Zod-free, so client islands can import them); re-exported here.
+export { CATEGORIES, MAX_QTY_PER_LINE, SIZES, SLOTS, VIBES };
 
 const KEBAB_CASE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;

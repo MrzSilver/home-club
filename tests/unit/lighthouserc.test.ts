@@ -20,6 +20,9 @@ function load(baseUrl: string | undefined): Config {
   return require(CONFIG_PATH) as Config;
 }
 
+// Home and one Collection page per locale (T08).
+const ROUTES = ['/en', '/th', '/en/shop', '/th/collections/foundations'];
+
 const MACHINE_DEPENDENT = [
   'categories:performance',
   'largest-contentful-paint',
@@ -43,7 +46,7 @@ describe('lighthouserc.cjs (ADR-0004 amendment)', () => {
   it('without LHCI_BASE_URL serves the build locally and only warns on machine-dependent metrics', () => {
     const { ci } = load(undefined);
     expect(ci.collect.startServerCommand).toBe('pnpm start');
-    expect(ci.collect.url).toEqual(['http://localhost:3000/en', 'http://localhost:3000/th']);
+    expect(ci.collect.url).toEqual(ROUTES.map((route) => `http://localhost:3000${route}`));
     for (const key of MACHINE_DEPENDENT) expect(ci.assert.assertions[key]?.[0]).toBe('warn');
     for (const key of DETERMINISTIC) expect(ci.assert.assertions[key]?.[0]).toBe('error');
   });
@@ -51,10 +54,9 @@ describe('lighthouserc.cjs (ADR-0004 amendment)', () => {
   it('with LHCI_BASE_URL audits that deployment, starts no server and errors on every assertion', () => {
     const { ci } = load('https://home-club-git-x.vercel.app/');
     expect(ci.collect.startServerCommand).toBeUndefined();
-    expect(ci.collect.url).toEqual([
-      'https://home-club-git-x.vercel.app/en',
-      'https://home-club-git-x.vercel.app/th',
-    ]);
+    expect(ci.collect.url).toEqual(
+      ROUTES.map((route) => `https://home-club-git-x.vercel.app${route}`),
+    );
     for (const [, [level]] of Object.entries(ci.assert.assertions)) expect(level).toBe('error');
   });
 

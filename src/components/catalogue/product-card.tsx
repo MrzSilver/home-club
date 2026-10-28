@@ -8,7 +8,7 @@ import { VisuallyHidden } from '@/components/ui/visually-hidden';
 import type { Locale, Product } from '@/data/schema';
 import { Link } from '@/i18n/navigation';
 import { convertFromUsdCents, formatMoney, type Currency } from '@/lib/money';
-import { defaultColorFor } from '@/lib/stock';
+import { defaultColorFor, isSoldOut } from '@/lib/stock';
 
 // 2-up on phones, 4-up from md (container padding and gaps included): the width a card really gets.
 export const PRODUCT_CARD_SIZES = '(min-width: 80rem) 282px, (min-width: 48rem) 25vw, 50vw';
@@ -19,6 +19,8 @@ type ProductCardProps = {
   currency: Currency;
   /** Tells the browser how wide the card is drawn; the default fits the 4-up Home grid. */
   sizes?: string;
+  /** Fetch the first picture eagerly: for the one card that can be the page's largest paint. */
+  priority?: boolean;
 };
 
 /**
@@ -33,6 +35,7 @@ export async function ProductCard({
   locale,
   currency,
   sizes = PRODUCT_CARD_SIZES,
+  priority = false,
 }: ProductCardProps): Promise<ReactElement> {
   const t = await getTranslations({ locale, namespace: 'catalogue' });
   const colorId = defaultColorFor(product);
@@ -58,6 +61,7 @@ export async function ProductCard({
             width={primary.width}
             height={primary.height}
             sizes={sizes}
+            priority={priority}
             className={imageClass}
           />
         )}
@@ -74,8 +78,11 @@ export async function ProductCard({
         )}
       </div>
       <h3 className="mt-3 text-eyebrow uppercase-latin">{product.name[locale]}</h3>
-      <p data-testid="product-price" data-currency={currency} className="mt-1 text-small">
-        {formatMoney(convertFromUsdCents(product.priceCents, currency), currency, locale)}
+      <p className="mt-1 flex flex-wrap items-baseline gap-x-3 text-small">
+        <span data-testid="product-price" data-currency={currency}>
+          {formatMoney(convertFromUsdCents(product.priceCents, currency), currency, locale)}
+        </span>
+        {isSoldOut(product) ? <span className="text-muted">{t('card.soldOut')}</span> : null}
       </p>
       <div className="mt-2 flex items-center gap-2">
         {product.colors.map((color) => (

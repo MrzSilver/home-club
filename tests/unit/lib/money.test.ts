@@ -5,6 +5,7 @@ import {
   convertFromUsdCents,
   convertWholeUnits,
   floorToWholeUnits,
+  currencySymbol,
   formatMoney,
   percentOf,
   roundHalfAwayFromZero,
@@ -225,4 +226,19 @@ describe('formatMoney (FR-072)', () => {
   it('formats repeatedly with the same result (formatter reuse)', () => {
     expect(formatMoney(100, 'USD', 'en')).toBe(formatMoney(100, 'USD', 'en'));
   });
+});
+
+describe('currencySymbol (price legend, FR-072)', () => {
+  it.each([
+    ['USD', 'en', '$'],
+    ['USD', 'th', 'US$'],
+    ['THB', 'en', '฿'],
+    ['THB', 'th', '฿'],
+  ] as const)(
+    'writes %s in %s as %s, the sign formatMoney itself uses',
+    (currency, locale, sign) => {
+      expect(currencySymbol(currency, locale)).toBe(sign);
+      expect(formatMoney(100, currency, locale)).toContain(sign);
+    },
+  );
 });

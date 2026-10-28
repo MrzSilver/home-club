@@ -1,10 +1,11 @@
-import { render, screen, within } from '@testing-library/react';
+import { cleanup, render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ProductCard } from '@/components/catalogue/product-card';
 import type { Product } from '@/data/schema';
 import { getProductBySlug } from '@/lib/catalogue';
 import en from '@messages/en.json';
+import th from '@messages/th.json';
 import { resetNavigationMock } from '../helpers/navigation-mock';
 
 vi.mock(
@@ -125,5 +126,46 @@ describe('ProductCard (FR-022, SPEC 9)', () => {
   it('has no quick-add control in phase 1', async () => {
     await renderCard('en', 'USD');
     expect(screen.queryByRole('button', { name: /add/i })).not.toBeInTheDocument();
+  });
+
+  it('says "Sold out" in text when no variant has stock, and only then (FR-022)', async () => {
+    await renderCard('en', 'USD');
+    expect(screen.queryByText(en.catalogue.card.soldOut)).not.toBeInTheDocument();
+    cleanup();
+
+    const soldOut: Product = {
+      ...tee,
+      variants: tee.variants.map((variant) => ({ ...variant, stock: 0 })),
+    };
+    render(await ProductCard({ product: soldOut, locale: 'en', currency: 'USD' }));
+
+    expect(screen.getByText('Sold out')).toBeInTheDocument();
+    // Still one link, price still shown: a sold-out product is not hidden or disabled.
+    expect(screen.getAllByRole('link')).toHaveLength(1);
+    expect(screen.getByTestId('product-price')).toHaveTextContent('$49.00');
+  });
+
+  it('says it in Thai too', async () => {
+    const soldOut: Product = {
+      ...tee,
+      variants: tee.variants.map((variant) => ({ ...variant, stock: 0 })),
+    };
+    render(await ProductCard({ product: soldOut, locale: 'th', currency: 'THB' }));
+
+    expect(screen.getByText(th.catalogue.card.soldOut)).toBeInTheDocument();
+  });
+
+  it('loads only the first picture eagerly, and only when asked (RULES 9.3)', async () => {
+    await renderCard('en', 'USD');
+    for (const image of document.querySelectorAll('img')) {
+      expect(image).toHaveAttribute('loading', 'lazy');
+    }
+    cleanup();
+
+    render(await ProductCard({ product: tee, locale: 'en', currency: 'USD', priority: true }));
+
+    const [primary, alternate] = [...document.querySelectorAll('img')];
+    expect(primary).not.toHaveAttribute('loading', 'lazy');
+    expect(alternate).toHaveAttribute('loading', 'lazy');
   });
 });
