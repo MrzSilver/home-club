@@ -50,7 +50,8 @@ export function ProductCardPreview({
               width={primary.width}
               height={primary.height}
               sizes={sizes}
-              preload={priority}
+              loading={priority ? 'eager' : undefined}
+              fetchPriority={priority ? 'high' : undefined}
               className={imageClass}
             />
           )}

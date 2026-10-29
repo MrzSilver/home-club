@@ -45,15 +45,18 @@ experiments were reverted; neither feature is enabled in the final source. These
 diagnostics per locale, not the five-run deployment gate above.
 
 The failing route's LCP element is the first product card's front photograph. The hidden
-hover photograph was also requested at High priority. The candidate sets only the hidden
-photograph to `fetchPriority="low"`, keeping the visible photograph's existing preload.
+hover photograph was also requested at High priority. The candidate sets the hidden
+photograph to `fetchPriority="low"` and the LCP photograph to eager/high. This follows the
+bundled Next.js guidance to prefer fetch priority over combining it with preload.
 Browser network tests verify High/Low priorities in both locales and viewports. Hover and
 colour selection retain the same images, dimensions and behavior.
 
 A preliminary three-run local diagnostic reduced median LCP from 2706.794 ms to 2460.684 ms,
-but included an extra front-image priority hint removed after independent review to follow
-the bundled Next.js guidance. These noisy local measurements do not establish deployment
-acceptance. The retained change still requires the unchanged strict deployed audit.
+but used preload together with the front-image priority hint. Independent review identified
+that combination as contrary to bundled Next.js guidance. Removing the hint made all four
+new tests fail (front request initially Low), so the final candidate uses eager/high without
+preload. These noisy local measurements do not establish deployment acceptance. The retained
+change still requires the unchanged strict deployed audit.
 
 The main CI log also showed that the Lighthouse report upload found no files because its target
 directory is hidden (`.lighthouseci`). The retained CI adjustment explicitly includes hidden files
@@ -73,5 +76,8 @@ performance first. The threshold remains unchanged and P2 is not authorized to s
   The failures are in existing Windows path handling (Tailwind stylesheet resolution and
   import-graph separators) and two mobile-nav asynchronous dialog tests. No tests or
   lint rules were disabled. Full Linux CI remains required for this candidate.
-- Independent read-only review found no blocker and recommended removing the redundant
-  front-image priority hint; that recommendation was applied.
+- Independent read-only review found no runtime blocker and flagged the preload/high
+  combination. The final candidate uses eager/high instead, preserving the test expectation.
+- The first candidate Preview audit redirected to Vercel login due to Deployment Protection.
+  It was stopped; its scores are not product-page measurements. Owner action to make the
+  Preview accessible is required before the strict deployed gate can be measured.
