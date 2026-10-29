@@ -124,6 +124,16 @@ for (const locale of ['en', 'th'] as const) {
         path: testInfo.outputPath(`look-${locale}-${currency}.png`),
         fullPage: true,
       });
+      if (testInfo.project.name === 'mobile') {
+        const summary = page.getByRole('complementary', { name: th ? 'ลุคของคุณ' : 'Your look' });
+        const box = await summary.boundingBox();
+        expect(box).not.toBeNull();
+        expect(
+          Math.abs((box?.y ?? 0) + (box?.height ?? 0) - (page.viewportSize()?.height ?? 0)),
+        ).toBeLessThan(2);
+        await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+        await expect(summary).not.toBeVisible();
+      }
     });
   }
 }

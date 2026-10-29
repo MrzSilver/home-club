@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useState, type ReactElement } from 'react';
+import { useEffect, useRef, useState, type ReactElement } from 'react';
 import { useTranslations } from 'next-intl';
 import { useCart, useCartContext } from '@/components/cart/cart-context';
 import { LookSlot } from '@/components/look/look-slot';
@@ -24,6 +24,18 @@ export function LookBuilder({
   const [selection, setSelection] = useState(() => createLookSelection(look, products));
   const [failed, setFailed] = useState(false);
   const errorRef = useRef<HTMLParagraphElement>(null);
+  const builderRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(true);
+  useEffect(() => {
+    const target = builderRef.current;
+    if (!target || typeof IntersectionObserver === 'undefined') return;
+    // Keep the mobile set summary reachable while choosing; release the footer afterward.
+    const observer = new IntersectionObserver(([entry]) =>
+      setInView(entry?.isIntersecting ?? false),
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, []);
   const hydrated = useCart((s) => s.hydrated);
   const lines = useCart((s) => s.lines);
   const availableProducts = products.map((product) => ({
@@ -41,7 +53,7 @@ export function LookBuilder({
   const validity = validateSelection(look, selection, availableProducts);
   const price = priceLook(selection, look.discountPct, products, currency);
   return (
-    <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
+    <div ref={builderRef} className="grid gap-8 pb-80 lg:grid-cols-[2fr_1fr] lg:pb-0">
       <div className="grid gap-6 md:grid-cols-2">
         {SLOTS.map((slot) => (
           <LookSlot
@@ -60,7 +72,7 @@ export function LookBuilder({
         ))}
       </div>
       <aside
-        className="h-fit space-y-4 rounded-md bg-surface p-6 lg:sticky lg:top-24"
+        className={`fixed inset-x-0 bottom-0 z-20 max-h-[50dvh] space-y-4 overflow-y-auto border-t border-line bg-surface p-4 lg:sticky lg:inset-auto lg:top-24 lg:z-auto lg:h-fit lg:max-h-none lg:rounded-md lg:border-0 lg:p-6 ${inView ? '' : 'hidden lg:block'}`}
         aria-label={t('summary')}
       >
         <h2 className="text-h2">{t('summary')}</h2>
