@@ -17,7 +17,7 @@ const BASE_URL = remote === '' ? LOCAL_URL : remote;
 
 // Routes under test: Home in both locales and one Collection page in each (RULES 8.8 and SPEC 12 apply
 // to Thai too): "Shop all" in English, a category page in Thai, and Product in both locales.
-// Look builder targets arrive in P2.
+// Look builder is included in both locales (P2, SPEC 14).
 const ROUTES = [
   '/en',
   '/th',
@@ -25,6 +25,8 @@ const ROUTES = [
   '/th/collections/foundations',
   '/en/products/essential-tee',
   '/th/products/essential-tee',
+  '/en/looks/the-essential-look',
+  '/th/looks/the-essential-look',
 ];
 
 // Vercel Deployment Protection: send the automation bypass header when the secret is provided.

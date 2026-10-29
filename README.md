@@ -98,7 +98,12 @@ Brand, products and copy are fictional. Imagery is placeholder/illustrative unti
 
 ## Status
 
-P1 T01–T10 are implemented: Home, Collection filters/sort, product gallery and stock-aware variants, plus a persisted cart with drawer and full page, in Thai/English and THB/USD. T11 adds product/cart axe coverage, product Lighthouse targets and the CI JavaScript-budget gate. See [P1 validation](./docs/p1-validation.md) for measured results and phase-exit limitations. Search, Look builder and checkout remain P2 (see [PRD.md §6](./PRD.md)).
+P1 T01–T11 are implemented; deployed performance confirmation remains tracked in PR #6.
+The owner authorized starting P2 before that gate closes. P2 now includes the four-slot Look
+Builder, atomic cart addition and grouped discounts, Vibes, three bilingual MDX Journal articles,
+keyboard-operated Search, demo Checkout, size guide and related products. Home and navigation
+link these flows. See [P2 validation](./docs/p2-validation.md) for verification and remaining
+phase-exit checks; implementation does not imply the deployed release gate has passed.
 
 ## Author
 

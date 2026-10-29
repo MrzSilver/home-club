@@ -30,7 +30,7 @@ Browser ──► Next.js (RSC + static) ──► src/data (typed catalogue)
 | i18n | `next-intl` | Locales `en`, `th`; prefix `always`; default `en` |
 | State | Zustand + `persist` middleware | Versioned, schema-validated rehydration |
 | Validation | Zod | Catalogue, cart rehydration, forms, env |
-| Forms | React Hook Form + Zod resolver | Checkout, newsletter |
+| Forms | Native React forms + Zod mini validation | Demo checkout stays local; ADR-0010 |
 | Content | MDX (Journal) via a maintained MDX integration | Frontmatter validated by Zod |
 | Motion | Framer Motion (`motion`) | Sparingly; reduced-motion aware |
 | Icons | `lucide-react` (tree-shaken) or inline SVG | No icon fonts |
@@ -213,18 +213,18 @@ Seed catalogue: 12–16 products across 4 categories (see PRD §11). Initial set
 ## 7. State
 
 ### 7.1 Cart (`store/cart.ts`)
-- Zustand `persist`, version 1, under `hc:cart:v1`. P1 persists only SKU/quantity; look grouping and atomic `addMany` are P2.
+- Zustand `persist`, version 1, under `hc:cart:v1`. Stores SKU/quantity and optional `lookId`; old SKU-only carts remain valid. Atomic `addMany` is implemented in P2 (ADR-0008).
 - Strict Zod mini validation rejects unsupported/malformed envelope versions, extra fields and invalid lines. The validator loads asynchronously only when storage contains a cart, with JIT disabled for the CSP. Invalid data resets safely; empty carts remove the key, and storage failures preserve in-memory use.
 - `add(sku, qty)` returns whether the add is accepted; `setQty`, `remove`, and `clear` clamp quantities with `lib/stock.ts` and discard stale or sold-out SKUs on rehydration. Duplicate SKUs merge within stock/max-10 limits.
 - A per-tree `CartProvider` gets a compact catalogue projection from the server. No seed catalogue or full data schema is imported into global client code. Persisted lines and the header badge are exposed only after hydration/validation; totals are never stored and are recomputed from current catalogue prices and the current currency segment.
-- Radix drawer content loads on interaction, traps focus and restores focus to the originating header/add control. `/cart` shares the line/subtotal UI. Checkout is deliberately deferred to P2.
+- Radix drawer content loads on interaction, traps focus and restores focus to the originating header/add control. `/cart` shares the line/subtotal UI. P2 checkout validates ephemeral example contact/address fields, clears the cart on success, and carries only a generated demo reference in the success URL. No payment, submission or PII persistence occurs.
 
 ### 7.2 Preferences (`store/preferences.ts`)
 - Currency (mirrors cookie). Locale is **not** stored; the URL is the source of truth.
 
 ### 7.3 URL state
 - Catalogue filters and sort live in the query string. The collection pages stay **static** (ADR-0006), so the query is not read on the server: the server renders the default view, and the client island (`CatalogueExplorer`) parses `location.search` with `lib/catalogue-query` (plain TypeScript; a unit test runs every parse result through the Zod `catalogueQuerySchema`, and invalid values fall back to defaults) and writes changes back with the History API (`replaceState`, no history entries, no server round trip); it re-reads the URL after Back/Forward and after Next.js navigations to the same page (`CatalogueUrlWatcher`). Price bounds carry a `priceCurrency` tag (ADR-0003).
-- Look selections (P2, FR-044) are in the query string too. They follow the same pattern unless that page is allowed to render per request (decide in its own ADR); parse and validate with Zod wherever the parsing runs.
+- Look selections stay in transient React state in P2 (ADR-0008). Shareable query selections are optional P3 work (FR-044, PRD takes precedence). Search query input is bounded and renders as text, never executable content.
 
 ## 8. Look builder logic (`lib/look.ts`)
 
@@ -242,7 +242,7 @@ findAlternatives(slot, selection, look): Variant[]   // in-stock options for a f
 Behaviour:
 1. `validateSelection` checks product membership in `allowedProductIds`, variant existence, and stock ≥ 1 for each slot.
 2. `addLook` is **atomic**: if validation fails nothing is added and the UI shows per-slot errors with alternatives.
-3. Lines added through a look carry `lookId`; the cart shows the discount only while all four slots of that look are present. If one is removed, the discount is dropped and the UI says so.
+3. Lines added through a look carry `lookId`; the cart pairs allowed units across all four slots of that look. Only complete sets receive the discount, including repeated sets with different allowed products. If no complete set remains, the discount is dropped and the UI says so. Regular lines and groups share stock without quantity edits stealing another group's units.
 4. Selection is serialisable to the query string: `?top=essential-tee.sand.M&bottom=…`.
 
 ## 9. Components (contracts)

@@ -4,6 +4,7 @@ import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server
 import type { ReactElement, ReactNode } from 'react';
 
 import { CartProvider } from '@/components/cart/cart-provider';
+import { LOOKS } from '@/data/looks';
 import { getAllProducts } from '@/lib/catalogue';
 import { Footer } from '@/components/layout/footer';
 import { Header } from '@/components/layout/header';
@@ -48,17 +49,21 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: 'a11y' });
   const messages = await getMessages({ locale });
-  const products = getAllProducts().map(({ slug, name, priceCents, colors, variants, images }) => ({
-    slug,
-    name,
-    priceCents,
-    colors,
-    variants,
-    images: colors.flatMap((color) => {
-      const image = images.find((item) => item.colorId === color.id);
-      return image ? [image] : [];
+  const products = getAllProducts().map(
+    ({ id, slot, slug, name, priceCents, colors, variants, images }) => ({
+      id,
+      ...(slot ? { slot } : {}),
+      slug,
+      name,
+      priceCents,
+      colors,
+      variants,
+      images: colors.flatMap((color) => {
+        const image = images.find((item) => item.colorId === color.id);
+        return image ? [image] : [];
+      }),
     }),
-  }));
+  );
 
   return (
     <html lang={locale} className={fontVariables}>
@@ -69,7 +74,7 @@ export default async function LocaleLayout({
           (`messages={pick(...)}` on its own provider, or props).
         */}
         <NextIntlClientProvider locale={locale} messages={{ cart: messages.cart }}>
-          <CartProvider products={products} locale={locale}>
+          <CartProvider products={products} looks={LOOKS} locale={locale}>
             <SkipLink label={t('skipToContent')} />
             <Header locale={locale} />
             {children}

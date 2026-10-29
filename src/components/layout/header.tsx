@@ -1,4 +1,4 @@
-import { getTranslations } from 'next-intl/server';
+import { getMessages, getTranslations } from 'next-intl/server';
 import type { ReactElement } from 'react';
 
 import { CurrencySync } from '@/components/layout/currency-sync';
@@ -7,15 +7,13 @@ import { MobileNav } from '@/components/layout/mobile-nav';
 import type { MobileNavContent } from '@/components/layout/mobile-nav-types';
 import { categoryLinks, primaryLinks } from '@/components/layout/nav-links';
 import { CartTrigger } from '@/components/cart/cart-trigger';
-import { SearchIcon } from '@/components/ui/icons/search-icon';
-import { IconButton } from '@/components/ui/icon-button';
+import { SearchTrigger } from '@/components/search/search-trigger';
+import { getSearchIndex } from '@/components/search/search-index';
 import { Wordmark } from '@/components/ui/wordmark';
 import type { Locale } from '@/data/schema';
 import { Link } from '@/i18n/navigation';
 
 type HeaderProps = { locale: Locale };
-
-const SEARCH_REASON_ID = 'header-search-reason';
 
 /**
  * Site header (FR-001): hamburger left, wordmark centred, search and cart right. Server-rendered; the
@@ -25,12 +23,18 @@ export async function Header({ locale }: HeaderProps): Promise<ReactElement> {
   const nav = await getTranslations({ locale, namespace: 'nav' });
   const common = await getTranslations({ locale, namespace: 'common' });
 
+  const messages = await getMessages({ locale });
   const content: MobileNavContent = {
     openLabel: nav('menu.open'),
     closeLabel: nav('menu.close'),
     title: nav('menu.title'),
     navLabel: nav('menu.mainLabel'),
-    primary: primaryLinks({ home: nav('links.home'), shopAll: nav('links.shopAll') }),
+    primary: [
+      ...primaryLinks({ home: nav('links.home'), shopAll: nav('links.shopAll') }),
+      { href: '/looks', label: nav('links.looks') },
+      { href: '/vibes', label: nav('links.vibes') },
+      { href: '/journal', label: nav('links.journal') },
+    ],
     categoriesHeading: nav('links.categoriesHeading'),
     categories: categoryLinks(locale),
     localeLabel: common('locale.label'),
@@ -62,13 +66,11 @@ export async function Header({ locale }: HeaderProps): Promise<ReactElement> {
         </Link>
 
         <div className="flex justify-end gap-2">
-          {/* Search arrives in phase 2: present and focusable, but inert, and it says why. */}
-          <IconButton label={nav('search.label')} disabled disabledReasonId={SEARCH_REASON_ID}>
-            <SearchIcon className="size-6" />
-          </IconButton>
-          <span id={SEARCH_REASON_ID} hidden>
-            {nav('search.reason')}
-          </span>
+          <SearchTrigger
+            entries={getSearchIndex(locale)}
+            locale={locale}
+            messages={messages.search}
+          />
 
           <CartTrigger />
         </div>

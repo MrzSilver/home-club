@@ -81,14 +81,14 @@ describe('Header (FR-001)', () => {
   });
 
   it.each([['search', en.nav.search]])(
-    'keeps %s focusable but inert and explains why (arrives later)',
+    'keeps %s focusable and exposes its search dialog (FR-023)',
     async (_name, copy) => {
       await renderHeader('en');
 
       const button = screen.getByRole('button', { name: copy.label });
       expect(button).not.toBeDisabled();
-      expect(button).toHaveAttribute('aria-disabled', 'true');
-      expect(button).toHaveAccessibleDescription(copy.reason);
+      expect(button).not.toHaveAttribute('aria-disabled', 'true');
+      expect(button).toHaveAttribute('aria-haspopup', 'dialog');
     },
   );
 

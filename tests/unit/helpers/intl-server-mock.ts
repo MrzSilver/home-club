@@ -9,6 +9,8 @@ import th from '@messages/th.json';
 export const setRequestLocale = vi.fn();
 
 export const serverIntlModule = {
+  getMessages: ({ locale }: { locale: 'en' | 'th' }): Promise<typeof en> =>
+    Promise.resolve(locale === 'th' ? th : en),
   setRequestLocale,
   getTranslations: ({
     locale,

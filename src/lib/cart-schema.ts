@@ -7,6 +7,7 @@ z.config({ jitless: true });
 const lineSchema = z.strictObject({
   sku: z.string(),
   qty: z.number().check(z.int(), z.minimum(1)),
+  lookId: z.optional(z.string().check(z.minLength(1), z.maxLength(100))),
 });
 const linesSchema = z.array(lineSchema).check(z.maxLength(500));
 

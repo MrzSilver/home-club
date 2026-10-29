@@ -28,6 +28,8 @@ const ROUTES = [
   '/th/collections/foundations',
   '/en/products/essential-tee',
   '/th/products/essential-tee',
+  '/en/looks/the-essential-look',
+  '/th/looks/the-essential-look',
 ];
 
 const MACHINE_DEPENDENT = [

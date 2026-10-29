@@ -1,16 +1,18 @@
 'use client';
 import { createContext, useContext } from 'react';
 import { useStore } from 'zustand';
-import type { Locale, Product } from '@/data/schema';
+import type { Locale, Product, Look } from '@/data/schema';
 import type { CartStore, CartState } from '@/store/cart';
 
 export type CartProduct = Pick<
   Product,
   'slug' | 'name' | 'priceCents' | 'colors' | 'variants' | 'images'
->;
+> &
+  Partial<Pick<Product, 'id' | 'slot'>>;
 export type CartContextValue = {
   store: CartStore;
   products: CartProduct[];
+  looks?: readonly Look[];
   locale: Locale;
   openCart: (trigger?: HTMLElement | null) => void;
 };

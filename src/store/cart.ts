@@ -1,14 +1,21 @@
 import { createStore, type Mutate, type StoreApi } from 'zustand/vanilla';
 import { persist, type PersistStorage } from 'zustand/middleware';
 import type { CartLine } from '@/data/schema';
-import { addCartLine, normalizeCart, type StockIndex } from '@/lib/cart';
+import {
+  addCartLine,
+  addCartLinesAtomically,
+  normalizeCart,
+  setCartLineQty,
+  type StockIndex,
+} from '@/lib/cart';
 
 export type CartState = {
   lines: CartLine[];
   hydrated: boolean;
   add: (sku: string, qty: number) => boolean;
-  setQty: (sku: string, qty: number) => void;
-  remove: (sku: string) => void;
+  addMany: (lines: readonly CartLine[]) => boolean;
+  setQty: (sku: string, qty: number, lookId?: string) => void;
+  remove: (sku: string, lookId?: string) => void;
   clear: () => void;
 };
 type SavedCart = { lines: CartLine[] };
@@ -69,18 +76,19 @@ export function createCartStore(stock: StockIndex, storage = browserCartStorage(
           set({ lines: addCartLine(get().lines, sku, qty, stock) });
           return true;
         },
-        setQty: (sku, qty) =>
+        addMany: (additions) => {
+          if (!get().hydrated) return false;
+          const lines = addCartLinesAtomically(get().lines, additions, stock);
+          if (lines === null) return false;
+          set({ lines });
+          return true;
+        },
+        setQty: (sku, qty, lookId) =>
           set({
-            lines: normalizeCart(
-              get().lines.map((line) =>
-                line.sku === sku
-                  ? { sku, qty: Number.isFinite(qty) ? Math.max(1, Math.trunc(qty)) : 1 }
-                  : line,
-              ),
-              stock,
-            ),
+            lines: setCartLineQty(get().lines, sku, qty, stock, lookId),
           }),
-        remove: (sku) => set({ lines: get().lines.filter((line) => line.sku !== sku) }),
+        remove: (sku, lookId) =>
+          set({ lines: get().lines.filter((line) => line.sku !== sku || line.lookId !== lookId) }),
         clear: () => set({ lines: [] }),
       }),
       {

@@ -21,16 +21,24 @@ describe('cart invariants (FR-050, FR-051)', () => {
       { sku: 'cap', qty: 10 },
     ]);
   });
-  it('never admits corrupt data, extra prices, unsupported look groups or fractional quantities', () => {
+  it('never admits corrupt data, extra prices, malformed look groups or fractional quantities', () => {
     for (const input of [
       null,
       {},
       'x',
       [{ sku: 'tee', qty: 1.5 }],
       [{ sku: 'tee', qty: 2, price: 1 }],
-      [{ sku: 'tee', qty: 1, lookId: 'fake' }],
+      [{ sku: 'tee', qty: 1, lookId: '' }],
     ])
       expect(parseSavedCart({ version: 1, state: { lines: input } })).toBeNull();
+  });
+  it('accepts optional look membership without stored prices (FR-052)', () => {
+    expect(
+      parseSavedCart({
+        version: 1,
+        state: { lines: [{ sku: 'tee', qty: 1, lookId: 'look-essential' }] },
+      })?.state.lines,
+    ).toEqual([{ sku: 'tee', qty: 1, lookId: 'look-essential' }]);
   });
   it('merges repeated adds without exceeding stock; rejects unknown and invalid additions', () => {
     expect(addCartLine([{ sku: 'tee', qty: 2 }], 'tee', 2, stock)).toEqual([
