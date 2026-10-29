@@ -1,0 +1,86 @@
+{
+  "auditDate": "2026-10-29",
+  "baseUrl": "https://home-club-eight.vercel.app",
+  "lighthouseVersion": "12.6.1",
+  "formFactor": "mobile",
+  "aggregation": "median",
+  "runsPerUrl": 5,
+  "totalRuns": 30,
+  "gate": "failed",
+  "failedAssertions": [
+    {
+      "route": "/th/collections/foundations",
+      "id": "largest-contentful-paint",
+      "maxNumericValue": 2500,
+      "actualNumericValue": 2513.533
+    }
+  ],
+  "routes": [
+    {
+      "route": "/en",
+      "runs": 5,
+      "performance": 0.95,
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 1,
+      "lcpMs": 2450.9475,
+      "tbtMs": 106,
+      "cls": 0
+    },
+    {
+      "route": "/en/products/essential-tee",
+      "runs": 5,
+      "performance": 0.97,
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 1,
+      "lcpMs": 2292.37,
+      "tbtMs": 107,
+      "cls": 0
+    },
+    {
+      "route": "/en/shop",
+      "runs": 5,
+      "performance": 0.97,
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 1,
+      "lcpMs": 2309.7515,
+      "tbtMs": 118,
+      "cls": 0
+    },
+    {
+      "route": "/th",
+      "runs": 5,
+      "performance": 0.97,
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 1,
+      "lcpMs": 2427.214,
+      "tbtMs": 90,
+      "cls": 0
+    },
+    {
+      "route": "/th/collections/foundations",
+      "runs": 5,
+      "performance": 0.96,
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 1,
+      "lcpMs": 2513.533,
+      "tbtMs": 94,
+      "cls": 0.0002800262544680965
+    },
+    {
+      "route": "/th/products/essential-tee",
+      "runs": 5,
+      "performance": 0.96,
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 1,
+      "lcpMs": 2474.625,
+      "tbtMs": 94,
+      "cls": 0
+    }
+  ]
+}

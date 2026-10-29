@@ -98,6 +98,11 @@ Brand, products and copy are fictional. Imagery is placeholder/illustrative unti
 
 ## Status
 
+Latest phase-exit evidence: [2026-10-29 deployed audit](./docs/p1-exit-audit.md). P1 functionality
+and main CI pass; the strict deployed Lighthouse gate still has one LCP miss (Thai Foundations:
+2513.533 ms against 2500 ms). The owner confirmed the screen-reader smoke test passed.
+The owner chose to resolve performance before phase exit; P2 has not started.
+
 P1 T01–T10 are implemented: Home, Collection filters/sort, product gallery and stock-aware variants, plus a persisted cart with drawer and full page, in Thai/English and THB/USD. T11 adds product/cart axe coverage, product Lighthouse targets and the CI JavaScript-budget gate. See [P1 validation](./docs/p1-validation.md) for measured results and phase-exit limitations. Search, Look builder and checkout remain P2 (see [PRD.md §6](./PRD.md)).
 
 ## Author

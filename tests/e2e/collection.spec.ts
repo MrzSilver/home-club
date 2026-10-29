@@ -164,6 +164,25 @@ for (const locale of LOCALES) {
       expect(html).toContain(`<link rel="canonical" href="http://localhost:3000/${locale}/shop"`);
     });
 
+    test('prioritizes the visible LCP image over its hidden hover view (FR-022)', async ({
+      page,
+      context,
+    }) => {
+      const session = await context.newCDPSession(page);
+      const priorities = new Map<string, string>();
+      await session.send('Network.enable');
+      session.on('Network.requestWillBeSent', ({ request, type }) => {
+        if (type === 'Image' && request.url.includes('essential-tee')) {
+          if (request.url.includes('sand-1.webp')) priorities.set('front', request.initialPriority);
+          if (request.url.includes('sand-2.webp')) priorities.set('back', request.initialPriority);
+        }
+      });
+      await page.goto(`/${locale}/shop`);
+      await expect.poll(() => priorities.get('front')).toBe('High');
+      await expect.poll(() => priorities.get('back')).toBe('Low');
+      await session.detach();
+    });
+
     test('filters by colour, size and price; the URL carries them, a reload keeps them, and nothing is fetched', async ({
       page,
     }) => {
