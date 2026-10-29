@@ -86,7 +86,7 @@ for (const locale of ['en', 'th'] as const) {
       await unavailable.click({ force: true });
       await expect(unavailable).not.toBeChecked();
       await page
-        .getByRole('button', { name: locale === 'en' ? 'View image 2' : 'ดูภาพที่ 2', exact: true })
+        .getByRole('button', { name: locale === 'en' ? 'Back' : 'ด้านหลัง', exact: true })
         .click();
       await page
         .getByRole('group', { name: copy.color, exact: true })

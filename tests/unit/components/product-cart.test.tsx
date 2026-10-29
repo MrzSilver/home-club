@@ -57,6 +57,7 @@ describe('Product and cart behavior (FR-030–033, FR-050–051)', () => {
         const thumbnail = thumbnails[index];
         if (!thumbnail) throw new Error('missing view');
         expect(thumbnail).toHaveTextContent(label);
+        expect(thumbnail).toHaveAccessibleName(label);
         fireEvent.click(thumbnail);
         expect(thumbnail).toHaveAttribute('aria-pressed', 'true');
       }

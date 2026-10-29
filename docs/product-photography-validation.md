@@ -1,5 +1,25 @@
 # Product photographs and colour previews — 2026-10-29
 
+## Gallery accessible-name correction (FR-030, RULES 8)
+
+CI identified `label-content-name-mismatch` on the three gallery thumbnail buttons in both
+locales and viewport sizes. The visible labels were Front/Back/Side (and Thai equivalents),
+but `aria-label` overrode them with View image 1/2/3 and the label spans were hidden from
+assistive technology. This was a real accessibility regression in the initial angle change.
+
+Thumbnails with a view now use their visible text as the native accessible name. Images without
+view metadata retain the localized numbered fallback. Unit and browser regression assertions
+check the accessible name for every view in both languages. The product/cart journey now
+selects the back thumbnail by its visible localized name. Accessibility rules remain unchanged.
+
+The new unit assertions failed in both locales before the fix, then the targeted product/cart
+and card suites passed all 22 tests. TypeScript, changed-file ESLint, formatting and the production
+build passed. The fix is based on main after PR #4 was merged.
+
+Full production E2E/accessibility rerun: **403 passed, 7 conditional skips, 0 failed** across
+all 410 test cases (4.0 minutes), including all four previously failing bilingual mobile/desktop
+product accessibility scans. Command: `node node_modules/@playwright/test/cli.js test --workers=2`.
+
 ## Back and side angles follow-up (FR-022, FR-030)
 
 The owner approved AI-generated additional angles. There are now three views per colour for
