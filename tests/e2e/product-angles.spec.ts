@@ -37,6 +37,7 @@ for (const locale of ['en', 'th'] as const) {
     ).entries()) {
       const thumbnail = thumbnails.nth(index);
       await expect(thumbnail).toContainText(view);
+      await expect(thumbnail).toHaveAccessibleName(view);
       await thumbnail.click();
       await expect(thumbnail).toHaveAttribute('aria-pressed', 'true');
       const track = gallery.getByRole('region');

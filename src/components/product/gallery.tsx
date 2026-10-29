@@ -47,7 +47,7 @@ export function Gallery({
           <button
             key={image.src}
             type="button"
-            aria-label={t('image', { number: index + 1 })}
+            aria-label={image.view === undefined ? t('image', { number: index + 1 }) : undefined}
             aria-pressed={activeIndex === index}
             title={image.alt[locale]}
             onClick={() => {
@@ -73,11 +73,7 @@ export function Gallery({
               sizes="64px"
               className="size-16 rounded-sm object-cover object-top"
             />
-            {image.view === undefined ? null : (
-              <span aria-hidden="true" className="text-small">
-                {t(image.view)}
-              </span>
-            )}
+            {image.view === undefined ? null : <span className="text-small">{t(image.view)}</span>}
           </button>
         ))}
       </div>
