@@ -379,11 +379,12 @@ describe('image files (RULES 14, DESIGN 9)', () => {
     }
   });
 
-  it('gives two images per colour (front and alternate view)', () => {
+  it('gives front, back and side images per colour (FR-030)', () => {
     for (const product of PRODUCTS) {
       for (const color of product.colors) {
-        const count = product.images.filter((image) => image.colorId === color.id).length;
-        expect(count).toBe(2);
+        const images = product.images.filter((image) => image.colorId === color.id);
+        expect(images.map((image) => image.view)).toEqual(['front', 'back', 'side']);
+        expect(images.map((image) => image.generated)).toEqual([false, true, true]);
       }
     }
   });

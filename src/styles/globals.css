@@ -306,6 +306,7 @@
 
     @media (min-width: 48rem) {
       background:
+        linear-gradient(to right, var(--color-overlay) 0%, transparent 70%),
         linear-gradient(to bottom, var(--color-overlay), var(--color-overlay) 10%, transparent 32%),
         linear-gradient(to top, var(--color-overlay) 0%, transparent 60%),
         linear-gradient(
@@ -321,6 +322,7 @@
   /* Under the text of a category tile: a dense band at the bottom, where the copy sits. */
   .tile-scrim {
     background:
+      linear-gradient(to top, var(--color-overlay) 0%, var(--color-overlay) 40%, transparent 100%),
       linear-gradient(to top, var(--color-overlay) 0%, var(--color-overlay) 45%, transparent 100%),
       linear-gradient(to top, var(--color-overlay) 0%, var(--color-overlay) 30%, transparent 80%),
       linear-gradient(to top, var(--color-overlay), transparent 65%);

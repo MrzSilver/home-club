@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: {
     formats: ['image/avif', 'image/webp'],
+    localPatterns: [
+      { pathname: '/images/**', search: '' },
+      { pathname: '/images/products/**', search: '?v=angles-20261029' },
+    ],
   },
   async headers() {
     return [{ source: '/:path*', headers: buildSecurityHeaders({ isDev }) }];
