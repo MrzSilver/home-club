@@ -47,7 +47,11 @@ export const imageAssetSchema = z.strictObject({
   height: z.int().positive(),
 });
 
-export const productImageSchema = imageAssetSchema.extend({ colorId: kebabId() });
+export const productImageSchema = imageAssetSchema.extend({
+  colorId: kebabId(),
+  view: z.enum(['front', 'back', 'side']).optional(),
+  generated: z.boolean().optional(),
+});
 
 const hasDuplicates = (values: readonly string[]): boolean =>
   new Set(values).size !== values.length;

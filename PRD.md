@@ -87,13 +87,13 @@ Every requirement has an ID; commits and tests reference IDs.
 |---|---|---|
 | FR-020 | Collection page per category and an "All" page, server-rendered | M-P1 |
 | FR-021 | Filters: category, colour, size, price range; sort: featured, price asc/desc, newest. State lives in the URL query string | M-P1 |
-| FR-022 | Product card: image, name, price (current currency), colour swatches, quick-add disabled in P1 | M-P1 |
+| FR-022 | Product card: front photograph, hover crossfades to selected colour's back view, name, price (current currency); colour swatches update both previews without navigation; image/name open details; AI-generated demo angles allowed; quick-add disabled in P1 | M-P1 |
 | FR-023 | Search: client-side over name, category, tags in the active locale; keyboard operable; results page and overlay | S-P2 |
 
 ### 7.4 Product detail
 | ID | Requirement | Pri |
 |---|---|---|
-| FR-030 | Image gallery (swipe on mobile, thumbnails on desktop), zoom optional | M-P1 |
+| FR-030 | Image gallery with front/back/side views for each colour, labelled thumbnails and active selection, swipe on mobile; AI-generated demo angles disclosed; zoom optional | M-P1 |
 | FR-031 | Colour and size pickers; unavailable combos visibly disabled and announced to assistive tech | M-P1 |
 | FR-032 | Per-variant stock (demo data); "low stock" label at ≤ 3 | M-P1 |
 | FR-033 | Add to cart with quantity; opens cart drawer; disabled until a valid variant is chosen | M-P1 |

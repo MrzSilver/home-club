@@ -51,7 +51,7 @@ export function CartContents({ onNavigate }: { onNavigate?: () => void }): React
             <li key={sku} className="flex gap-4 py-6">
               {image ? (
                 <Image
-                  src={image.src}
+                  src={`${image.src}?v=angles-20261029`}
                   alt={image.alt[locale]}
                   width={image.width}
                   height={image.height}

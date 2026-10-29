@@ -40,6 +40,41 @@ async function fixture(locale: 'en' | 'th' = 'en') {
 }
 describe('Product and cart behavior (FR-030–033, FR-050–051)', () => {
   it.each(['en', 'th'] as const)(
+    'labels all three views and resets selection when colour changes (%s, FR-030)',
+    async (locale) => {
+      const copy = locale === 'en' ? en : th;
+      await fixture(locale);
+      const gallery = screen.getByRole('region', { name: copy.product.gallery });
+      const track = within(gallery).getByRole('region', { name: copy.product.swipe });
+      Object.defineProperty(track, 'scrollTo', { value: vi.fn() });
+      const thumbnails = within(gallery).getAllByRole('button');
+      expect(thumbnails).toHaveLength(3);
+      for (const [index, label] of [
+        copy.product.front,
+        copy.product.back,
+        copy.product.side,
+      ].entries()) {
+        const thumbnail = thumbnails[index];
+        if (!thumbnail) throw new Error('missing view');
+        expect(thumbnail).toHaveTextContent(label);
+        fireEvent.click(thumbnail);
+        expect(thumbnail).toHaveAttribute('aria-pressed', 'true');
+      }
+      expect(within(gallery).getByText(copy.product.generatedViews)).toBeVisible();
+      const colours = screen.getByRole('group', { name: copy.product.color });
+      fireEvent.click(
+        within(colours).getByRole('radio', { name: locale === 'en' ? 'Black' : 'ดำ' }),
+      );
+      const updated = within(
+        screen.getByRole('region', { name: copy.product.gallery }),
+      ).getAllByRole('button');
+      expect(updated[0]).toHaveAttribute('aria-pressed', 'true');
+      expect(updated[1]).toHaveAttribute('aria-pressed', 'false');
+      expect(updated[2]).toHaveAttribute('aria-pressed', 'false');
+    },
+  );
+
+  it.each(['en', 'th'] as const)(
     'requires a variant, announces stock, adds safely, updates totals and removes (%s)',
     async (locale) => {
       const copy = locale === 'en' ? en : th;

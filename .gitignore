@@ -22,3 +22,4 @@ test-results
 .DS_Store
 npm-debug.log*
 pnpm-debug.log*
+.asset-sources/

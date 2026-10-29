@@ -27,7 +27,7 @@ const APPAREL_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'] as const satisfies read
 const SOCK_SIZES = ['S', 'M', 'L'] as const satisfies readonly Size[];
 const ONE_SIZE = ['ONE'] as const satisfies readonly Size[];
 
-// Every generated placeholder is 4:5 (DESIGN 4 gallery ratio); cards crop to 1:1 with object-fit.
+// Every product photograph is 4:5 (DESIGN 4 gallery ratio); cards crop with object-fit.
 const IMAGE_WIDTH = 1200;
 const IMAGE_HEIGHT = 1500;
 
@@ -45,13 +45,13 @@ interface ProductSeed {
   // One entry per colour, in display order (the first is the default). Stock is hand-authored and
   // aligned with `sizes`: 0 = sold out, 1-3 = low stock (FR-032), the rest comfortable.
   stock: readonly (readonly [ColorId, readonly number[]])[];
-  // Labels for image 1 and image 2 of every colour.
-  views: readonly [Localized, Localized];
+  views: readonly [Localized, Localized, Localized];
 }
 
-const FRONT_BACK: ProductSeed['views'] = [
+const FRONT_BACK_SIDE: ProductSeed['views'] = [
   { en: 'front view', th: 'ด้านหน้า' },
   { en: 'back view', th: 'ด้านหลัง' },
+  { en: 'side view', th: 'ด้านข้าง' },
 ];
 
 const seeds: readonly ProductSeed[] = [
@@ -75,7 +75,7 @@ const seeds: readonly ProductSeed[] = [
       ['white', [4, 12, 18, 14, 9, 5]],
       ['forest', [5, 9, 13, 11, 6, 3]],
     ],
-    views: FRONT_BACK,
+    views: FRONT_BACK_SIDE,
   },
   {
     slug: 'premium-hoodie',
@@ -97,7 +97,7 @@ const seeds: readonly ProductSeed[] = [
       ['forest', [3, 6, 1, 7, 5, 0]],
       ['sand', [4, 7, 10, 9, 5, 3]],
     ],
-    views: FRONT_BACK,
+    views: FRONT_BACK_SIDE,
   },
   {
     slug: 'essential-socks',
@@ -118,10 +118,7 @@ const seeds: readonly ProductSeed[] = [
       ['black', [25, 36, 28]],
       ['grey', [12, 18, 0]],
     ],
-    views: [
-      { en: 'pair, front view', th: 'หนึ่งคู่ ด้านหน้า' },
-      { en: 'single sock, detail view', th: 'ถุงเท้าข้างเดียว ภาพใกล้' },
-    ],
+    views: FRONT_BACK_SIDE,
   },
   {
     slug: 'performance-short',
@@ -142,7 +139,7 @@ const seeds: readonly ProductSeed[] = [
       ['forest', [4, 10, 14, 12, 8, 0]],
       ['grey', [5, 11, 16, 13, 9, 6]],
     ],
-    views: FRONT_BACK,
+    views: FRONT_BACK_SIDE,
   },
   {
     slug: 'performance-long-sleeve',
@@ -163,7 +160,7 @@ const seeds: readonly ProductSeed[] = [
       ['grey', [3, 8, 11, 9, 6, 4]],
       ['forest', [0, 5, 9, 8, 4, 2]],
     ],
-    views: FRONT_BACK,
+    views: FRONT_BACK_SIDE,
   },
   {
     slug: 'performance-socks',
@@ -183,10 +180,7 @@ const seeds: readonly ProductSeed[] = [
       ['black', [14, 22, 16]],
       ['white', [9, 15, 2]],
     ],
-    views: [
-      { en: 'pair, front view', th: 'หนึ่งคู่ ด้านหน้า' },
-      { en: 'single sock, detail view', th: 'ถุงเท้าข้างเดียว ภาพใกล้' },
-    ],
+    views: FRONT_BACK_SIDE,
   },
   {
     slug: 'everyday-jogger',
@@ -210,7 +204,7 @@ const seeds: readonly ProductSeed[] = [
       // because the first colour is the default on cards and the product page.
       ['grey', [0, 0, 0, 0, 0, 0]],
     ],
-    views: FRONT_BACK,
+    views: FRONT_BACK_SIDE,
   },
   {
     slug: 'coach-jacket',
@@ -230,7 +224,7 @@ const seeds: readonly ProductSeed[] = [
       ['sand', [2, 5, 8, 7, 4, 0]],
       ['forest', [3, 6, 9, 8, 5, 2]],
     ],
-    views: FRONT_BACK,
+    views: FRONT_BACK_SIDE,
   },
   {
     slug: 'relaxed-short',
@@ -251,7 +245,7 @@ const seeds: readonly ProductSeed[] = [
       ['forest', [3, 7, 10, 8, 5, 2]],
       ['black', [5, 10, 14, 12, 8, 5]],
     ],
-    views: FRONT_BACK,
+    views: FRONT_BACK_SIDE,
   },
   {
     slug: 'classic-cap',
@@ -273,10 +267,7 @@ const seeds: readonly ProductSeed[] = [
       ['forest', [11]],
       ['white', [8]],
     ],
-    views: [
-      { en: 'side view', th: 'ด้านข้าง' },
-      { en: 'front view', th: 'ด้านหน้า' },
-    ],
+    views: FRONT_BACK_SIDE,
   },
   {
     slug: 'knit-beanie',
@@ -297,7 +288,7 @@ const seeds: readonly ProductSeed[] = [
       ['grey', [9]],
       ['sand', [2]],
     ],
-    views: FRONT_BACK,
+    views: FRONT_BACK_SIDE,
   },
   {
     slug: 'canvas-tote',
@@ -316,7 +307,7 @@ const seeds: readonly ProductSeed[] = [
       ['sand', [14]],
       ['black', [7]],
     ],
-    views: FRONT_BACK,
+    views: FRONT_BACK_SIDE,
   },
 ];
 
@@ -341,10 +332,12 @@ function buildProduct(seed: ProductSeed): Product {
   const images = colors.flatMap((color) =>
     seed.views.map((view, index) => ({
       colorId: color.id,
+      view: (['front', 'back', 'side'] as const)[index],
+      generated: index > 0,
       src: `/images/products/${seed.slug}/${color.id}-${index + 1}.webp`,
       alt: {
-        en: `${seed.name.en}, ${color.name.en.toLowerCase()}, ${view.en}`,
-        th: `${seed.name.th} สี${color.name.th} ${view.th}`,
+        en: `${seed.name.en}, ${color.name.en.toLowerCase()}, ${view.en}${index > 0 ? ' (AI-generated preview)' : ''}`,
+        th: `${seed.name.th} สี${color.name.th} ${view.th}${index > 0 ? ' (ภาพตัวอย่างสร้างด้วย AI)' : ''}`,
       },
       width: IMAGE_WIDTH,
       height: IMAGE_HEIGHT,

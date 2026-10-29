@@ -1,4 +1,4 @@
-import { cleanup, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ProductCard } from '@/components/catalogue/product-card';
@@ -44,15 +44,36 @@ beforeEach(() => {
 });
 
 describe('ProductCard (FR-022, SPEC 9)', () => {
-  it('is one link to the product and has no other interactive element inside', async () => {
+  it('keeps colour buttons outside the product link (FR-022)', async () => {
     await renderCard('en', 'USD');
 
     const links = screen.getAllByRole('link');
     expect(links).toHaveLength(1);
     expect(links[0]).toHaveAttribute('href', '/en/products/essential-tee');
     expect(within(links[0] as HTMLElement).queryByRole('button')).not.toBeInTheDocument();
-    expect(document.querySelectorAll('button, input, select, textarea, a a')).toHaveLength(0);
+    expect(screen.getAllByRole('button')).toHaveLength(tee.colors.length);
+    expect(document.querySelectorAll('a a')).toHaveLength(0);
   });
+
+  it.each(['en', 'th'] as const)(
+    'changes both images in place with a keyboard-accessible button: %s (FR-022)',
+    async (locale) => {
+      await renderCard(locale, 'USD');
+      const color = tee.colors.find((item) => item.id === 'black');
+      if (color === undefined) throw new Error('missing colour');
+      const link = screen.getByRole('link');
+      const destination = link.getAttribute('href');
+      const button = screen.getByRole('button', { name: color.name[locale] });
+      expect(button).toHaveAttribute('aria-pressed', 'false');
+      fireEvent.click(button);
+      expect(button).toHaveAttribute('aria-pressed', 'true');
+      expect(document.querySelectorAll('[aria-pressed="true"]')).toHaveLength(1);
+      const images = document.querySelectorAll('img');
+      expect(images[0]?.getAttribute('src')).toContain('black-1');
+      expect(images[1]?.getAttribute('src')).toContain('black-2');
+      expect(link).toHaveAttribute('href', destination);
+    },
+  );
 
   it.each([
     ['en', 'USD', '$49.00'],
@@ -108,19 +129,35 @@ describe('ProductCard (FR-022, SPEC 9)', () => {
     expect(document.querySelector('.aspect-card')).toHaveClass('bg-surface');
   });
 
-  it('swaps to the second view on hover with CSS alone (no script, no state)', async () => {
+  it('uses the back view on hover, with a CSS crossfade (FR-022)', async () => {
     await renderCard('en', 'USD');
 
     const images = document.querySelectorAll('img');
     expect(images).toHaveLength(2);
     expect(images[0]?.getAttribute('src')).toMatch(/sand-1/);
     expect(images[1]?.getAttribute('src')).toMatch(/sand-2/);
+    expect(tee.images.find((image) => image.src.endsWith('sand-2.webp'))?.view).toBe('back');
     expect(images[1]).toHaveClass(
       'opacity-0',
       'group-hover:opacity-100',
       'motion-reduce:transition-none',
     );
     expect(document.querySelector('a')).toHaveClass('group');
+  });
+
+  it('selects front/back by view metadata even when a side image comes first (FR-022)', async () => {
+    resetNavigationMock('/', 'en');
+    render(
+      await ProductCard({
+        product: { ...tee, images: tee.images.toReversed() },
+        locale: 'en',
+        currency: 'USD',
+      }),
+    );
+    const images = document.querySelectorAll('img');
+    expect(images).toHaveLength(2);
+    expect(images[0]?.getAttribute('src')).toMatch(/sand-1/);
+    expect(images[1]?.getAttribute('src')).toMatch(/sand-2/);
   });
 
   it('has no quick-add control in phase 1', async () => {

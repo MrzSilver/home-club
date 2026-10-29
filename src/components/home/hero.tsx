@@ -12,16 +12,16 @@ import { Link } from '@/i18n/navigation';
 // Slide order matches HERO_IMAGES. `focus` keeps the figure in frame when a phone crops the 16:9
 // picture to a tall box; from md the box is wide enough to show the whole width.
 const SLIDES = [
-  { id: 'discover', href: '/shop', focus: 'object-[55%_50%] md:object-center' },
+  { id: 'discover', href: '/shop', focus: 'object-center' },
   {
     id: 'performance',
     href: '/collections/performance',
-    focus: 'object-[66%_50%] md:object-center',
+    focus: 'object-center',
   },
   {
     id: 'lifestyle',
     href: '/collections/lifestyle',
-    focus: 'object-[76%_50%] md:object-center',
+    focus: 'object-[60%_50%] md:object-center',
   },
 ] as const;
 

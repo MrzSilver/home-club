@@ -16,7 +16,7 @@ type CategoryTileProps = { category: CategoryEntry; locale: Locale };
  * subtitle name the link, so a screen reader does not read a photo description first (as ProductCard).
  * The title is uppercase in
  * English only (`uppercase-latin`, Thai keeps its case). The gradient sits under the text and keeps
- * canvas-coloured copy readable on the lightest placeholder (measured in tests/e2e/home-contrast).
+ * canvas-coloured copy readable over photography (measured in tests/e2e/home-contrast).
  */
 export function CategoryTile({ category, locale }: CategoryTileProps): ReactElement {
   const { image } = category;

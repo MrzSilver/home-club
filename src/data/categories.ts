@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { categoryEntrySchema, type CategoryEntry } from './schema';
 
-// Tile images are generated placeholders (docs/ASSETS.md); 3:2 per DESIGN 4.
+// Licensed Pexels fashion photography (docs/ASSETS.md); 3:2 per DESIGN 4.
 const TILE = { width: 1200, height: 800 } as const;
 
 const seed: readonly CategoryEntry[] = [
@@ -12,8 +12,8 @@ const seed: readonly CategoryEntry[] = [
     image: {
       src: '/images/categories/foundations.webp',
       alt: {
-        en: 'A white tee and a black tee laid out on a warm sand backdrop',
-        th: 'เสื้อยืดสีขาวและสีดำวางบนฉากโทนทราย',
+        en: 'Two models standing back to back in beige tops beside tall studio windows',
+        th: 'นายแบบและนางแบบสวมเสื้อสีเบจยืนหันหลังชนกันข้างหน้าต่างสูงในสตูดิโอ',
       },
       ...TILE,
     },
@@ -25,8 +25,8 @@ const seed: readonly CategoryEntry[] = [
     image: {
       src: '/images/categories/performance.webp',
       alt: {
-        en: 'A grey long-sleeve top and a black training short on a deep forest backdrop',
-        th: 'เสื้อแขนยาวสีเทาและกางเกงขาสั้นออกกำลังกายสีดำ บนฉากสีเขียวเข้ม',
+        en: 'A model wearing a beige sports bra and cycling shorts in natural light',
+        th: 'นางแบบสวมสปอร์ตบรากับกางเกงขาสั้นแนบตัวสีเบจในแสงธรรมชาติ',
       },
       ...TILE,
     },
@@ -38,8 +38,8 @@ const seed: readonly CategoryEntry[] = [
     image: {
       src: '/images/categories/lifestyle.webp',
       alt: {
-        en: 'A grey hoodie and a sand jogger on a warm stone backdrop',
-        th: 'ฮู้ดดี้สีเทาและกางเกงจ๊อกเกอร์สีทรายบนฉากโทนหินอุ่น',
+        en: 'A model wearing a white hoodie against a warm grey studio backdrop',
+        th: 'นายแบบสวมฮู้ดดี้สีขาวในสตูดิโอฉากสีเทาโทนอุ่น',
       },
       ...TILE,
     },
@@ -51,8 +51,8 @@ const seed: readonly CategoryEntry[] = [
     image: {
       src: '/images/categories/accessories.webp',
       alt: {
-        en: 'A white cap and a sand canvas tote on a dark backdrop',
-        th: 'หมวกแก๊ปสีขาวและกระเป๋าผ้าแคนวาสสีทรายบนฉากสีเข้ม',
+        en: 'A model in a black sweatshirt holding a plain cream canvas tote on a beige backdrop',
+        th: 'นายแบบสวมเสื้อสเวตเชิ้ตสีดำถือกระเป๋าผ้าแคนวาสสีครีมเรียบบนฉากสีเบจ',
       },
       ...TILE,
     },

@@ -251,9 +251,9 @@ Behaviour:
 |---|---|---|
 | `Header` | Server shell + client islands | Sticky; cart badge is a client island |
 | `Hero` | Client | `slides[]`; arrows, dots, pause; no autoplay unless explicitly enabled; reduced-motion safe; first slide image is `priority` |
-| `ProductCard` | Server | Link wraps whole card; swatches are decorative + `aria-label`; no nested interactive elements |
+| `ProductCard` | Server + client preview island | Server renders price/copy; image/name link opens details; separate labelled colour buttons update both images locally, expose pressed state, and never navigate |
 | `CatalogueExplorer` (`Filters`, `SortSelect`, chips) | Client | Reads and writes the URL (History API, ADR-0006); filters a server-rendered card list; price = two debounced inputs; sidebar from `lg`, Radix drawer (lazy) below |
-| `Gallery` | Client | Keyboard + swipe; `sizes` tuned; only first image eager |
+| `Gallery` | Client | Front/back/side per colour; labelled thumbnails with pressed state synchronized to swipes; AI preview disclosure; only first image eager |
 | `VariantPicker` | Client | Radio groups (`role="radiogroup"`), disabled combos have `aria-disabled` + reason text |
 | `CartDrawer` | Client | Focus trap, `Esc` closes, returns focus to trigger, `aria-live` for updates |
 | `LookBuilder` | Client | Four `LookSlot`s, `LookSummary`, atomic add |

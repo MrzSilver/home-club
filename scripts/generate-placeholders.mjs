@@ -3,7 +3,7 @@
 //   node scripts/generate-placeholders.mjs
 //
 // Everything is drawn as SVG in this repository and rasterised with sharp to WebP, so the output is
-// original, deterministic and idempotent (a file is only rewritten when its bytes would change).
+// original and deterministic. Only missing files are written; existing photography is preserved.
 // Replace the output with rights-cleared photography before any public marketing use (RULES 14.3).
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -277,12 +277,14 @@ async function emit(relativePath, buffer) {
   } catch {
     current = null;
   }
-  if (current !== null && current.equals(buffer)) {
+  // Existing paths contain licensed photographs. Never overwrite them with generated placeholders.
+  if (current !== null) {
     stats.unchanged += 1;
-  } else {
-    await writeFile(target, buffer);
-    stats.written += 1;
+    stats.bytes += current.length;
+    return;
   }
+  await writeFile(target, buffer);
+  stats.written += 1;
   stats.bytes += buffer.length;
 }
 
