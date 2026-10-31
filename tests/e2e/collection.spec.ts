@@ -164,7 +164,7 @@ for (const locale of LOCALES) {
       expect(html).toContain(`<link rel="canonical" href="http://localhost:3000/${locale}/shop"`);
     });
 
-    test('prioritizes the visible LCP photo over the hidden hover photo (FR-022)', async ({
+    test('prioritizes the visible LCP image over its hidden hover view (FR-022)', async ({
       page,
       context,
     }) => {

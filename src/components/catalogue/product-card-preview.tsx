@@ -50,10 +50,8 @@ export function ProductCardPreview({
               width={primary.width}
               height={primary.height}
               sizes={sizes}
-              // `preload` alone only adds a <link> that Chrome fetches at Low priority; the LCP card photo
-              // must be requested eagerly at High priority (FR-022, SPEC §12).
-              loading={priority ? 'eager' : 'lazy'}
-              fetchPriority={priority ? 'high' : 'auto'}
+              loading={priority ? 'eager' : undefined}
+              fetchPriority={priority ? 'high' : undefined}
               className={imageClass}
             />
           )}
@@ -64,6 +62,8 @@ export function ProductCardPreview({
               width={alternate.width}
               height={alternate.height}
               sizes={sizes}
+              // The hidden hover view must not compete with the visible LCP photograph.
+              fetchPriority="low"
               className={`${imageClass} opacity-0 transition-opacity duration-slow ease-standard group-hover:opacity-100 motion-reduce:transition-none`}
             />
           )}

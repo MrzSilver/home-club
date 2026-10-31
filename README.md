@@ -98,7 +98,8 @@ Brand, products and copy are fictional. Imagery is placeholder/illustrative unti
 
 ## Status
 
-P1 T01–T11 are implemented; deployed performance confirmation remains tracked in PR #6.
+P1 T01–T11 are implemented: Home, Collection filters/sort, product gallery and stock-aware variants, plus a persisted cart with drawer and full page, in Thai/English and THB/USD, with product/cart axe coverage, Lighthouse targets and the CI JavaScript-budget gate. See [P1 validation](./docs/p1-validation.md). The [2026-10-29 deployed audit](./docs/p1-exit-audit.md) had one LCP miss (Thai Foundations: 2513.533 ms against 2500 ms); the LCP image-priority fix for it is merged (PR #6), and the deployed re-measurement is still to be recorded. The owner confirmed the P1 screen-reader smoke test passed.
+
 The owner authorized starting P2 before that gate closes. P2 now includes the four-slot Look
 Builder, atomic cart addition and grouped discounts, Vibes, three bilingual MDX Journal articles,
 keyboard-operated Search, demo Checkout, size guide and related products. Home and navigation
