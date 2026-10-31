@@ -189,7 +189,9 @@ for (const locale of ['en', 'th'] as const) {
         });
       }
     });
-    test('corrupt and stale localStorage recover without breaking the page', async ({ page }) => {
+    test('Journey 5: corrupt and stale localStorage recover without breaking the page', async ({
+      page,
+    }) => {
       await page.addInitScript(() => {
         if (localStorage.getItem('hc:cart:v1') === null)
           localStorage.setItem('hc:cart:v1', 'not-json');

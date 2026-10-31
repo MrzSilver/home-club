@@ -5,18 +5,19 @@ import type { ReactElement } from 'react';
 import { CheckoutForm } from '@/components/checkout/checkout-form';
 import { Container } from '@/components/ui/container';
 import { resolveRouteParams } from '@/i18n/params';
-import { languageAlternates } from '@/lib/locale-path';
+import { pageMetadata } from '@/lib/seo';
 
 type Props = { params: Promise<{ locale: string; currency: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await resolveRouteParams(params);
   const t = await getTranslations({ locale, namespace: 'checkout' });
-  return {
+  return pageMetadata({
+    locale,
+    path: '/checkout',
     title: t('title'),
     description: t('demo'),
-    alternates: languageAlternates(locale, '/checkout'),
-    robots: { index: false, follow: false },
-  };
+    noindex: true,
+  });
 }
 export default async function CheckoutPage({ params }: Props): Promise<ReactElement> {
   const { locale, currency } = await resolveRouteParams(params);

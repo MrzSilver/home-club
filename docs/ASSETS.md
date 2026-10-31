@@ -168,3 +168,19 @@ no additional photographs or image sources were introduced. Six EN/TH MDX files 
 `src/content/journal` are original AI-assisted demo editorial copy authored for this project
 on 2026-10-29, with no third-party excerpts. Thai copy requires owner review. Size-guide figures
 are labeled illustrative body measurements and do not describe the photographed garments.
+
+## Generated Open Graph images — 2026-10-31 (SEO NFR, ADR-0011)
+
+Thirty-two 1200 x 630 PNG share images are generated at build time by `next/og` (Satori) from code in
+`src/components/og/`: `/{locale}/og/home.png`, one per product and locale, one per journal article and
+locale. They contain only typography, the brand colours from `tokens.css` and product swatch colours from
+catalogue data; **no photograph and no third-party image is used**, and nothing in them is AI-generated.
+Nothing is committed under `public/`.
+
+| Font file (read at build from `node_modules/@fontsource`) | Source                                             | Licence |
+| --------------------------------------------------------- | -------------------------------------------------- | ------- |
+| `jost/files/jost-latin-500-normal.woff`                   | Jost by Owen Earl, via `@fontsource/jost`          | OFL-1.1 |
+| `inter/files/inter-latin-400-normal.woff`                 | Inter by Rasmus Andersson, via `@fontsource/inter` | OFL-1.1 |
+
+The fonts are the same families already self-hosted for the site (see ADR-0001); the licence field of each
+package is `OFL-1.1`. The `.woff` files are embedded in the rendered PNGs only, not distributed.

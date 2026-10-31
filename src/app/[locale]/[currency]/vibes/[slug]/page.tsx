@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { setRequestLocale } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { ReactElement } from 'react';
 import { ProductCard } from '@/components/catalogue/product-card';
 import { Container } from '@/components/ui/container';
@@ -8,7 +8,8 @@ import { VIBE_ENTRIES } from '@/data/vibes';
 import { CATEGORY_ENTRIES } from '@/data/categories';
 import { PRODUCTS } from '@/data/products';
 import { resolveRouteParams } from '@/i18n/params';
-import { languageAlternates } from '@/lib/locale-path';
+import { withOgImage } from '@/components/og/og-metadata';
+import { pageMetadata } from '@/lib/seo';
 import Image from 'next/image';
 
 type Props = { params: Promise<{ locale: string; currency: string; slug: string }> };
@@ -21,11 +22,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const slug = (await params).slug;
   const vibe = VIBE_ENTRIES.find((v) => v.id === slug);
   if (!vibe) notFound();
-  return {
-    title: vibe.name[locale],
-    description: vibe.description[locale],
-    alternates: languageAlternates(locale, `/vibes/${slug}`),
-  };
+  const seo = await getTranslations({ locale, namespace: 'seo' });
+  const name = vibe.name[locale];
+  return withOgImage(
+    pageMetadata({
+      locale,
+      path: `/vibes/${slug}`,
+      title: seo('vibeTitle', { name }),
+      description: seo('vibeDescription', { name, description: vibe.description[locale] }),
+    }),
+    locale,
+    { kind: 'home' },
+  );
 }
 export default async function VibePage({ params }: Props): Promise<ReactElement> {
   const { locale, currency } = await resolveRouteParams(params);

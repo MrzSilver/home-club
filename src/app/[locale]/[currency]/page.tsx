@@ -8,11 +8,13 @@ import { Hero } from '@/components/home/hero';
 import { LookTeaser } from '@/components/home/look-teaser';
 import { EditorialTeaser } from '@/components/home/editorial-teaser';
 import { VibesGrid } from '@/components/content/vibes-grid';
+import { JsonLd } from '@/components/seo/json-ld';
 import { Container } from '@/components/ui/container';
 import { TrustStrip } from '@/components/home/trust-strip';
 import { localeFromParam, resolveRouteParams } from '@/i18n/params';
-import { languageAlternates } from '@/lib/locale-path';
-import { openGraphLocales } from '@/lib/seo';
+import { withOgImage } from '@/components/og/og-metadata';
+import { pageMetadata } from '@/lib/seo';
+import { organizationJsonLd, webSiteJsonLd } from '@/lib/structured-data';
 
 type HomePageProps = {
   params: Promise<{ locale: string; currency: string }>;
@@ -24,22 +26,17 @@ export const dynamicParams = false;
 export async function generateMetadata({ params }: HomePageProps): Promise<Metadata> {
   const locale = localeFromParam((await params).locale);
   const t = await getTranslations({ locale, namespace: 'seo' });
-  const common = await getTranslations({ locale, namespace: 'common' });
-  const alternates = languageAlternates(locale);
-  return {
-    title: { absolute: t('homeTitle') },
-    description: t('homeDescription'),
-    alternates,
-    // The share image is a P4 task (SPEC 10); until then there is no og:image.
-    openGraph: {
-      type: 'website',
-      siteName: common('brandName'),
+  return withOgImage(
+    pageMetadata({
+      locale,
+      path: '',
       title: t('homeTitle'),
       description: t('homeDescription'),
-      url: alternates.canonical,
-      ...openGraphLocales(locale),
-    },
-  };
+      absoluteTitle: true,
+    }),
+    locale,
+    { kind: 'home' },
+  );
 }
 
 /**
@@ -50,22 +47,30 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
 export default async function HomePage({ params }: HomePageProps): Promise<ReactElement> {
   const { locale, currency } = await resolveRouteParams(params);
   setRequestLocale(locale);
+  const seo = await getTranslations({ locale, namespace: 'seo' });
+  const description = seo('siteDescription');
 
   return (
-    <main id="main">
-      <Hero locale={locale} />
-      <div className="relative z-10 -mt-6 rounded-t-md bg-canvas pt-6">
-        <div className="flex flex-col gap-12 md:gap-16 xl:gap-24">
-          <CategoryTiles locale={locale} />
-          <EssentialsGrid locale={locale} currency={currency} />
-          <LookTeaser locale={locale} currency={currency} />
-          <EditorialTeaser locale={locale} />
-          <TrustStrip locale={locale} />
-          <Container>
-            <VibesGrid locale={locale} />
-          </Container>
+    <>
+      {/* Outside <main>: the modal menu's aria-hidden never hides a <script> or its ancestors. */}
+      <JsonLd
+        data={[organizationJsonLd(locale, description), webSiteJsonLd(locale, description)]}
+      />
+      <main id="main">
+        <Hero locale={locale} />
+        <div className="relative z-10 -mt-6 rounded-t-md bg-canvas pt-6">
+          <div className="flex flex-col gap-12 md:gap-16 xl:gap-24">
+            <CategoryTiles locale={locale} />
+            <EssentialsGrid locale={locale} currency={currency} />
+            <LookTeaser locale={locale} currency={currency} />
+            <EditorialTeaser locale={locale} />
+            <TrustStrip locale={locale} />
+            <Container>
+              <VibesGrid locale={locale} />
+            </Container>
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 }

@@ -266,15 +266,15 @@ Shell as built (T06): `Header` is a server component inside the locale layout; i
 ## 10. SEO and structured data
 
 - `app/sitemap.ts` emits every route × locale with `alternates`.
-- `app/robots.ts`: allow all; disallow `/checkout` and `/cart`; mark demo clearly.
+- `app/robots.ts`: allow all; disallow the locale-prefixed `/{locale}/cart`, `/{locale}/checkout` and `/{locale}/search` (no rule for query URLs: canonical handles filtered pages); mark demo clearly.
 - JSON-LD: `Organization` (Home), `Product` + `Offer` (Product page; price in the active currency), `BreadcrumbList`, `Article` (Journal). Built in `lib/seo.ts`, rendered with a safe `<script type="application/ld+json">` helper (escape `<`).
-- OG images generated via `opengraph-image` route per page type, localised.
+- OG images: static 1200 x 630 PNG route handlers under `/[locale]/og/` (default, product, article), referenced explicitly from each page's metadata by `withOgImage` (no currency segment in the URL; file-based `opengraph-image` above a page is dropped when the page sets `openGraph`); alt text localised; card text is Latin until Satori shapes Thai (ADR-0011).
 - Because the brand is fictional, add `<meta name="robots">` policy per owner's decision (default: indexable; case-study page explains it is a demo).
 
 ## 11. Security
 
 - Security headers via `next.config`: CSP (nonce or hashed; no `unsafe-eval`), `Referrer-Policy`, `X-Content-Type-Options`, `Permissions-Policy`, `frame-ancestors 'none'`.
-- No secrets in repo; `.env.example` only; `src/lib/env.ts` validates env with Zod at startup.
+- No secrets in repo; `.env.example` only; `src/lib/env.ts` validates env with Zod at startup. When `VERCEL_ENV=production`, it also fails the build unless `NEXT_PUBLIC_SITE_URL` is a public https origin (not localhost), so a sitemap, canonical or JSON-LD can never point at localhost.
 - Forms: validate on client and (when a server action exists) on server; never trust client prices — recompute from `data/` on every checkout step.
 - No PII persistence in P1–P3. Newsletter and checkout forms do not transmit data off-device.
 - Dependencies audited in CI (`pnpm audit` non-blocking report; Dependabot/Renovate on).

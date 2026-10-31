@@ -1,14 +1,15 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, setRequestLocale } from 'next-intl/server';
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import type { ReactElement } from 'react';
 import { LookBuilderLoader } from '@/components/look/look-builder-loader';
 import { Container } from '@/components/ui/container';
 import { LOOKS } from '@/data/looks';
 import { PRODUCTS } from '@/data/products';
 import { resolveRouteParams } from '@/i18n/params';
-import { languageAlternates } from '@/lib/locale-path';
+import { withOgImage } from '@/components/og/og-metadata';
+import { pageMetadata } from '@/lib/seo';
 
 type Props = { params: Promise<{ locale: string; currency: string; slug: string }> };
 export const dynamicParams = false;
@@ -20,11 +21,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const slug = (await params).slug;
   const current = LOOKS.find((l) => l.slug === slug);
   if (!current) notFound();
-  return {
-    title: current.name[locale],
-    description: current.description[locale],
-    alternates: languageAlternates(locale, `/looks/${slug}`),
-  };
+  const seo = await getTranslations({ locale, namespace: 'seo' });
+  return withOgImage(
+    pageMetadata({
+      locale,
+      path: `/looks/${slug}`,
+      title: current.name[locale],
+      description: seo('lookDescription', { description: current.description[locale] }),
+    }),
+    locale,
+    { kind: 'home' },
+  );
 }
 export default async function LookPage({ params }: Props): Promise<ReactElement> {
   const { locale, currency } = await resolveRouteParams(params);

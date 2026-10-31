@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { MobileNav } from '@/components/layout/mobile-nav';
 import type { MobileNavContent } from '@/components/layout/mobile-nav-types';
@@ -38,6 +38,14 @@ const CONTENT: MobileNavContent = {
   currencyNames: { USD: 'US dollar (USD)', THB: 'Thai baht (THB)' },
   currencyAnnouncements: { USD: 'Dollars.', THB: 'Baht.' },
 };
+
+// The gate below holds the panel back until the test releases it; then the real module loads. Cold,
+// that load makes Vite transform the Radix Dialog graph inside the test, which under a full parallel run
+// can outlast findBy*'s 1000 ms default (the same flake as mobile-nav.test.tsx). Loading the real module
+// once up front, past the mock, fills the module cache; the gate still decides when the panel appears.
+beforeAll(async () => {
+  await vi.importActual('@/components/layout/mobile-nav-panel');
+}, 60_000);
 
 describe('MobileNav first open on a slow link', () => {
   it('is busy, not expanded, and shows no dialog until the code has arrived', async () => {

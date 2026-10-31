@@ -6,18 +6,19 @@ import { SearchPage } from '@/components/search/search-page';
 import { getSearchIndex } from '@/components/search/search-index';
 import { Container } from '@/components/ui/container';
 import { resolveRouteParams } from '@/i18n/params';
-import { languageAlternates } from '@/lib/locale-path';
+import { pageMetadata } from '@/lib/seo';
 
 type Props = { params: Promise<{ locale: string; currency: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await resolveRouteParams(params);
   const t = await getTranslations({ locale, namespace: 'search' });
-  return {
+  return pageMetadata({
+    locale,
+    path: '/search',
     title: t('title'),
     description: t('hint'),
-    alternates: languageAlternates(locale, '/search'),
-    robots: { index: false, follow: true },
-  };
+    noindex: true,
+  });
 }
 export default async function Page({ params }: Props): Promise<ReactElement> {
   const { locale } = await resolveRouteParams(params);

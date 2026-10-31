@@ -187,6 +187,9 @@ describe('proxy matcher', () => {
     '/sitemap.xml',
     '/manifest.webmanifest',
     '/en/opengraph-image.png',
+    '/en/og/home.png',
+    '/th/og/products/essential-tee/image.png',
+    '/en/og/journal/care-for-basics/image.png',
     '/_vercel/insights/script.js',
   ])('is skipped for %s', (pathname) => {
     expect(matches(pathname)).toBe(false);

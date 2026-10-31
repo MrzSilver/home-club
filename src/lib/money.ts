@@ -158,13 +158,21 @@ export function formatMoney(amountMinor: number, currency: Currency, locale: Loc
       `THB amounts must be whole baht (multiples of 100), received ${amountMinor}`,
     );
   }
+  // A decimal string is an exact Intl input; the assertion only widens the template literal type.
+  return formatterFor(currency, locale).format(toDecimalString(amountMinor) as `${number}`);
+}
+
+/**
+ * Integer minor units as an exact two-decimal string ("2900" -> "29.00", "-5" -> "-0.05"), built from
+ * integer arithmetic only. For machine-readable output such as schema.org `Offer.price`; people see
+ * `formatMoney`. For THB the figure is whole baht ("101500" -> "1015.00").
+ */
+export function toDecimalString(amountMinor: number): string {
+  assertInteger(amountMinor, 'amount');
   const magnitude = Math.abs(amountMinor);
   const major = floorDiv(magnitude, MINOR_PER_MAJOR);
   const minor = String(magnitude % MINOR_PER_MAJOR).padStart(2, '0');
-  const sign = amountMinor < 0 ? '-' : '';
-  // A decimal string is an exact Intl input; the assertion only widens the template literal type.
-  const decimal = `${sign}${major}.${minor}` as `${number}`;
-  return formatterFor(currency, locale).format(decimal);
+  return `${amountMinor < 0 ? '-' : ''}${major}.${minor}`;
 }
 
 /**
