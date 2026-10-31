@@ -79,6 +79,10 @@ T1 and T4 share `src/lib/seo.ts`; T2/T4/T5 all touch route `page.tsx` files. Eac
   - Validated once with Google's Rich Results Test or schema.org validator; record the result in the PR, do not claim it otherwise.
 - Files: `src/components/seo/json-ld.tsx`, product, home, collection and journal `page.tsx`, `tests/e2e/seo-jsonld.spec.ts` (new).
 - Out of scope: reviews/ratings (RULES §1.3, no fabricated data). Dependencies: T1. Verification: unit, e2e, build.
+- **Done (2026-10-31).** `src/components/seo/json-ld.tsx`. Home: `Organization` + `WebSite`; Product: `Product`+`Offer` +
+  `BreadcrumbList` (Home > Shop > category > product, the collection pages' visible trail extended); Shop and collections:
+  `BreadcrumbList` matching the visible breadcrumb; articles: `Article` (no dates) + `BreadcrumbList`. All routes still SSG.
+  Open: the Rich Results / schema.org validator run has not been done yet; do it on the Vercel Preview and record it in the PR.
 
 ### T3. Sitemap and robots
 

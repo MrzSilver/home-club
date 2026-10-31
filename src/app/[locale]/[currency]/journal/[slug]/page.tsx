@@ -2,12 +2,14 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { ReactElement } from 'react';
+import { JsonLd } from '@/components/seo/json-ld';
 import { Container } from '@/components/ui/container';
 import { ProductCard } from '@/components/catalogue/product-card';
 import { JOURNAL_SLUGS, getArticle } from '@/content/journal';
 import { PRODUCTS } from '@/data/products';
 import { resolveRouteParams } from '@/i18n/params';
-import { languageAlternates } from '@/lib/locale-path';
+import { languageAlternates, publicPath } from '@/lib/locale-path';
+import { articleJsonLd, breadcrumbJsonLd } from '@/lib/structured-data';
 
 type Props = { params: Promise<{ locale: string; currency: string; slug: string }> };
 export const dynamicParams = false;
@@ -32,10 +34,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ArticlePage({ params }: Props): Promise<ReactElement> {
   const { locale, currency } = await resolveRouteParams(params);
   setRequestLocale(locale);
-  const { meta, minutes, Content } = await getArticle(locale, knownSlug((await params).slug));
+  const slug = knownSlug((await params).slug);
+  const { meta, minutes, Content } = await getArticle(locale, slug);
   const t = await getTranslations({ locale, namespace: 'content' });
+  const nav = await getTranslations({ locale, namespace: 'nav' });
+  // The frontmatter has no dates, so the Article carries none (nothing is invented, RULES 1.3).
+  const structuredData = [
+    articleJsonLd({ slug, locale, headline: meta.title, description: meta.description }),
+    breadcrumbJsonLd([
+      { name: nav('links.home'), path: publicPath(locale) },
+      { name: nav('links.journal'), path: publicPath(locale, '/journal') },
+      { name: meta.title, path: publicPath(locale, `/journal/${slug}`) },
+    ]),
+  ];
   return (
     <Container as="main" className="py-12">
+      <JsonLd data={structuredData} />
       <div id="main" tabIndex={-1} className="space-y-12">
         <article className="mx-auto max-w-prose space-y-6">
           <h1 className="text-h1">{meta.title}</h1>

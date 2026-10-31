@@ -3,11 +3,13 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { ReactElement } from 'react';
 
 import { CollectionView } from '@/components/catalogue/collection-view';
+import { JsonLd } from '@/components/seo/json-ld';
 import { CURRENCY_SEGMENTS } from '@/lib/currency';
 import { LOCALES } from '@/data/locales';
 import { localeFromParam, resolveRouteParams } from '@/i18n/params';
-import { languageAlternates } from '@/lib/locale-path';
+import { languageAlternates, publicPath } from '@/lib/locale-path';
 import { openGraphLocales } from '@/lib/seo';
+import { breadcrumbJsonLd } from '@/lib/structured-data';
 
 type ShopPageProps = {
   params: Promise<{ locale: string; currency: string }>;
@@ -47,5 +49,16 @@ export default async function ShopPage({ params }: ShopPageProps): Promise<React
   const { locale, currency } = await resolveRouteParams(params);
   setRequestLocale(locale);
 
-  return <CollectionView locale={locale} currency={currency} category={null} />;
+  const t = await getTranslations({ locale, namespace: 'catalogue' });
+  const crumbs = breadcrumbJsonLd([
+    { name: t('page.home'), path: publicPath(locale) },
+    { name: t('page.shop'), path: publicPath(locale, '/shop') },
+  ]);
+
+  return (
+    <>
+      <JsonLd data={crumbs} />
+      <CollectionView locale={locale} currency={currency} category={null} />
+    </>
+  );
 }

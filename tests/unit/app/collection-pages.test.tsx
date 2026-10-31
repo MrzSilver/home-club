@@ -164,7 +164,8 @@ describe('Shop all page (FR-020, FR-022)', () => {
   it('adds the pre-paint hold through server-inserted HTML only, not as a script in the tree', async () => {
     await renderShop('en', 'usd');
 
-    expect(document.querySelectorAll('script')).toHaveLength(0);
+    // Structured data is a data block (FR-036), not an executable script.
+    expect(document.querySelectorAll('script:not([type="application/ld+json"])')).toHaveLength(0);
     expect(insertedHtml.callbacks).toHaveLength(1);
     const callback = insertedHtml.callbacks[0];
     const inserted = callback?.() as ReactElement<{ children: string }>;

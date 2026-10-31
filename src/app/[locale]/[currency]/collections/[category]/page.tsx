@@ -4,12 +4,14 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { ReactElement } from 'react';
 
 import { CollectionView } from '@/components/catalogue/collection-view';
+import { JsonLd } from '@/components/seo/json-ld';
 import { LOCALES } from '@/data/locales';
 import { localeFromParam, resolveRouteParams } from '@/i18n/params';
 import { getAllCategories, getCategory, getProductsByCategory } from '@/lib/catalogue';
 import { CURRENCY_SEGMENTS } from '@/lib/currency';
-import { languageAlternates } from '@/lib/locale-path';
+import { languageAlternates, publicPath } from '@/lib/locale-path';
 import { openGraphLocales } from '@/lib/seo';
+import { breadcrumbJsonLd } from '@/lib/structured-data';
 
 type CategoryPageProps = {
   params: Promise<{ locale: string; currency: string; category: string }>;
@@ -62,5 +64,17 @@ export default async function CategoryPage({ params }: CategoryPageProps): Promi
   const category = getCategory((await params).category);
   if (category === undefined) notFound();
 
-  return <CollectionView locale={locale} currency={currency} category={category} />;
+  const t = await getTranslations({ locale, namespace: 'catalogue' });
+  const crumbs = breadcrumbJsonLd([
+    { name: t('page.home'), path: publicPath(locale) },
+    { name: t('page.shop'), path: publicPath(locale, '/shop') },
+    { name: category.name[locale], path: publicPath(locale, `/collections/${category.id}`) },
+  ]);
+
+  return (
+    <>
+      <JsonLd data={crumbs} />
+      <CollectionView locale={locale} currency={currency} category={category} />
+    </>
+  );
 }

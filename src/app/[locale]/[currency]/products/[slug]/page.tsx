@@ -6,14 +6,16 @@ import type { ReactElement } from 'react';
 import { ProductDetails } from '@/components/product/product-details';
 import { SizeGuide } from '@/components/product/size-guide';
 import { ProductCard } from '@/components/catalogue/product-card';
+import { JsonLd } from '@/components/seo/json-ld';
 import { LOOKS } from '@/data/looks';
 import { Container } from '@/components/ui/container';
 import { LOCALES } from '@/data/locales';
 import { resolveRouteParams } from '@/i18n/params';
-import { getAllProducts, getProductBySlug } from '@/lib/catalogue';
+import { getAllProducts, getCategory, getProductBySlug } from '@/lib/catalogue';
 import { CURRENCY_SEGMENTS } from '@/lib/currency';
-import { languageAlternates } from '@/lib/locale-path';
+import { languageAlternates, publicPath } from '@/lib/locale-path';
 import { openGraphLocales } from '@/lib/seo';
+import { breadcrumbJsonLd, productJsonLd } from '@/lib/structured-data';
 
 type Props = { params: Promise<{ locale: string; currency: string; slug: string }> };
 export const dynamicParams = false;
@@ -48,6 +50,17 @@ export default async function ProductPage({ params }: Props): Promise<ReactEleme
   if (!product) notFound();
   const messages = await getMessages({ locale });
   const t = await getTranslations({ locale, namespace: 'content' });
+  const catalogue = await getTranslations({ locale, namespace: 'catalogue' });
+  const category = getCategory(product.category);
+  const crumbs = breadcrumbJsonLd([
+    // Same trail as the collection pages' visible breadcrumb, extended by the product.
+    { name: catalogue('page.home'), path: publicPath(locale) },
+    { name: catalogue('page.shop'), path: publicPath(locale, '/shop') },
+    ...(category
+      ? [{ name: category.name[locale], path: publicPath(locale, `/collections/${category.id}`) }]
+      : []),
+    { name: product.name[locale], path: publicPath(locale, `/products/${product.slug}`) },
+  ]);
   const look = LOOKS.find((item) =>
     Object.values(item.slots).some((slot) => slot.allowedProductIds.includes(product.id)),
   );
@@ -60,6 +73,7 @@ export default async function ProductPage({ params }: Props): Promise<ReactEleme
     : [];
   return (
     <Container as="main" className="py-12 md:py-16">
+      <JsonLd data={[productJsonLd(product, locale, currency), crumbs]} />
       <div id="main" tabIndex={-1} className="space-y-12">
         <NextIntlClientProvider messages={{ product: messages.product, cart: messages.cart }}>
           <ProductDetails
