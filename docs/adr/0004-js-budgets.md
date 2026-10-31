@@ -99,3 +99,14 @@ Operational note: Vercel protects preview deployments by default. For the previe
 page, either disable Deployment Protection for previews or create a "Protection Bypass for
 Automation" secret and store it as the `VERCEL_AUTOMATION_BYPASS_SECRET` repository secret;
 `lighthouserc.cjs` then sends it as the `x-vercel-protection-bypass` header.
+
+Amendment (2026-10-29, owner decision): Preview deployments stay `noindex`; full SEO is verified on
+Production. The preview workflow sets `LHCI_TARGET=preview`, and only then `lighthouserc.cjs` turns
+off `is-crawlable`, lowers the overall `categories:seo` score to `warn` (still reported), and requires
+every other SEO audit (`document-title`, `meta-description`, `http-status-code`, `link-text`,
+`crawlable-anchors`, `image-alt`, `hreflang`, `canonical`) at score 1 as an `error`. Performance,
+accessibility and best-practices stay `error`. Before Lighthouse runs,
+`scripts/check-preview-headers.mjs` requires every audited URL to return 200 and to carry
+`X-Robots-Tag: noindex`, so the exemption cannot hide an accidental noindex or a protection login
+page. `vercel.json` sets `VERCEL_PREVIEW_FEEDBACK_ENABLED=0` so the Vercel toolbar is not injected
+into the audited Preview pages.

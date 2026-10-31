@@ -14,6 +14,18 @@
 const LOCAL_URL = 'http://localhost:3000';
 const remote = (process.env.LHCI_BASE_URL ?? '').trim().replace(/\/+$/, '');
 const BASE_URL = remote === '' ? LOCAL_URL : remote;
+// Owner decision, 2026-10-29: keep Preview noindex and verify full SEO on Production.
+const preview = remote !== '' && process.env.LHCI_TARGET === 'preview';
+const PREVIEW_SEO_AUDITS = [
+  'document-title',
+  'meta-description',
+  'http-status-code',
+  'link-text',
+  'crawlable-anchors',
+  'image-alt',
+  'hreflang',
+  'canonical',
+];
 
 // Routes under test: Home in both locales and one Collection page in each (RULES 8.8 and SPEC 12 apply
 // to Thai too): "Shop all" in English, a category page in Thai, and Product in both locales.
@@ -65,7 +77,17 @@ module.exports = {
         'categories:performance': [machineLevel, { minScore: 0.95 }],
         'categories:accessibility': ['error', { minScore: 0.95 }],
         'categories:best-practices': ['error', { minScore: 0.95 }],
-        'categories:seo': ['error', { minScore: 0.95 }],
+        'categories:seo': [preview ? 'warn' : 'error', { minScore: 0.95 }],
+        ...(preview
+          ? {
+              // Keep the raw SEO score visible. Only intentional crawl blocking is exempted;
+              // the preflight separately requires Vercel's noindex header on every Preview URL.
+              'is-crawlable': 'off',
+              ...Object.fromEntries(
+                PREVIEW_SEO_AUDITS.map((id) => [id, ['error', { minScore: 1 }]]),
+              ),
+            }
+          : {}),
         'largest-contentful-paint': [machineLevel, { maxNumericValue: 2500 }],
         'cumulative-layout-shift': ['error', { maxNumericValue: 0.1 }],
         'total-blocking-time': [machineLevel, { maxNumericValue: 200 }],
