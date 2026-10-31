@@ -166,6 +166,26 @@ T1 and T4 share `src/lib/seo.ts`; T2/T4/T5 all touch route `page.tsx` files. Eac
   - Manual keyboard-only checklist run on case-study and each P3-touched page; results recorded in `docs/p3-validation.md`. Defects found are fixed in this task or filed as issues (no weakened checks).
   - The agent cannot do a screen-reader pass; the owner does it (E6).
 - Files: `tests/e2e/*`, `docs/p3-validation.md`. Dependencies: T2 to T6. Verification: `pnpm test:e2e`, `pnpm test:a11y`.
+- **Done (2026-10-31).** `tests/e2e/routes.ts` (37 paths × 2 locales) drives the axe sweep (220 @a11y tests, zero
+  critical/serious, plus console/hydration/CSP checks per route). `journeys.spec.ts` covers journeys 1 and 3 as single
+  runs; journeys 2, 4 and 5 are retitled in place (`--grep Journey` finds all five). The review found and fixed a T2
+  regression: the JSON-LD `<script>` inside `<main>` kept the page exposed while the modal menu was open (aria-hidden
+  never hides scripts). Three load-sensitive tests were made deterministic or given an explained budget
+  (`docs/p3-validation.md`). Keyboard pass recorded. Owner still to do: screen-reader smoke for P3 pages (E6).
+
+## P3 exit status (2026-10-31)
+
+T1–T7 done; T8 (FR-044) deferred to the backlog (E7). Open items for the owner:
+
+- Set `NEXT_PUBLIC_SITE_URL=https://home-club-eight.vercel.app` in Vercel Production (the build fails until then).
+- After merging, run the Rich Results / schema.org and OG validators on Production, and re-check canonical and hreflang
+  there (on Preview they point at localhost because the variable is unset for Preview).
+- Screen-reader smoke for the case study and the menu on pages with structured data (E6).
+- Review the new Thai copy: `seo.*` page descriptions, `seo.og.alt.*`, `caseStudy.*`.
+- Thin margins: `/en/shop` application JS 39.9/40 KiB; `/th` Lighthouse performance 0.95; `/th/products/essential-tee`
+  LCP 2462 ms of 2500 (Preview run).
+- The lhci upload step logs `Invalid values: Argument: target` because `LHCI_TARGET` doubles as lhci's own option
+  (harmless; see `docs/p3-validation.md`).
 
 ### T8. Shareable look URL (FR-044, optional, C-P3)
 

@@ -25,6 +25,8 @@ cp .env.example .env.local   # optional: every variable has a default
 pnpm dev                     # http://localhost:3000
 ```
 
+`NEXT_PUBLIC_SITE_URL` is the public origin used for canonical links, hreflang, the sitemap, JSON-LD and Open Graph images. It defaults to `http://localhost:3000` locally, but a Vercel **Production** build fails unless it is set to the public https origin (`src/lib/env.ts`, SPEC §11).
+
 ## Scripts
 
 | Command                             | What it does                                                                                  |
@@ -62,10 +64,13 @@ pnpm dev                     # http://localhost:3000
 
 ```
 src/app/[locale]/[currency]/   routes (home, shop, collections, products, looks, vibes, journal, cart, checkout, case-study); [currency] is hidden, see docs/adr/0003
+src/app/[locale]/og/  static Open Graph PNGs (home, products, articles); see docs/adr/0011
+src/app/sitemap.ts · robots.ts
 src/proxy.ts        locale redirects + currency rewrite
 src/i18n/           next-intl routing, navigation helpers, request config, typed messages
-src/components/     ui · layout · home · catalogue · product · cart · look
-src/lib/            pure business logic (money, pricing, stock, look, catalogue, search, seo)
+src/components/     ui · layout · home · catalogue · product · cart · look · content · case-study · seo · og
+src/content/        journal MDX and the case-study data loader
+src/lib/            pure business logic (money, pricing, stock, look, catalogue, search, seo, structured data, sitemap)
 src/data/           typed seed catalogue + Zod schema
 src/store/          cart and preferences (Zustand)
 messages/           en.json · th.json
@@ -104,7 +109,14 @@ P2 is implemented and its phase-exit checks have evidence; the owner moved the p
 Builder, atomic cart addition and grouped discounts, Vibes, three bilingual MDX Journal articles,
 keyboard-operated Search, demo Checkout, size guide and related products. Home and navigation
 link these flows. See [P2 validation](./docs/p2-validation.md) for verification and
-phase-exit evidence (deployed Lighthouse passed; screen-reader smoke and Thai copy approved by the owner). The P3 plan is on the `feat/p3-seo-builders` branch.
+phase-exit evidence (deployed Lighthouse passed; screen-reader smoke and Thai copy approved by the owner).
+
+P3 (Proof) is implemented on `feat/p3-seo-builders` (PR #8, stacked on #7). It adds per-page metadata with canonical,
+hreflang, Open Graph and Twitter tags; JSON-LD (`Organization`, `Product`/`Offer`, `BreadcrumbList`, `Article`);
+`sitemap.xml` and `robots.txt`; localised Open Graph images; the bilingual case-study page; and an axe sweep over
+every route and locale with the five SPEC §14 journeys. See the [P3 plan](./docs/p3-plan.md) and
+[P3 validation](./docs/p3-validation.md). The open owner items (production site URL, validators on Production,
+screen-reader smoke, Thai copy review) are listed under "P3 exit status" in the plan.
 
 ## Author
 

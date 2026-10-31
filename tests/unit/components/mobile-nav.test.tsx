@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { MobileNav } from '@/components/layout/mobile-nav';
 import type { MobileNavContent } from '@/components/layout/mobile-nav-types';
@@ -49,6 +49,16 @@ async function openMenu(): Promise<HTMLElement> {
   fireEvent.click(trigger());
   return screen.findByRole('dialog', { name: 'Menu' });
 }
+
+// MobileNav loads its drawer with a dynamic import on first open. Cold, that import makes Vite transform
+// the Radix Dialog graph inside the test, and under the load of a full parallel run it can take longer
+// than findBy*'s 1000 ms default (the flake: "findByRole dialog" timed out in the full suite only).
+// Importing the module once, up front and with its own generous timeout, makes the component's import
+// resolve from the module cache, so every test below measures behaviour, not transform speed.
+// mobile-nav-loading.test.tsx covers the slow-link path deterministically with a gated module.
+beforeAll(async () => {
+  await import('@/components/layout/mobile-nav-panel');
+}, 60_000);
 
 beforeEach(() => {
   resetNavigationMock('/shop');

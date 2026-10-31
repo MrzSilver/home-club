@@ -1,30 +1,49 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
-// Public URLs under test: every route in both locales (RULES 8.8), plus the bilingual 404 page.
-// Later tasks extend this list.
-const ROUTES = [
-  '/en/products/essential-tee',
-  '/th/products/essential-tee',
-  '/en/cart',
-  '/th/cart',
-  '/en',
-  '/th',
-  '/en/does-not-exist',
-  '/en/shop',
-  '/th/shop',
-  '/en/collections/foundations',
-  '/th/collections/lifestyle',
-  // Collection states that carry a query string: active chips and the empty state (T08).
-  '/en/shop?color=black&size=M&minPrice=50&priceCurrency=usd&sort=price-asc',
-  '/th/shop?category=accessories&size=XXL',
-];
+import { allRoutes, NOT_FOUND_PATH, QUERY_STATE_ROUTES } from './routes';
+
+// Public URLs under test: the manifest generates every route from the seed data in both locales
+// (RULES 8.8), plus the bilingual 404 page. A new product, look, vibe or article is covered by adding it
+// to the data; nothing is listed by hand here. Query-string states are listed separately.
+const ROUTES = [...allRoutes(), ...QUERY_STATE_ROUTES];
+
+/**
+ * Console errors, warnings and page errors; hydration problems show up here (PRD 9). Chromium logs the
+ * 404 status of the document itself as a console error, so that one message is expected on the 404 route.
+ * Any other failed request (an image, a script, a font) is reported separately and always fails.
+ */
+function watchProblems(page: Page, expectDocument404: boolean): string[] {
+  const problems: string[] = [];
+  page.on('console', (message) => {
+    const text = message.text();
+    if (expectDocument404 && /Failed to load resource.*404/.test(text)) return;
+    if (message.type() === 'error' || message.type() === 'warning') {
+      problems.push(`${message.type()}: ${text}`);
+    }
+  });
+  page.on('pageerror', (error) => problems.push(`pageerror: ${error.message}`));
+  page.on('response', (response) => {
+    const isDocument = response.request().resourceType() === 'document';
+    if (response.status() >= 400 && !(isDocument && expectDocument404)) {
+      problems.push(`failed request: ${response.status()} ${response.url()}`);
+    }
+  });
+  return problems;
+}
 
 for (const route of ROUTES) {
   test(
-    `axe: ${route} has no critical or serious violations`,
+    `axe: ${route} has no critical or serious violations and a clean console`,
     { tag: '@a11y' },
     async ({ page }) => {
+      const problems = watchProblems(page, route.endsWith(`/${NOT_FOUND_PATH}`));
+      // A blocked eval or inline script raises this event but no console error.
+      await page.addInitScript(() => {
+        document.addEventListener('securitypolicyviolation', (event) => {
+          console.error(`CSP violation: ${event.violatedDirective} ${event.blockedURI}`);
+        });
+      });
       await page.goto(route);
       // Wait for hydration: a filtered collection URL is only rendered as filtered once React has run.
       await page.waitForLoadState('networkidle');
@@ -43,6 +62,7 @@ for (const route of ROUTES) {
           nodes: violation.nodes.length,
         })),
       ).toEqual([]);
+      expect(problems).toEqual([]);
     },
   );
 }

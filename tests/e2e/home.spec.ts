@@ -279,11 +279,23 @@ for (const locale of LOCALES) {
               `${getComputedStyle(node).contentVisibility}/${getComputedStyle(node).visibility}/${Number(getComputedStyle(node).opacity).toFixed(1)}`,
           );
 
-      await page.getByRole('button', { name: copy.slideButton(2) }).click();
-      await page.waitForTimeout(120);
-      // Mid-fade (--dur-slow is 400 ms): slide 1 is still drawn, slide 2 is on its way in.
-      expect(await state(0)).toMatch(/^visible\/visible\//);
-      expect(await state(1)).toMatch(/^visible\/visible\//);
+      // Click and sample mid-fade (--dur-slow is 400 ms) in one in-page task, two frames after the
+      // click. Sampling from the test process instead added cross-process latency that, under a
+      // parallel run, often landed after the fade had finished (the old 120 ms wait was flaky).
+      const midFade = await page
+        .getByRole('button', { name: copy.slideButton(2) })
+        .evaluate(async (button) => {
+          const read = (node: Element): string =>
+            `${getComputedStyle(node).contentVisibility}/${getComputedStyle(node).visibility}`;
+          (button as HTMLButtonElement).click();
+          await new Promise((resolve) =>
+            requestAnimationFrame(() => requestAnimationFrame(resolve)),
+          );
+          const all = document.querySelectorAll('.hero-slide');
+          return [all[0], all[1]].map((node) => (node ? read(node) : 'missing'));
+        });
+      // Slide 1 is still drawn while slide 2 is on its way in.
+      expect(midFade).toEqual(['visible/visible', 'visible/visible']);
       // After the fade the outgoing slide leaves the tree.
       await expect.poll(() => state(0)).toBe('hidden/hidden/0.0');
       expect(await state(1)).toBe('visible/visible/1.0');

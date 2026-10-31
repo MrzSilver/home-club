@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 
 for (const locale of ['en', 'th'] as const) {
   const th = locale === 'th';
-  test(`complete look survives reload and loses its discount after removal ${locale} (FR-040, FR-042, FR-052) @a11y`, async ({
+  test(`Journey 2: complete look survives reload and loses its discount after removal ${locale} (FR-040, FR-042, FR-052) @a11y`, async ({
     page,
   }) => {
     await page.goto(`/${locale}/looks/the-essential-look`);
@@ -41,7 +41,7 @@ for (const locale of ['en', 'th'] as const) {
       ),
     ).toBeVisible();
   });
-  test(`unavailable look adds nothing and offers an alternative ${locale} (FR-041, FR-043)`, async ({
+  test(`Journey 4: unavailable look adds nothing and offers an alternative ${locale} (FR-041, FR-043)`, async ({
     page,
   }) => {
     await page.goto(`/${locale}/looks/the-essential-look`);

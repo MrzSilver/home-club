@@ -75,3 +75,119 @@ failed with `Invalid values: Argument: target, Given: "preview"` and the autorun
 `WARNING: upload command failed.` The collect and assert steps completed first, the process exited 0, and
 reports were written to `.lighthouseci/` as configured. The same variable is used by
 `.github/workflows/lighthouse-preview.yml`, so the same message is expected there.
+
+## T7 accessibility and E2E - 2026-10-31
+
+Commands run on the production build (`pnpm build && pnpm start`, started by Playwright), Windows
+workstation, Chromium only (projects `mobile` 375 px and `desktop` 1280 px).
+
+### Route manifest and axe sweep (RULES 8.8)
+
+`tests/e2e/routes.ts` generates every public path from the seed data (`@/data`) and reads the journal slugs
+from `src/content/journal/en/*.mdx` (the loader `src/content/journal.ts` imports MDX, which Playwright cannot
+load). `journeys.spec.ts` asserts that every URL in `sitemap.xml` is in the manifest.
+
+| Item                                                                                                                                                                      | Count |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----: |
+| Public paths: home, shop, 4 collections, 12 products, looks index + 1 look, vibes index + 5, journal index + 3, search, cart, checkout, checkout/success, case-study, 404 |    37 |
+| x 2 locales                                                                                                                                                               |    74 |
+| Query-string states (filter chips, empty state)                                                                                                                           |     2 |
+| Axe route tests per project                                                                                                                                               |    76 |
+| Interaction-state axe tests per project (menu open x2, filters drawer x2)                                                                                                 |     4 |
+
+`pnpm test:a11y`: 220 passed, 0 failed (110 per project), 3.3 min. Every route test now also fails on a console
+error or warning (hydration), a `securitypolicyviolation` event, a page error, or any request with status >= 400.
+The only allowance: Chromium logs the 404 status of the document itself as a console error, so on the 404
+route that one message is ignored (a failing image or script on that route still fails the test).
+Zero critical or serious axe violations on all 76 routes x 2 projects.
+
+### Journeys (SPEC 14)
+
+| Journey                                                     | Where                                                       | Result                   |
+| ----------------------------------------------------------- | ----------------------------------------------------------- | ------------------------ |
+| 1 browse, filter, variant, add, quantity, checkout, confirm | `journeys.spec.ts` (en, th x mobile, desktop)               | 4 of 4 pass              |
+| 2 look, discount, remove one, discount removed              | `look.spec.ts` ("Journey 2: ...", renamed in place)         | 4 of 4 pass              |
+| 3 locale and currency persist across reload and navigation  | `journeys.spec.ts` (en, th x mobile, desktop)               | 4 of 4 pass              |
+| 4 out-of-stock slot, atomic failure, alternatives           | `look.spec.ts` ("Journey 4: ...", renamed in place)         | pass; 1 flake, see below |
+| 5 corrupt localStorage recovery                             | `product-cart.spec.ts` ("Journey 5: ...", renamed in place) | 4 of 4 pass              |
+
+`pnpm test:e2e --grep Journey` finds all five.
+
+### Full E2E run
+
+`pnpm test:e2e`, second run: 705 passed, 4 failed, 7 skipped, 7.3 min. Per project: mobile 353 passed / 2 failed
+/ 3 skipped, desktop 352 passed / 2 failed / 4 skipped. The skips are the existing viewport-conditional skips
+(desktop sidebar test on mobile, mobile drawer tests on desktop, hover test on mobile).
+
+Failures, none caused by T7 changes (test code under them is unmodified, `src/` is unmodified):
+
+- `shell.spec.ts:256` "menu: opens from the keyboard, traps focus, hides the page ..." in en and th, on both
+  projects (4 failures, deterministic: fails in isolation too). With the menu open, `getByRole('main')` still
+  resolves to one element (`expect(...).toHaveCount(0)` at line 268); the snapshot shows the children of `main`
+  as `aria-hidden` but `main` itself not hidden. Likely cause (not confirmed): the hero carousel's
+  `<div role="status" class="sr-only">` (`src/components/home/hero-carousel.tsx:121`) is a live region inside
+  `main`, and the aria-hidden helper used by Radix does not hide ancestors of live regions. Impact: the
+  background is not fully inert for assistive technology while the menu is open (RULES 8.6). Needs the owner or
+  a builder to decide: move the live region out of `main`, or adjust the contract.
+- First run only (not reproduced in the second run or in isolation): `home.spec.ts:267` "cross-fade keeps the
+  outgoing slide rendered" mobile en (a 120 ms wait racing a 400 ms transition under load) and `look.spec.ts:44`
+  "Journey 4 ... en" on both projects (alert not found after the Add click; passed in isolation and in the second
+  full run). Both look like load-sensitive timing; not changed.
+
+### Flaky unit test
+
+`tests/unit/components/mobile-nav.test.tsx` timed out in `findByRole('dialog')` only in full-suite runs. Cause:
+`MobileNav` loads its drawer with `import('@/components/layout/mobile-nav-panel')` on first open; in the first
+test of the file that import is cold, so Vite transforms the Radix Dialog graph inside the test, and with 62
+files running in parallel it can exceed `findBy*`'s 1000 ms default. The cause is in the test, not the
+component. Fix: `beforeAll` imports the panel module once (60 s timeout of its own) so the component's import
+resolves from the module cache; no assertion timeouts were raised. The slow-link path stays covered
+deterministically by `mobile-nav-loading.test.tsx` (gated module). Evidence: `pnpm exec vitest run` three times
+after the fix: 62 files / 991 tests passed each time (23.4 s, 23.8 s, 23.8 s); `pnpm check` also green. The
+flake was intermittent, so three green runs are consistent with the fix but cannot prove it.
+
+### Manual keyboard-only pass
+
+Driven with Playwright keyboard input in Chromium at 375 and 1280 px, en and th; focus observed through
+`document.activeElement` and its computed outline or box-shadow. Scripts were scratch files, not committed.
+
+| Check                                                                                                                                                                                                          | Result |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| Case study (4 combinations): first Tab is the skip link; Enter moves focus to `main`                                                                                                                           | pass   |
+| Case study: 15 (375) or 15-16 (1280) tab stops, in reading order; every stop shows a focus ring and is in the viewport                                                                                         | pass   |
+| Case study: external links say they open in a new tab; no horizontal overflow                                                                                                                                  | pass   |
+| Footer: category links and case-study link reachable; newsletter field has a ring; Enter submits and the status line reads the demo message (en, th)                                                           | pass   |
+| Product page: gallery region, front/back/side buttons, colour, size, Add reachable by Tab; Space picks a size, Enter on Add opens the drawer with focus inside; Esc returns focus to Add (en, th, both widths) | pass   |
+| Console warnings or errors during the above                                                                                                                                                                    | none   |
+
+Reduced motion: covered by existing specs (`home.spec.ts` reduced-motion carousel tests); not re-run as a
+separate manual check beyond the full E2E run.
+
+Not done: the screen-reader smoke (VoiceOver/NVDA) for the P3 pages is owner-run (E6) and has not been done.
+
+### Main-agent review of T7 - 2026-10-31
+
+- **Menu not hiding the page (the shell.spec menu failure):** a P3 regression from T2, not the hero live region.
+  Radix's `aria-hidden` (`hideOthers`) never hides a `<script>` or an `[aria-live]` element, nor their
+  ancestors. The JSON-LD `<script>` sat inside `<main>` on Home, product and article pages, so `<main>` stayed
+  exposed to assistive technology while the modal menu was open (RULES 8.6). Shop and collections were fine
+  (their script was already outside `<main>`). Fix: the `JsonLd` element now renders as a sibling before
+  `<main>` on those three pages. New test in `shell.spec.ts` ("menu hides the page on ..., which carries
+  structured data") for Shop, a product and an article, en and th: it failed for product and article (and
+  the existing Home test failed) before the fix, and passes after it.
+- **`home.spec.ts` cross-fade:** deterministic under parallel load (16/16 failed with `--repeat-each 4`),
+  8/8 passed with `--workers=1`, and it also failed without the JSON-LD fix. So the timing was fragile,
+  not a P3 regression. The test waited 120 ms in the test process and then read styles, and the round
+  trip between processes could land after the 400 ms fade. Fix: the click and the mid-fade read now
+  happen in one in-page task, two animation frames after the click. The assertion is unchanged (both
+  slides still drawn mid-fade). Evidence: 16/16 passed with `--repeat-each 4` in parallel.
+- **`mobile-nav-loading.test.tsx`:** the same cold-import flake as `mobile-nav.test.tsx` (it failed once
+  in a full `pnpm check`). Fix: `beforeAll` loads the real panel module past the mock with
+  `vi.importActual` (60 s timeout of its own). The gate still decides when the panel appears. Evidence:
+  `pnpm exec vitest run` three times, 991/991 each.
+- **Wheel-scroll header test (`shell.spec.ts:185`):** it timed out (30 s default) in a shell-only run and in
+  one full run, and passed 12/12 alone. It does 80 wheel steps, each with a 90 ms settle and two round trips,
+  which takes about 15 s alone and 35–40 s under a full parallel run. Fix: `test.setTimeout(90_000)` with that
+  explanation; no assertion changed. Evidence: shell and home specs `--repeat-each 2` in parallel, 320/320
+  passed (this test 18.5 s).
+- **Journey 4 en:** QA saw one first-run failure. It passed in every later run; still noted as load-sensitive.
