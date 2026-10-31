@@ -1,4 +1,4 @@
-import { createTranslator } from 'next-intl';
+import { createFormatter, createTranslator } from 'next-intl';
 import { vi } from 'vitest';
 
 import en from '@messages/en.json';
@@ -12,6 +12,11 @@ export const serverIntlModule = {
   getMessages: ({ locale }: { locale: 'en' | 'th' }): Promise<typeof en> =>
     Promise.resolve(locale === 'th' ? th : en),
   setRequestLocale,
+  getFormatter: ({
+    locale,
+  }: {
+    locale: 'en' | 'th';
+  }): Promise<ReturnType<typeof createFormatter>> => Promise.resolve(createFormatter({ locale })),
   getTranslations: ({
     locale,
     namespace,

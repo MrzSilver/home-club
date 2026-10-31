@@ -186,6 +186,9 @@ T1–T7 done; T8 (FR-044) deferred to the backlog (E7). Open items for the owner
   LCP 2462 ms of 2500 (Preview run).
 - The lhci upload step logs `Invalid values: Argument: target` because `LHCI_TARGET` doubles as lhci's own option
   (harmless; see `docs/p3-validation.md`).
+- Lesson (2026-10-31): CI `verify` failed on PR #8 at the coverage gate (global lines 73.59% < 75%). `pnpm check` does
+  not run coverage, so local verification missed it. Unit tests for the P3 components bring it to 79.16%. Before
+  reporting a task done, run `pnpm test:coverage` as well as `pnpm check`, and check the PR's CI result.
 
 ### T8. Shareable look URL (FR-044, optional, C-P3)
 
