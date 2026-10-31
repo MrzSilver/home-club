@@ -81,3 +81,29 @@ performance first. The threshold remains unchanged and P2 is not authorized to s
 - The first candidate Preview audit redirected to Vercel login due to Deployment Protection.
   It was stopped; its scores are not product-page measurements. Owner action to make the
   Preview accessible is required before the strict deployed gate can be measured.
+
+## Re-measurement after the fix — 2026-10-31
+
+PR #6 (LCP image priority) is merged into `main` (`abe625e`) and into the P2 branch (`878fcb0`).
+The unchanged `lighthouserc.cjs` thresholds were run against the public Vercel Preview of
+`878fcb0` with `LHCI_TARGET=preview`: five mobile runs per URL, median aggregation, eight URLs
+(the six P1 routes plus both Look Builder locales). The preflight confirmed every URL returned 200
+with `X-Robots-Tag: noindex`. **All error-level assertions passed** (40 runs). The only warning is
+the overall SEO score, which Preview reports as a warning because it is intentionally `noindex`
+(ADR-0004 amendment); every other SEO audit is an error and passed.
+
+| Route                         | Performance | Accessibility / Best Practices / SEO | LCP median, ms |
+| ----------------------------- | ----------: | ------------------------------------ | -------------: |
+| `/en`                         |          97 | 100 / 100 / 66                       |       2438.976 |
+| `/th`                         |          97 | 100 / 100 / 66                       |       2293.869 |
+| `/en/shop`                    |          97 | 100 / 100 / 66                       |       2286.911 |
+| `/th/collections/foundations` |          97 | 100 / 100 / 66                       |   **2435.372** |
+| `/en/products/essential-tee`  |          98 | 100 / 100 / 66                       |       2287.887 |
+| `/th/products/essential-tee`  |          99 | 100 / 100 / 66                       |       1994.326 |
+
+The previously failing Thai Foundations LCP is now 2435.372 ms (runs: 2431.4, 2441.3, 2438.6,
+2430.5, 2435.4) against the 2500 ms maximum. The [machine-readable summary](./p2-deployed-audit.json)
+holds all routes, every LCP run and the assertion outcome; full reports are kept in the ignored
+`.asset-sources/p2-preview-878fcb0/`. This run was started from a workstation with `lhci autorun`,
+not by the Preview workflow, which has not yet fired because Vercel creates no GitHub Deployments
+for this repository. The measured build also contains P2 code, so it covers P1 routes as they ship.
