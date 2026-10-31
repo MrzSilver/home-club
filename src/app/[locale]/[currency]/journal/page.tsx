@@ -6,6 +6,7 @@ import { buttonClasses } from '@/components/ui/button';
 import { JOURNAL_SLUGS, getArticle } from '@/content/journal';
 import { resolveRouteParams } from '@/i18n/params';
 import { Link } from '@/i18n/navigation';
+import { withOgImage } from '@/components/og/og-metadata';
 import { pageMetadata } from '@/lib/seo';
 
 type Props = { params: Promise<{ locale: string; currency: string }> };
@@ -13,12 +14,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await resolveRouteParams(params);
   const t = await getTranslations({ locale, namespace: 'content' });
   const seo = await getTranslations({ locale, namespace: 'seo' });
-  return pageMetadata({
+  return withOgImage(
+    pageMetadata({
+      locale,
+      path: '/journal',
+      title: t('journal'),
+      description: seo('journalDescription'),
+    }),
     locale,
-    path: '/journal',
-    title: t('journal'),
-    description: seo('journalDescription'),
-  });
+    { kind: 'home' },
+  );
 }
 export default async function JournalPage({ params }: Props): Promise<ReactElement> {
   const { locale } = await resolveRouteParams(params);

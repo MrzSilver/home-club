@@ -268,7 +268,7 @@ Shell as built (T06): `Header` is a server component inside the locale layout; i
 - `app/sitemap.ts` emits every route × locale with `alternates`.
 - `app/robots.ts`: allow all; disallow the locale-prefixed `/{locale}/cart`, `/{locale}/checkout` and `/{locale}/search` (no rule for query URLs: canonical handles filtered pages); mark demo clearly.
 - JSON-LD: `Organization` (Home), `Product` + `Offer` (Product page; price in the active currency), `BreadcrumbList`, `Article` (Journal). Built in `lib/seo.ts`, rendered with a safe `<script type="application/ld+json">` helper (escape `<`).
-- OG images generated via `opengraph-image` route per page type, localised.
+- OG images: static 1200 x 630 PNG route handlers under `/[locale]/og/` (default, product, article), referenced explicitly from each page's metadata by `withOgImage` (no currency segment in the URL; file-based `opengraph-image` above a page is dropped when the page sets `openGraph`); alt text localised; card text is Latin until Satori shapes Thai (ADR-0011).
 - Because the brand is fictional, add `<meta name="robots">` policy per owner's decision (default: indexable; case-study page explains it is a demo).
 
 ## 11. Security

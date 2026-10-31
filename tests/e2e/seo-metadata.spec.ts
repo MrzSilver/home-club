@@ -106,7 +106,17 @@ test.describe('page metadata (FR-071, PRD §8 SEO)', () => {
       expect(first(head, 'og:locale'), `${path} og:locale`).toBe(OG_LOCALE[locale]);
       expect(first(head, 'twitter:card'), `${path} twitter:card`).toBe('summary_large_image');
 
-      const urls = [canonical, first(head, 'og:url'), ...head.alternates.values()];
+      expect(pathOf(first(head, 'og:image')), `${path} og:image`).toMatch(
+        new RegExp(`^/${locale}/og/.+\\.png$`),
+      );
+      expect(first(head, 'twitter:image'), `${path} twitter:image`).toBe(first(head, 'og:image'));
+
+      const urls = [
+        canonical,
+        first(head, 'og:url'),
+        first(head, 'og:image'),
+        ...head.alternates.values(),
+      ];
       for (const url of urls)
         expect(url, `${path} currency segment`).not.toMatch(/\/(usd|thb)(\/|$)/);
     }

@@ -8,6 +8,7 @@ import { VIBE_ENTRIES } from '@/data/vibes';
 import { CATEGORY_ENTRIES } from '@/data/categories';
 import { PRODUCTS } from '@/data/products';
 import { resolveRouteParams } from '@/i18n/params';
+import { withOgImage } from '@/components/og/og-metadata';
 import { pageMetadata } from '@/lib/seo';
 import Image from 'next/image';
 
@@ -23,12 +24,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!vibe) notFound();
   const seo = await getTranslations({ locale, namespace: 'seo' });
   const name = vibe.name[locale];
-  return pageMetadata({
+  return withOgImage(
+    pageMetadata({
+      locale,
+      path: `/vibes/${slug}`,
+      title: seo('vibeTitle', { name }),
+      description: seo('vibeDescription', { name, description: vibe.description[locale] }),
+    }),
     locale,
-    path: `/vibes/${slug}`,
-    title: seo('vibeTitle', { name }),
-    description: seo('vibeDescription', { name, description: vibe.description[locale] }),
-  });
+    { kind: 'home' },
+  );
 }
 export default async function VibePage({ params }: Props): Promise<ReactElement> {
   const { locale, currency } = await resolveRouteParams(params);

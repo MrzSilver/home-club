@@ -9,6 +9,7 @@ import { JOURNAL_SLUGS, getArticle } from '@/content/journal';
 import { PRODUCTS } from '@/data/products';
 import { resolveRouteParams } from '@/i18n/params';
 import { publicPath } from '@/lib/locale-path';
+import { withOgImage } from '@/components/og/og-metadata';
 import { pageMetadata } from '@/lib/seo';
 import { articleJsonLd, breadcrumbJsonLd } from '@/lib/structured-data';
 
@@ -27,13 +28,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const slug = knownSlug((await params).slug);
   const { meta } = await getArticle(locale, slug);
   const seo = await getTranslations({ locale, namespace: 'seo' });
-  return pageMetadata({
+  return withOgImage(
+    pageMetadata({
+      locale,
+      path: `/journal/${slug}`,
+      title: meta.title,
+      description: seo('articleDescription', { description: meta.description }),
+      type: 'article',
+    }),
     locale,
-    path: `/journal/${slug}`,
-    title: meta.title,
-    description: seo('articleDescription', { description: meta.description }),
-    type: 'article',
-  });
+    { kind: 'article', slug, title: meta.title },
+  );
 }
 export default async function ArticlePage({ params }: Props): Promise<ReactElement> {
   const { locale, currency } = await resolveRouteParams(params);

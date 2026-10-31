@@ -6,6 +6,7 @@ import { buttonClasses } from '@/components/ui/button';
 import { LOOKS } from '@/data/looks';
 import { Link } from '@/i18n/navigation';
 import { resolveRouteParams } from '@/i18n/params';
+import { withOgImage } from '@/components/og/og-metadata';
 import { pageMetadata } from '@/lib/seo';
 
 type Props = { params: Promise<{ locale: string; currency: string }> };
@@ -13,12 +14,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await resolveRouteParams(params);
   const t = await getTranslations({ locale, namespace: 'look' });
   const seo = await getTranslations({ locale, namespace: 'seo' });
-  return pageMetadata({
+  return withOgImage(
+    pageMetadata({
+      locale,
+      path: '/looks',
+      title: t('title'),
+      description: seo('looksDescription'),
+    }),
     locale,
-    path: '/looks',
-    title: t('title'),
-    description: seo('looksDescription'),
-  });
+    { kind: 'home' },
+  );
 }
 export default async function LooksPage({ params }: Props): Promise<ReactElement> {
   const { locale } = await resolveRouteParams(params);

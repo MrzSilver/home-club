@@ -37,7 +37,7 @@ currency) in the server HTML, creates a flash and a hydration-mismatch risk, and
      to the locale default) and **rewrites** `/{locale}/rest` to `/{locale}/{usd|thb}/rest`, preserving the query string and
      keeping the headers and cookies next-intl set (the locale request header, `NEXT_LOCALE`).
   4. The matcher skips `/_next`, `/_vercel`, `/api`, `/images` and any path with a file extension (`icon.svg`,
-     `favicon.ico`, `robots.txt`, `sitemap.xml`, `manifest.webmanifest`, fonts, OG images).
+     `favicon.ico`, `robots.txt`, `sitemap.xml`, `manifest.webmanifest`, fonts). Generated OG images are skipped only because their URLs end in `.png` (ADR-0011); an extensionless image route such as `/en/opengraph-image` would not be.
 - Path logic (detect, strip, add the segment, hreflang paths) is pure and lives in `src/lib/locale-path.ts`.
 - Public URLs, canonical links, `alternates.languages` and the sitemap never contain the segment.
 - Switching currency (T06) = write `hc_currency` (path `/`, one year, `SameSite=Lax`), then `router.refresh()`.

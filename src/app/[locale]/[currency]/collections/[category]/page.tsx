@@ -10,6 +10,7 @@ import { localeFromParam, resolveRouteParams } from '@/i18n/params';
 import { getAllCategories, getCategory, getProductsByCategory } from '@/lib/catalogue';
 import { CURRENCY_SEGMENTS } from '@/lib/currency';
 import { publicPath } from '@/lib/locale-path';
+import { withOgImage } from '@/components/og/og-metadata';
 import { pageMetadata } from '@/lib/seo';
 import { breadcrumbJsonLd } from '@/lib/structured-data';
 
@@ -34,16 +35,20 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   const category = getCategory(rawCategory);
   if (category === undefined) notFound();
   const t = await getTranslations({ locale, namespace: 'seo' });
-  return pageMetadata({
-    locale,
-    path: `/collections/${category.id}`,
-    title: category.name[locale],
-    description: t('collectionDescription', {
-      name: category.name[locale],
-      subtitle: category.subtitle[locale],
-      count: getProductsByCategory(category.id).length,
+  return withOgImage(
+    pageMetadata({
+      locale,
+      path: `/collections/${category.id}`,
+      title: category.name[locale],
+      description: t('collectionDescription', {
+        name: category.name[locale],
+        subtitle: category.subtitle[locale],
+        count: getProductsByCategory(category.id).length,
+      }),
     }),
-  });
+    locale,
+    { kind: 'home' },
+  );
 }
 
 /** A category page (FR-020): the same filters and sort as "Shop all", scoped to one category. */

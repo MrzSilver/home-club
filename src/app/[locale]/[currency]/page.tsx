@@ -12,6 +12,7 @@ import { JsonLd } from '@/components/seo/json-ld';
 import { Container } from '@/components/ui/container';
 import { TrustStrip } from '@/components/home/trust-strip';
 import { localeFromParam, resolveRouteParams } from '@/i18n/params';
+import { withOgImage } from '@/components/og/og-metadata';
 import { pageMetadata } from '@/lib/seo';
 import { organizationJsonLd, webSiteJsonLd } from '@/lib/structured-data';
 
@@ -25,14 +26,17 @@ export const dynamicParams = false;
 export async function generateMetadata({ params }: HomePageProps): Promise<Metadata> {
   const locale = localeFromParam((await params).locale);
   const t = await getTranslations({ locale, namespace: 'seo' });
-  // The share image is a P4 task (SPEC 10); until then there is no og:image.
-  return pageMetadata({
+  return withOgImage(
+    pageMetadata({
+      locale,
+      path: '',
+      title: t('homeTitle'),
+      description: t('homeDescription'),
+      absoluteTitle: true,
+    }),
     locale,
-    path: '',
-    title: t('homeTitle'),
-    description: t('homeDescription'),
-    absoluteTitle: true,
-  });
+    { kind: 'home' },
+  );
 }
 
 /**

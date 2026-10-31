@@ -14,6 +14,7 @@ import { resolveRouteParams } from '@/i18n/params';
 import { getAllProducts, getCategory, getProductBySlug } from '@/lib/catalogue';
 import { CURRENCY_SEGMENTS } from '@/lib/currency';
 import { publicPath } from '@/lib/locale-path';
+import { withOgImage } from '@/components/og/og-metadata';
 import { pageMetadata } from '@/lib/seo';
 import { breadcrumbJsonLd, productJsonLd } from '@/lib/structured-data';
 
@@ -30,12 +31,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await resolveRouteParams(params);
   const product = getProductBySlug((await params).slug);
   if (!product) notFound();
-  return pageMetadata({
+  return withOgImage(
+    pageMetadata({
+      locale,
+      path: `/products/${product.slug}`,
+      title: product.name[locale],
+      description: product.description[locale],
+    }),
     locale,
-    path: `/products/${product.slug}`,
-    title: product.name[locale],
-    description: product.description[locale],
-  });
+    { kind: 'product', slug: product.slug, name: product.name[locale] },
+  );
 }
 export default async function ProductPage({ params }: Props): Promise<ReactElement> {
   const { locale, currency } = await resolveRouteParams(params);

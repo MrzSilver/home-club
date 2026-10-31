@@ -8,6 +8,7 @@ import { Container } from '@/components/ui/container';
 import { LOOKS } from '@/data/looks';
 import { PRODUCTS } from '@/data/products';
 import { resolveRouteParams } from '@/i18n/params';
+import { withOgImage } from '@/components/og/og-metadata';
 import { pageMetadata } from '@/lib/seo';
 
 type Props = { params: Promise<{ locale: string; currency: string; slug: string }> };
@@ -21,12 +22,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const current = LOOKS.find((l) => l.slug === slug);
   if (!current) notFound();
   const seo = await getTranslations({ locale, namespace: 'seo' });
-  return pageMetadata({
+  return withOgImage(
+    pageMetadata({
+      locale,
+      path: `/looks/${slug}`,
+      title: current.name[locale],
+      description: seo('lookDescription', { description: current.description[locale] }),
+    }),
     locale,
-    path: `/looks/${slug}`,
-    title: current.name[locale],
-    description: seo('lookDescription', { description: current.description[locale] }),
-  });
+    { kind: 'home' },
+  );
 }
 export default async function LookPage({ params }: Props): Promise<ReactElement> {
   const { locale, currency } = await resolveRouteParams(params);

@@ -74,8 +74,9 @@ export type PageMetadataInput = {
 
 /**
  * Metadata for one page. Next.js shallow-merges `openGraph` per segment, so every field is set here
- * rather than inherited from a layout. Images are left out: the file-based `opengraph-image` routes
- * add them. Open Graph and Twitter carry the plain title, since the template only applies to <title>.
+ * rather than inherited from a layout. Images are left out: routes add them with `withOgImage`
+ * (src/components/og, ADR-0011). Open Graph and Twitter carry the plain title, since the template only
+ * applies to <title>.
  */
 export function pageMetadata(input: PageMetadataInput): PageMetadata {
   const { locale, path, title, description, type = 'website', absoluteTitle = false } = input;

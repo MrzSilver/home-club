@@ -4,18 +4,23 @@ import type { ReactElement } from 'react';
 import { VibesGrid } from '@/components/content/vibes-grid';
 import { Container } from '@/components/ui/container';
 import { resolveRouteParams } from '@/i18n/params';
+import { withOgImage } from '@/components/og/og-metadata';
 import { pageMetadata } from '@/lib/seo';
 
 type Props = { params: Promise<{ locale: string; currency: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await resolveRouteParams(params);
   const seo = await getTranslations({ locale, namespace: 'seo' });
-  return pageMetadata({
+  return withOgImage(
+    pageMetadata({
+      locale,
+      path: '/vibes',
+      title: seo('vibesTitle'),
+      description: seo('vibesDescription'),
+    }),
     locale,
-    path: '/vibes',
-    title: seo('vibesTitle'),
-    description: seo('vibesDescription'),
-  });
+    { kind: 'home' },
+  );
 }
 export default async function VibesPage({ params }: Props): Promise<ReactElement> {
   const { locale } = await resolveRouteParams(params);

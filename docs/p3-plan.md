@@ -128,6 +128,15 @@ T1 and T4 share `src/lib/seo.ts`; T2/T4/T5 all touch route `page.tsx` files. Eac
   - `docs/adr/0011-og-images.md` records route placement and the proxy matcher change; ADR-0003 text corrected.
   - Build time and route count recorded (output multiplies by locale x slug); proxy tests extended for the new path.
 - Files: `src/app/[locale]/opengraph-image.tsx` (and product/journal variants), `src/proxy.ts`, `src/lib/locale-path.ts` tests, ADR. Dependencies: T4, E2. Verification: unit (proxy), e2e, build, manual check in an OG validator.
+- **Done (2026-10-31), placement changed from E2 (accepted by the main agent, reported to the owner).** Next 16
+  drops a parent `opengraph-image` once a page sets `openGraph`, so images are static route handlers named `*.png`
+  under `/[locale]/og/` (home, 12 products, 3 articles; 32 PNGs, 42–53 kB). They end in `.png`, so the proxy
+  matcher needed no change. Every indexable page names its image with `withOgImage` (`src/components/og`);
+  T6 must do the same. Satori drops Thai tone marks after upper/lower vowels, so the card text is Latin in both
+  locales; alt text and metadata stay Thai. No photos (Satori cannot decode WebP). ADR-0011; ADR-0003 corrected.
+  Not done: a manual OG validator check (run on the Preview).
+  Budget note: `/en/shop` application JS is 39.9/40 KiB (unchanged by T5, which is server-only), so T6/T7 must
+  not add client code to catalogue pages.
 
 ### T6. Case-study page (FR-062)
 

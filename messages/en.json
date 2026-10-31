@@ -35,7 +35,17 @@
     "looksDescription": "Pick a top, bottoms, cap and socks that work together, then choose colours and sizes. A demo store; nothing is sold.",
     "lookDescription": "{description} Pick colours and sizes, then add all four at once. A demo store; nothing is sold.",
     "journalDescription": "Everyday ideas for wearing and caring for your clothes, from the Home Club Foundation demo store.",
-    "articleDescription": "{description} From the Journal at Home Club Foundation, a demo store."
+    "articleDescription": "{description} From the Journal at Home Club Foundation, a demo store.",
+    "og": {
+      "tagline": "Quiet essentials for every day.",
+      "demo": "Demo store. Nothing is sold.",
+      "journal": "Journal",
+      "alt": {
+        "home": "Home Club Foundation, a demo online clothing store",
+        "product": "{name}, a product from Home Club Foundation",
+        "article": "Journal article: {name}"
+      }
+    }
   },
   "home": {
     "hero": {

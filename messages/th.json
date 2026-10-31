@@ -35,7 +35,17 @@
     "looksDescription": "เลือกเสื้อ กางเกง หมวก และถุงเท้าที่เข้ากัน แล้วเลือกสีและไซซ์ ร้านตัวอย่างที่ไม่มีการขายสินค้าจริง",
     "lookDescription": "{description} เลือกสีและไซซ์ แล้วเพิ่มทั้งสี่ชิ้นลงตะกร้าพร้อมกัน ร้านตัวอย่างที่ไม่มีการขายสินค้าจริง",
     "journalDescription": "ไอเดียการแต่งตัวและดูแลเสื้อผ้าในทุกวัน จากร้านตัวอย่าง Home Club Foundation",
-    "articleDescription": "{description} บทความจาก Home Club Foundation ร้านตัวอย่าง"
+    "articleDescription": "{description} บทความจาก Home Club Foundation ร้านตัวอย่าง",
+    "og": {
+      "tagline": "เสื้อผ้าเบสิกเรียบง่ายสำหรับทุกวัน",
+      "demo": "ร้านตัวอย่าง ไม่มีการขายสินค้าจริง",
+      "journal": "บทความ",
+      "alt": {
+        "home": "Home Club Foundation ร้านเสื้อผ้าออนไลน์ตัวอย่าง",
+        "product": "{name} สินค้าจาก Home Club Foundation",
+        "article": "บทความ: {name}"
+      }
+    }
   },
   "home": {
     "hero": {
