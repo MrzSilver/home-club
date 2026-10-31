@@ -50,7 +50,10 @@ export function ProductCardPreview({
               width={primary.width}
               height={primary.height}
               sizes={sizes}
-              preload={priority}
+              // `preload` alone only adds a <link> that Chrome fetches at Low priority; the LCP card photo
+              // must be requested eagerly at High priority (FR-022, SPEC §12).
+              loading={priority ? 'eager' : 'lazy'}
+              fetchPriority={priority ? 'high' : 'auto'}
               className={imageClass}
             />
           )}
