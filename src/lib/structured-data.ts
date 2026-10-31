@@ -1,7 +1,7 @@
 import type { Locale, Product } from '@/data/schema';
 import { publicPath } from '@/lib/locale-path';
 import { convertFromUsdCents, toDecimalString, type Currency } from '@/lib/money';
-import { absoluteUrl } from '@/lib/seo';
+import { absoluteUrl, BRAND_NAME } from '@/lib/seo';
 import { isSoldOut } from '@/lib/stock';
 
 // schema.org JSON-LD as plain typed objects (SPEC 10, FR-036). Nothing here is invented: the brand is
@@ -9,8 +9,7 @@ import { isSoldOut } from '@/lib/stock';
 
 export const SCHEMA_CONTEXT = 'https://schema.org';
 
-/** Brand name for structured data; mirrors `common.brandName` in the message catalogues. */
-export const BRAND_NAME = 'Home Club Foundation';
+export { BRAND_NAME };
 
 /** `siteUrl` overrides `NEXT_PUBLIC_SITE_URL`; tests use it, pages leave it out. */
 export type UrlOptions = { siteUrl?: string };

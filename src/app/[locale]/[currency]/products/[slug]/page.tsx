@@ -13,8 +13,8 @@ import { LOCALES } from '@/data/locales';
 import { resolveRouteParams } from '@/i18n/params';
 import { getAllProducts, getCategory, getProductBySlug } from '@/lib/catalogue';
 import { CURRENCY_SEGMENTS } from '@/lib/currency';
-import { languageAlternates, publicPath } from '@/lib/locale-path';
-import { openGraphLocales } from '@/lib/seo';
+import { publicPath } from '@/lib/locale-path';
+import { pageMetadata } from '@/lib/seo';
 import { breadcrumbJsonLd, productJsonLd } from '@/lib/structured-data';
 
 type Props = { params: Promise<{ locale: string; currency: string; slug: string }> };
@@ -30,18 +30,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await resolveRouteParams(params);
   const product = getProductBySlug((await params).slug);
   if (!product) notFound();
-  const alternates = languageAlternates(locale, `/products/${product.slug}`);
-  return {
+  return pageMetadata({
+    locale,
+    path: `/products/${product.slug}`,
     title: product.name[locale],
     description: product.description[locale],
-    alternates,
-    openGraph: {
-      title: product.name[locale],
-      description: product.description[locale],
-      url: alternates.canonical,
-      ...openGraphLocales(locale),
-    },
-  };
+  });
 }
 export default async function ProductPage({ params }: Props): Promise<ReactElement> {
   const { locale, currency } = await resolveRouteParams(params);

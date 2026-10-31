@@ -27,7 +27,15 @@
     "homeDescription": "Quiet essentials for every day. Home Club Foundation is a demo online clothing store built as a portfolio project. Nothing is sold.",
     "shopTitle": "Shop all",
     "shopDescription": "Browse every piece in the Home Club Foundation demo store: tees, hoodies, shorts, caps and socks. Nothing is sold.",
-    "collectionDescription": "{subtitle}. Browse {count, plural, one {# product} other {# products}} in {name} at Home Club Foundation, a demo store. Nothing is sold."
+    "collectionDescription": "{subtitle}. Browse {count, plural, one {# product} other {# products}} in {name} at Home Club Foundation, a demo store. Nothing is sold.",
+    "vibesTitle": "Shop by vibe",
+    "vibesDescription": "Five ways to dress the day: performance, outdoor, lazy, skate and hockey. A demo store; nothing is sold.",
+    "vibeTitle": "{name} vibe",
+    "vibeDescription": "{description} Shop the {name} vibe at Home Club Foundation, a demo store. Nothing is sold.",
+    "looksDescription": "Pick a top, bottoms, cap and socks that work together, then choose colours and sizes. A demo store; nothing is sold.",
+    "lookDescription": "{description} Pick colours and sizes, then add all four at once. A demo store; nothing is sold.",
+    "journalDescription": "Everyday ideas for wearing and caring for your clothes, from the Home Club Foundation demo store.",
+    "articleDescription": "{description} From the Journal at Home Club Foundation, a demo store."
   },
   "home": {
     "hero": {

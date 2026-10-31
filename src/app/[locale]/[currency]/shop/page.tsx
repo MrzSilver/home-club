@@ -7,8 +7,8 @@ import { JsonLd } from '@/components/seo/json-ld';
 import { CURRENCY_SEGMENTS } from '@/lib/currency';
 import { LOCALES } from '@/data/locales';
 import { localeFromParam, resolveRouteParams } from '@/i18n/params';
-import { languageAlternates, publicPath } from '@/lib/locale-path';
-import { openGraphLocales } from '@/lib/seo';
+import { publicPath } from '@/lib/locale-path';
+import { pageMetadata } from '@/lib/seo';
 import { breadcrumbJsonLd } from '@/lib/structured-data';
 
 type ShopPageProps = {
@@ -25,23 +25,14 @@ export function generateStaticParams(): { locale: string; currency: string }[] {
 export async function generateMetadata({ params }: ShopPageProps): Promise<Metadata> {
   const locale = localeFromParam((await params).locale);
   const t = await getTranslations({ locale, namespace: 'seo' });
-  const common = await getTranslations({ locale, namespace: 'common' });
-  const alternates = languageAlternates(locale, '/shop');
   // Canonical and hreflang point at the public path without a query string: filtered views are the
   // same page. A noindex for them cannot be set on a static page (ADR-0006, SEO follow-up in P3).
-  return {
+  return pageMetadata({
+    locale,
+    path: '/shop',
     title: t('shopTitle'),
     description: t('shopDescription'),
-    alternates,
-    openGraph: {
-      type: 'website',
-      siteName: common('brandName'),
-      title: t('shopTitle'),
-      description: t('shopDescription'),
-      url: alternates.canonical,
-      ...openGraphLocales(locale),
-    },
-  };
+  });
 }
 
 /** "Shop all" (FR-020): every product, filterable and sortable from the URL. */

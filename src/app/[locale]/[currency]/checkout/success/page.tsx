@@ -7,12 +7,19 @@ import { Container } from '@/components/ui/container';
 import { buttonClasses } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
 import { resolveRouteParams } from '@/i18n/params';
+import { pageMetadata } from '@/lib/seo';
 
 type Props = { params: Promise<{ locale: string; currency: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await resolveRouteParams(params);
   const t = await getTranslations({ locale, namespace: 'checkout' });
-  return { title: t('success'), robots: { index: false, follow: false } };
+  return pageMetadata({
+    locale,
+    path: '/checkout/success',
+    title: t('success'),
+    description: t('demo'),
+    noindex: true,
+  });
 }
 export default async function Page({ params }: Props): Promise<ReactElement> {
   const { locale } = await resolveRouteParams(params);

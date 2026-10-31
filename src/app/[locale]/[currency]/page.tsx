@@ -12,8 +12,7 @@ import { JsonLd } from '@/components/seo/json-ld';
 import { Container } from '@/components/ui/container';
 import { TrustStrip } from '@/components/home/trust-strip';
 import { localeFromParam, resolveRouteParams } from '@/i18n/params';
-import { languageAlternates } from '@/lib/locale-path';
-import { openGraphLocales } from '@/lib/seo';
+import { pageMetadata } from '@/lib/seo';
 import { organizationJsonLd, webSiteJsonLd } from '@/lib/structured-data';
 
 type HomePageProps = {
@@ -26,22 +25,14 @@ export const dynamicParams = false;
 export async function generateMetadata({ params }: HomePageProps): Promise<Metadata> {
   const locale = localeFromParam((await params).locale);
   const t = await getTranslations({ locale, namespace: 'seo' });
-  const common = await getTranslations({ locale, namespace: 'common' });
-  const alternates = languageAlternates(locale);
-  return {
-    title: { absolute: t('homeTitle') },
+  // The share image is a P4 task (SPEC 10); until then there is no og:image.
+  return pageMetadata({
+    locale,
+    path: '',
+    title: t('homeTitle'),
     description: t('homeDescription'),
-    alternates,
-    // The share image is a P4 task (SPEC 10); until then there is no og:image.
-    openGraph: {
-      type: 'website',
-      siteName: common('brandName'),
-      title: t('homeTitle'),
-      description: t('homeDescription'),
-      url: alternates.canonical,
-      ...openGraphLocales(locale),
-    },
-  };
+    absoluteTitle: true,
+  });
 }
 
 /**

@@ -27,7 +27,15 @@
     "homeDescription": "เสื้อผ้าเบสิกเรียบง่ายสำหรับทุกวัน Home Club Foundation เป็นร้านเสื้อผ้าออนไลน์ตัวอย่าง สร้างขึ้นเป็นผลงานในพอร์ตโฟลิโอ ไม่มีการขายสินค้าจริง",
     "shopTitle": "สินค้าทั้งหมด",
     "shopDescription": "ดูสินค้าทุกชิ้นในร้านตัวอย่าง Home Club Foundation ทั้งเสื้อยืด ฮู้ดดี้ กางเกงขาสั้น หมวก และถุงเท้า ไม่มีการขายสินค้าจริง",
-    "collectionDescription": "{subtitle} ดูสินค้า {count} รายการในหมวด{name} ของ Home Club Foundation ร้านตัวอย่างที่ไม่มีการขายสินค้าจริง"
+    "collectionDescription": "{subtitle} ดูสินค้า {count} รายการในหมวด{name} ของ Home Club Foundation ร้านตัวอย่างที่ไม่มีการขายสินค้าจริง",
+    "vibesTitle": "เลือกตามสไตล์",
+    "vibesDescription": "ห้าสไตล์สำหรับแต่ละวัน ทั้งสายสปอร์ต กลางแจ้ง วันชิล สเก็ต และฮอกกี้ ร้านตัวอย่างที่ไม่มีการขายสินค้าจริง",
+    "vibeTitle": "สไตล์{name}",
+    "vibeDescription": "{description} ดูสินค้าสไตล์{name}ของ Home Club Foundation ร้านตัวอย่างที่ไม่มีการขายสินค้าจริง",
+    "looksDescription": "เลือกเสื้อ กางเกง หมวก และถุงเท้าที่เข้ากัน แล้วเลือกสีและไซซ์ ร้านตัวอย่างที่ไม่มีการขายสินค้าจริง",
+    "lookDescription": "{description} เลือกสีและไซซ์ แล้วเพิ่มทั้งสี่ชิ้นลงตะกร้าพร้อมกัน ร้านตัวอย่างที่ไม่มีการขายสินค้าจริง",
+    "journalDescription": "ไอเดียการแต่งตัวและดูแลเสื้อผ้าในทุกวัน จากร้านตัวอย่าง Home Club Foundation",
+    "articleDescription": "{description} บทความจาก Home Club Foundation ร้านตัวอย่าง"
   },
   "home": {
     "hero": {

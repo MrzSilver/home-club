@@ -9,8 +9,8 @@ import { LOCALES } from '@/data/locales';
 import { localeFromParam, resolveRouteParams } from '@/i18n/params';
 import { getAllCategories, getCategory, getProductsByCategory } from '@/lib/catalogue';
 import { CURRENCY_SEGMENTS } from '@/lib/currency';
-import { languageAlternates, publicPath } from '@/lib/locale-path';
-import { openGraphLocales } from '@/lib/seo';
+import { publicPath } from '@/lib/locale-path';
+import { pageMetadata } from '@/lib/seo';
 import { breadcrumbJsonLd } from '@/lib/structured-data';
 
 type CategoryPageProps = {
@@ -34,27 +34,16 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   const category = getCategory(rawCategory);
   if (category === undefined) notFound();
   const t = await getTranslations({ locale, namespace: 'seo' });
-  const common = await getTranslations({ locale, namespace: 'common' });
-  const alternates = languageAlternates(locale, `/collections/${category.id}`);
-  const title = category.name[locale];
-  const description = t('collectionDescription', {
-    name: title,
-    subtitle: category.subtitle[locale],
-    count: getProductsByCategory(category.id).length,
+  return pageMetadata({
+    locale,
+    path: `/collections/${category.id}`,
+    title: category.name[locale],
+    description: t('collectionDescription', {
+      name: category.name[locale],
+      subtitle: category.subtitle[locale],
+      count: getProductsByCategory(category.id).length,
+    }),
   });
-  return {
-    title,
-    description,
-    alternates,
-    openGraph: {
-      type: 'website',
-      siteName: common('brandName'),
-      title,
-      description,
-      url: alternates.canonical,
-      ...openGraphLocales(locale),
-    },
-  };
 }
 
 /** A category page (FR-020): the same filters and sort as "Shop all", scoped to one category. */

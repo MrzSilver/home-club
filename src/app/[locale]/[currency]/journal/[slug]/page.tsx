@@ -8,7 +8,8 @@ import { ProductCard } from '@/components/catalogue/product-card';
 import { JOURNAL_SLUGS, getArticle } from '@/content/journal';
 import { PRODUCTS } from '@/data/products';
 import { resolveRouteParams } from '@/i18n/params';
-import { languageAlternates, publicPath } from '@/lib/locale-path';
+import { publicPath } from '@/lib/locale-path';
+import { pageMetadata } from '@/lib/seo';
 import { articleJsonLd, breadcrumbJsonLd } from '@/lib/structured-data';
 
 type Props = { params: Promise<{ locale: string; currency: string; slug: string }> };
@@ -25,11 +26,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await resolveRouteParams(params);
   const slug = knownSlug((await params).slug);
   const { meta } = await getArticle(locale, slug);
-  return {
+  const seo = await getTranslations({ locale, namespace: 'seo' });
+  return pageMetadata({
+    locale,
+    path: `/journal/${slug}`,
     title: meta.title,
-    description: meta.description,
-    alternates: languageAlternates(locale, `/journal/${slug}`),
-  };
+    description: seo('articleDescription', { description: meta.description }),
+    type: 'article',
+  });
 }
 export default async function ArticlePage({ params }: Props): Promise<ReactElement> {
   const { locale, currency } = await resolveRouteParams(params);

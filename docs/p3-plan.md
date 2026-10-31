@@ -111,6 +111,11 @@ T1 and T4 share `src/lib/seo.ts`; T2/T4/T5 all touch route `page.tsx` files. Eac
   - New strings in both `messages/en.json` and `messages/th.json`; TH flagged `needs-review`.
   - Filtered collection URLs (E3, ADR-0006 follow-up): no robots rule; `seo-metadata.spec.ts` asserts a filtered URL such as `/en/shop?color=black&sort=price-asc` still carries the clean canonical and hreflang alternates, with no query.
 - Files: page `generateMetadata` blocks, `src/lib/seo.ts`, `messages/*`, `tests/e2e/seo-metadata.spec.ts` (new). Dependencies: T1. Verification: e2e, `pnpm check`.
+- **Done (2026-10-31).** `pageMetadata` in `lib/seo.ts` (returns a local `PageMetadata` type, since `lib/` may not
+  import Next; a test checks it is assignable to `Metadata`) now builds all 14 routes' metadata. 8 new `seo.*` keys
+  (vibes, looks, journal); TH copy needs owner review. Noindex pages are `noindex, follow` (checkout used to be
+  `nofollow`; it is also disallowed in robots.txt). `seo-metadata.spec.ts` sweeps every sitemap URL: full head
+  tags, unique titles and descriptions, clean canonical on a filtered URL.
 
 ### T5. Open Graph images (`opengraph-image`)
 
@@ -164,6 +169,13 @@ T1 and T4 share `src/lib/seo.ts`; T2/T4/T5 all touch route `page.tsx` files. Eac
 Owner decisions, 2026-10-31: **E1 accepted** (Production indexable, Preview stays noindex) and
 **E2 accepted** (generated `opengraph-image` routes at `[locale]` level, proxy matcher exclusion,
 ADR-0011). E4 and E5 are still open and block T6 only. T1 has started.
+
+Owner decisions, 2026-10-31 (later): **E4 accepted**: the case study links to the public repo
+`https://github.com/MrzSilver/home-club` and the live site `https://home-club-eight.vercel.app`.
+**E5 accepted**: the owner sets `NEXT_PUBLIC_SITE_URL=https://home-club-eight.vercel.app` in Vercel
+Production (the T3 guard fails the build until then). Pushing the P3 branch and opening a draft PR, so
+Vercel builds a Preview for the T6 Lighthouse run, is approved. **E7: FR-044 (T8) deferred** to the
+backlog; P3 ends at T7.
 
 - **E1 Indexing policy** (SPEC §10): recommend Production indexable, Preview stays noindex (already decided 2026-10-29, ADR-0004 amendment); case-study and footer say demo; no `noindex` meta on Production. Owner to confirm.
 - **E2 OG images and the proxy** (new route files, ADR): SPEC §10 wants generated `opengraph-image` routes. Placing them under `[currency]` would leak `/en/usd/opengraph-image` into metadata (violates SPEC §4); placing them under `[locale]` needs the proxy matcher to skip them, which changes `src/proxy.ts` and ADR-0003. Recommend: `[locale]`-level routes, matcher exclusion, ADR-0011. Cheaper alternative if rejected: a few static images in `public/images/og/` referenced from metadata (needs `ASSETS.md` entries; weaker per-page localisation).

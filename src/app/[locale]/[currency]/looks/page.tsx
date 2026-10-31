@@ -6,17 +6,19 @@ import { buttonClasses } from '@/components/ui/button';
 import { LOOKS } from '@/data/looks';
 import { Link } from '@/i18n/navigation';
 import { resolveRouteParams } from '@/i18n/params';
-import { languageAlternates } from '@/lib/locale-path';
+import { pageMetadata } from '@/lib/seo';
 
 type Props = { params: Promise<{ locale: string; currency: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await resolveRouteParams(params);
   const t = await getTranslations({ locale, namespace: 'look' });
-  return {
+  const seo = await getTranslations({ locale, namespace: 'seo' });
+  return pageMetadata({
+    locale,
+    path: '/looks',
     title: t('title'),
-    description: t('description'),
-    alternates: languageAlternates(locale, '/looks'),
-  };
+    description: seo('looksDescription'),
+  });
 }
 export default async function LooksPage({ params }: Props): Promise<ReactElement> {
   const { locale } = await resolveRouteParams(params);
