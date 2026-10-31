@@ -51,23 +51,26 @@ export default async function HomePage({ params }: HomePageProps): Promise<React
   const description = seo('siteDescription');
 
   return (
-    <main id="main">
+    <>
+      {/* Outside <main>: the modal menu's aria-hidden never hides a <script> or its ancestors. */}
       <JsonLd
         data={[organizationJsonLd(locale, description), webSiteJsonLd(locale, description)]}
       />
-      <Hero locale={locale} />
-      <div className="relative z-10 -mt-6 rounded-t-md bg-canvas pt-6">
-        <div className="flex flex-col gap-12 md:gap-16 xl:gap-24">
-          <CategoryTiles locale={locale} />
-          <EssentialsGrid locale={locale} currency={currency} />
-          <LookTeaser locale={locale} currency={currency} />
-          <EditorialTeaser locale={locale} />
-          <TrustStrip locale={locale} />
-          <Container>
-            <VibesGrid locale={locale} />
-          </Container>
+      <main id="main">
+        <Hero locale={locale} />
+        <div className="relative z-10 -mt-6 rounded-t-md bg-canvas pt-6">
+          <div className="flex flex-col gap-12 md:gap-16 xl:gap-24">
+            <CategoryTiles locale={locale} />
+            <EssentialsGrid locale={locale} currency={currency} />
+            <LookTeaser locale={locale} currency={currency} />
+            <EditorialTeaser locale={locale} />
+            <TrustStrip locale={locale} />
+            <Container>
+              <VibesGrid locale={locale} />
+            </Container>
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 }

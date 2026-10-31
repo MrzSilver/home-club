@@ -185,6 +185,9 @@ for (const locale of LOCALES) {
     test('the header turns solid when scrolling gradually with the wheel in 40px steps, and back again (never light-on-light)', async ({
       page,
     }) => {
+      // 80 wheel steps, each with a 90 ms settle and two round trips: about 15 s alone, and 35-40 s under a
+      // full parallel run, past the 30 s default. The budget grows; no assertion changes.
+      test.setTimeout(90_000);
       await page.goto(`/${locale}`);
       await page.waitForLoadState('networkidle');
       const header = page.getByRole('banner');
@@ -287,6 +290,20 @@ for (const locale of LOCALES) {
       await expect(page.getByRole('main')).toHaveCount(1);
       await expect(page.locator('body')).not.toHaveCSS('overflow', 'hidden');
     });
+
+    // aria-hidden (behind the Radix dialog) never hides a <script> or any of its ancestors, so a
+    // JSON-LD block inside <main> would keep the page exposed while the menu is open (FR-036, RULES 8.6).
+    for (const path of ['/shop', '/products/essential-tee', '/journal/everyday-layers']) {
+      test(`menu hides the page on ${path}, which carries structured data (RULES 8.6, FR-036)`, async ({
+        page,
+      }) => {
+        await page.goto(`/${locale}${path}`);
+        await expect(page.locator('script[type="application/ld+json"]').first()).toBeAttached();
+        const drawer = await openMenu(page, locale);
+        await expect(drawer).toBeVisible();
+        await expect(page.getByRole('main')).toHaveCount(0);
+      });
+    }
 
     test('menu: the close button closes it and focus returns to the hamburger', async ({
       page,

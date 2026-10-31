@@ -57,29 +57,32 @@ export default async function ArticlePage({ params }: Props): Promise<ReactEleme
     ]),
   ];
   return (
-    <Container as="main" className="py-12">
+    <>
+      {/* Outside <main>: the modal menu's aria-hidden never hides a <script> or its ancestors. */}
       <JsonLd data={structuredData} />
-      <div id="main" tabIndex={-1} className="space-y-12">
-        <article className="mx-auto max-w-prose space-y-6">
-          <h1 className="text-h1">{meta.title}</h1>
-          <p className="text-muted">{t('reading', { minutes })}</p>
-          <div className="space-y-6 [&_h2]:text-h2 [&_h2]:pt-6 [&_p]:leading-relaxed">
-            <Content />
-          </div>
-        </article>
-        <section aria-labelledby="related-heading" className="space-y-6">
-          <h2 id="related-heading" className="text-h2">
-            {t('related')}
-          </h2>
-          <ul className="grid grid-cols-2 gap-6 md:grid-cols-4">
-            {PRODUCTS.filter((p) => meta.related.includes(p.slug)).map((product) => (
-              <li key={product.id}>
-                <ProductCard product={product} locale={locale} currency={currency} />
-              </li>
-            ))}
-          </ul>
-        </section>
-      </div>
-    </Container>
+      <Container as="main" className="py-12">
+        <div id="main" tabIndex={-1} className="space-y-12">
+          <article className="mx-auto max-w-prose space-y-6">
+            <h1 className="text-h1">{meta.title}</h1>
+            <p className="text-muted">{t('reading', { minutes })}</p>
+            <div className="space-y-6 [&_h2]:text-h2 [&_h2]:pt-6 [&_p]:leading-relaxed">
+              <Content />
+            </div>
+          </article>
+          <section aria-labelledby="related-heading" className="space-y-6">
+            <h2 id="related-heading" className="text-h2">
+              {t('related')}
+            </h2>
+            <ul className="grid grid-cols-2 gap-6 md:grid-cols-4">
+              {PRODUCTS.filter((p) => meta.related.includes(p.slug)).map((product) => (
+                <li key={product.id}>
+                  <ProductCard product={product} locale={locale} currency={currency} />
+                </li>
+              ))}
+            </ul>
+          </section>
+        </div>
+      </Container>
+    </>
   );
 }

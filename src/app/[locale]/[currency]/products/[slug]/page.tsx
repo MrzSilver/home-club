@@ -71,35 +71,38 @@ export default async function ProductPage({ params }: Props): Promise<ReactEleme
       )
     : [];
   return (
-    <Container as="main" className="py-12 md:py-16">
+    <>
+      {/* Outside <main>: the modal menu's aria-hidden never hides a <script> or its ancestors. */}
       <JsonLd data={[productJsonLd(product, locale, currency), crumbs]} />
-      <div id="main" tabIndex={-1} className="space-y-12">
-        <NextIntlClientProvider messages={{ product: messages.product, cart: messages.cart }}>
-          <ProductDetails
-            key={product.slug}
-            product={product}
-            locale={locale}
-            currency={currency}
-          />
-        </NextIntlClientProvider>
-        <NextIntlClientProvider messages={{ sizeGuide: messages.sizeGuide }}>
-          <SizeGuide locale={locale} />
-        </NextIntlClientProvider>
-        {related.length ? (
-          <section aria-labelledby="goes-with-heading" className="space-y-6">
-            <h2 id="goes-with-heading" className="text-h2">
-              {t('goesWith')}
-            </h2>
-            <ul className="grid grid-cols-2 gap-6 md:grid-cols-4">
-              {related.map((item) => (
-                <li key={item.id}>
-                  <ProductCard product={item} locale={locale} currency={currency} />
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
-      </div>
-    </Container>
+      <Container as="main" className="py-12 md:py-16">
+        <div id="main" tabIndex={-1} className="space-y-12">
+          <NextIntlClientProvider messages={{ product: messages.product, cart: messages.cart }}>
+            <ProductDetails
+              key={product.slug}
+              product={product}
+              locale={locale}
+              currency={currency}
+            />
+          </NextIntlClientProvider>
+          <NextIntlClientProvider messages={{ sizeGuide: messages.sizeGuide }}>
+            <SizeGuide locale={locale} />
+          </NextIntlClientProvider>
+          {related.length ? (
+            <section aria-labelledby="goes-with-heading" className="space-y-6">
+              <h2 id="goes-with-heading" className="text-h2">
+                {t('goesWith')}
+              </h2>
+              <ul className="grid grid-cols-2 gap-6 md:grid-cols-4">
+                {related.map((item) => (
+                  <li key={item.id}>
+                    <ProductCard product={item} locale={locale} currency={currency} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+        </div>
+      </Container>
+    </>
   );
 }
