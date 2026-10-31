@@ -56,6 +56,16 @@ T1 and T4 share `src/lib/seo.ts`; T2/T4/T5 all touch route `page.tsx` files. Eac
   - Unit tests cover the above, every seed product, and Thai text.
 - Files: `src/lib/seo.ts`, `tests/unit/lib/seo.test.ts`.
 - Out of scope: React, routes. Dependencies: none. Verification: unit, `pnpm check`.
+- **Done (2026-10-31).** API: `absoluteUrl` in `lib/seo.ts`; `organizationJsonLd`, `webSiteJsonLd`,
+  `productJsonLd`, `breadcrumbJsonLd`, `articleJsonLd`, `serializeJsonLd` in `lib/structured-data.ts`;
+  `sitemapEntries(articles, siteUrl?)` in `lib/sitemap.ts`; `toDecimalString` in `lib/money.ts`.
+  Notes for later tasks:
+  - T2: journal frontmatter has no dates, so `Article` carries no `datePublished`. Adding dates is a
+    content + frontmatter-schema change (content-editor and logic-builder), not invented in code.
+  - T3: `sitemapEntries` takes the article list as a parameter (MDX on disk is I/O, not allowed in
+    `lib/`); `src/app/sitemap.ts` builds it. The e2e test should request every sitemap URL and expect 200.
+  - T6: add `'/case-study'` to `STATIC_ROUTES` in `lib/sitemap.ts` and update the sitemap unit test,
+    which currently asserts the route is absent.
 
 ### T2. JSON-LD helper and wiring
 

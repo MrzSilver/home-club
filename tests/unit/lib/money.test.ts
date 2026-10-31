@@ -9,6 +9,7 @@ import {
   formatMoney,
   percentOf,
   roundHalfAwayFromZero,
+  toDecimalString,
   wholeUnitsToMinor,
 } from '@/lib/money';
 
@@ -239,6 +240,32 @@ describe('currencySymbol (price legend, FR-072)', () => {
     (currency, locale, sign) => {
       expect(currencySymbol(currency, locale)).toBe(sign);
       expect(formatMoney(100, currency, locale)).toContain(sign);
+    },
+  );
+});
+
+describe('toDecimalString (FR-036, RULES 7.1)', () => {
+  it.each([
+    [0, '0.00'],
+    [5, '0.05'],
+    [2900, '29.00'],
+    [2905, '29.05'],
+    [101500, '1015.00'],
+    [-5, '-0.05'],
+    [-2900, '-29.00'],
+    [Number.MAX_SAFE_INTEGER, '90071992547409.91'],
+  ])('writes %i minor units as the exact decimal "%s"', (minor, expected) => {
+    expect(toDecimalString(minor)).toBe(expected);
+  });
+
+  it('writes a converted THB price as whole baht with two zero decimals', () => {
+    expect(toDecimalString(convertFromUsdCents(2900, 'THB'))).toBe('1015.00');
+  });
+
+  it.each([1.5, Number.NaN, Number.POSITIVE_INFINITY])(
+    'rejects %s, which is not an integer',
+    (bad) => {
+      expect(() => toDecimalString(bad)).toThrow(RangeError);
     },
   );
 });
