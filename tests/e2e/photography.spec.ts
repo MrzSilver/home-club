@@ -28,7 +28,9 @@ for (const locale of ['en', 'th'] as const) {
       }
 
       for (const category of CATEGORY_ENTRIES) {
-        const image = page.locator(`img[src*="${encodeURIComponent(category.image.src)}"]`);
+        const image = page
+          .locator('[aria-labelledby="categories-heading"]')
+          .locator(`img[src*="${encodeURIComponent(category.image.src)}"]`);
         await image.scrollIntoViewIfNeeded();
         await expect(image).toHaveAttribute('alt', '');
         await expect(image).toHaveJSProperty('complete', true);

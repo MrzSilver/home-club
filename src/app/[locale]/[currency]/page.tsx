@@ -5,6 +5,10 @@ import type { ReactElement } from 'react';
 import { CategoryTiles } from '@/components/home/category-tiles';
 import { EssentialsGrid } from '@/components/home/essentials-grid';
 import { Hero } from '@/components/home/hero';
+import { LookTeaser } from '@/components/home/look-teaser';
+import { EditorialTeaser } from '@/components/home/editorial-teaser';
+import { VibesGrid } from '@/components/content/vibes-grid';
+import { Container } from '@/components/ui/container';
 import { TrustStrip } from '@/components/home/trust-strip';
 import { localeFromParam, resolveRouteParams } from '@/i18n/params';
 import { languageAlternates } from '@/lib/locale-path';
@@ -54,7 +58,12 @@ export default async function HomePage({ params }: HomePageProps): Promise<React
         <div className="flex flex-col gap-12 md:gap-16 xl:gap-24">
           <CategoryTiles locale={locale} />
           <EssentialsGrid locale={locale} currency={currency} />
+          <LookTeaser locale={locale} currency={currency} />
+          <EditorialTeaser locale={locale} />
           <TrustStrip locale={locale} />
+          <Container>
+            <VibesGrid locale={locale} />
+          </Container>
         </div>
       </div>
     </main>

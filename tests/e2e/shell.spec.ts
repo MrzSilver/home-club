@@ -141,12 +141,12 @@ for (const locale of LOCALES) {
       expect(box?.height).toBe(width < 768 ? 64 : 80);
     });
 
-    test('search explains its disabled state; cart is available (FR-001)', async ({ page }) => {
+    test('search and cart are available with touch targets (FR-001, FR-023)', async ({ page }) => {
       await page.goto(`/${locale}`);
 
       const search = page.getByRole('button', { name: copy.search });
-      await expect(search).toHaveAttribute('aria-disabled', 'true');
-      await expect(search).toHaveAccessibleDescription(copy.searchReason);
+      await expect(search).not.toHaveAttribute('aria-disabled', 'true');
+      await expect(search).toHaveAttribute('aria-haspopup', 'dialog');
       await search.focus();
       await expect(search).toBeFocused();
       const cart = page.getByRole('button', { name: copy.cart });
@@ -300,7 +300,7 @@ for (const locale of LOCALES) {
       await expect(menuButton(page, locale)).toBeFocused();
     });
 
-    test('menu: lists Home, Shop all and the four categories with public, locale-prefixed links', async ({
+    test('menu: lists Phase 2 destinations and categories with public, locale-prefixed links', async ({
       page,
     }) => {
       await page.goto(`/${locale}`);
@@ -313,6 +313,9 @@ for (const locale of LOCALES) {
       expect(hrefs).toEqual([
         `/${locale}`,
         `/${locale}/shop`,
+        `/${locale}/looks`,
+        `/${locale}/vibes`,
+        `/${locale}/journal`,
         `/${locale}/collections/foundations`,
         `/${locale}/collections/performance`,
         `/${locale}/collections/lifestyle`,

@@ -39,7 +39,9 @@ function resolveSpecifier(root: string, importer: string, specifier: string): st
   if (specifier.startsWith('@/')) base = join('src', specifier.slice(2));
   else if (specifier.startsWith('.')) base = normalize(join(dirname(importer), specifier));
   if (base === null) return specifier;
-  return candidates(base).find((file) => existsSync(join(root, file))) ?? base;
+  return (candidates(base).find((file) => existsSync(join(root, file))) ?? base)
+    .split('\\')
+    .join('/');
 }
 
 /** Every module reachable at run time from `entries`, mapped to the file that first imported it. */

@@ -1,5 +1,6 @@
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
+import createMDX from '@next/mdx';
 
 import { buildSecurityHeaders } from './src/lib/security-headers';
 
@@ -10,6 +11,7 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  pageExtensions: ['ts', 'tsx', 'mdx'],
   images: {
     formats: ['image/avif', 'image/webp'],
     localPatterns: [
@@ -22,4 +24,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+export default createMDX()(withNextIntl(nextConfig));

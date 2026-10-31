@@ -142,13 +142,18 @@ describe('message catalogues: en and th stay in step (FR-070)', () => {
       'a11y',
       'cart',
       'catalogue',
+      'checkout',
       'common',
+      'content',
       'footer',
       'home',
+      'look',
       'nav',
       'notFound',
       'product',
+      'search',
       'seo',
+      'sizeGuide',
     ]);
   });
 

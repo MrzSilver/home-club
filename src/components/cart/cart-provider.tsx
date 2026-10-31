@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState, type ReactElement, type ReactNode } from 'react';
-import type { Locale } from '@/data/schema';
+import type { Locale, Look } from '@/data/schema';
 import { createCartStore } from '@/store/cart';
 import { CartContext, type CartProduct } from '@/components/cart/cart-context';
 
@@ -13,10 +13,12 @@ const CartDrawer = dynamic(() => import('./cart-drawer').then((module) => module
 export function CartProvider({
   products,
   locale,
+  looks = [],
   children,
 }: {
   products: CartProduct[];
   locale: Locale;
+  looks?: readonly Look[];
   children: ReactNode;
 }): ReactElement {
   const [store] = useState(() =>
@@ -43,7 +45,7 @@ export function CartProvider({
     setOpen(true);
   };
   return (
-    <CartContext value={{ store, products, locale, openCart }}>
+    <CartContext value={{ store, products, looks, locale, openCart }}>
       {children}
       {loaded ? (
         <CartDrawer open={open} onOpenChange={setOpen} returnFocusRef={returnFocusRef} />

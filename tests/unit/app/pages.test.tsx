@@ -57,25 +57,34 @@ const SECTION_NAMES = {
     en.home.hero.label,
     en.home.categories.heading,
     en.home.essentials.title,
+    en.look.build,
+    en.content.journal,
     en.home.trust.heading,
+    en.content.vibes,
   ],
   th: [
     th.home.hero.label,
     th.home.categories.heading,
     th.home.essentials.title,
+    th.look.build,
+    th.content.journal,
     th.home.trust.heading,
+    th.content.vibes,
   ],
 } as const;
 
 describe('home page (FR-010, FR-011, FR-012, FR-015, FR-070, FR-071, FR-072)', () => {
   it.each(['en', 'th'] as const)(
-    'puts the hero, category tiles, essentials and trust strip in the DESIGN 8 order (%s)',
+    'puts all Phase 2 home sections in the DESIGN 8 order (%s)',
     async (locale) => {
       await renderPage(locale, locale === 'en' ? 'usd' : 'thb');
 
       const regions = within(screen.getByRole('main')).getAllByRole('region');
       expect(regions.map((region) => region.getAttribute('aria-label') ?? '')).toEqual([
         SECTION_NAMES[locale][0],
+        '',
+        '',
+        '',
         '',
         '',
         '',

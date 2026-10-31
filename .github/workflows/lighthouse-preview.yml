@@ -20,6 +20,10 @@ jobs:
       startsWith(github.event.deployment.environment, 'Preview')
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      LHCI_TARGET: preview
+      LHCI_BASE_URL: ${{ github.event.deployment_status.target_url }}
+      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
     steps:
       # The deployed commit, so lighthouserc.cjs and the budgets match what was deployed.
       - uses: actions/checkout@v7
@@ -36,7 +40,10 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
-      # LHCI_BASE_URL switches lighthouserc.cjs to "no local server, every assertion is an error".
+      - name: Require public Preview response and intentional noindex
+        run: node scripts/check-preview-headers.mjs
+
+      # Preview keeps noindex; all non-indexing SEO audits and performance remain errors.
       - name: Lighthouse CI against the preview
         run: pnpm lhci
         env:

@@ -6,7 +6,7 @@ import { compile } from 'tailwindcss';
 import { describe, expect, it } from 'vitest';
 
 const ROOT = process.cwd();
-const read = (path: string): string => readFileSync(join(ROOT, path), 'utf8');
+const read = (path: string): string => readFileSync(resolve(ROOT, path), 'utf8');
 
 const tokensCss = read('src/styles/tokens.css');
 const globalsCss = read('src/styles/globals.css');
@@ -261,7 +261,7 @@ async function compileUtilities(candidates: string[]): Promise<string> {
     loadStylesheet: async (id, base) => {
       const path =
         id === 'tailwindcss' ? nodeRequire.resolve('tailwindcss/index.css') : resolve(base, id);
-      return { path, base: dirname(path), content: read(path.replace(`${ROOT}/`, '')) };
+      return { path, base: dirname(path), content: read(path) };
     },
   });
   return compiler.build(candidates);

@@ -97,7 +97,10 @@
     "links": {
       "home": "Home",
       "shopAll": "Shop all",
-      "categoriesHeading": "Shop by category"
+      "categoriesHeading": "Shop by category",
+      "looks": "Looks",
+      "vibes": "Vibes",
+      "journal": "Journal"
     },
     "search": {
       "label": "Search",
@@ -205,7 +208,13 @@
     "subtotal": "Subtotal",
     "demo": "Demo store — nothing is sold. No payment is taken.",
     "view": "View cart",
-    "oneSize": "One size"
+    "oneSize": "One size",
+    "look": "Look",
+    "lookGroup": "Part of {name}",
+    "lookDiscount": "{name}: you save {amount}",
+    "lookIncomplete": "Set discount removed: all four pieces are needed.",
+    "total": "Total",
+    "checkout": "Checkout (demo)"
   },
   "product": {
     "gallery": "Product images",
@@ -225,5 +234,89 @@
     "inStock": "In stock",
     "quantity": "Quantity",
     "add": "Add to cart"
+  },
+  "look": {
+    "title": "Build your look",
+    "description": "Four pieces. Your colours, your fit.",
+    "build": "Assemble your look",
+    "product": "Product",
+    "color": "Colour",
+    "size": "Size",
+    "oneSize": "One size",
+    "summary": "Your look",
+    "listTotal": "List total",
+    "discount": "Set discount ({percent}%)",
+    "total": "Total",
+    "saved": "You save {amount}",
+    "add": "Add the look",
+    "available": "Available",
+    "unavailable": "This colour and size is unavailable.",
+    "alternatives": "Try an available alternative",
+    "atomicError": "Nothing was added. Choose an available option for each highlighted slot.",
+    "cartFull": "Nothing was added. Your cart already reserves the available stock for one of these items.",
+    "slots": {
+      "top": "Top",
+      "bottom": "Bottom",
+      "cap": "Cap",
+      "socks": "Socks"
+    }
+  },
+  "content": {
+    "vibes": "Explore other vibes",
+    "vibesDescription": "Curated pieces for the way you spend your day.",
+    "journal": "Journal",
+    "journalDescription": "Everyday ideas for wearing and caring for your clothes.",
+    "read": "Read the story",
+    "related": "Related pieces",
+    "reading": "{minutes} min read",
+    "goesWith": "Goes well with"
+  },
+  "search": {
+    "title": "Search",
+    "close": "Close search",
+    "label": "Search products",
+    "submit": "Search",
+    "hint": "Search by product name, category or tag.",
+    "empty": "No matches. Try another word.",
+    "count": "{count, plural, one {# result} other {# results}}"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "demo": "Demo store — no payment taken. Use example details only. Nothing is sent or saved.",
+    "loading": "Loading your cart…",
+    "empty": "Your cart is empty.",
+    "shop": "Continue shopping",
+    "errors": "Check these fields",
+    "invalid": "Enter a valid value.",
+    "summary": "Order summary",
+    "total": "Total: {amount}",
+    "shippingNote": "Both delivery choices are simulated and free in this demo.",
+    "payment": "Payment placeholder — no card details required.",
+    "submit": "Place demo order",
+    "standard": "Standard (demo, free)",
+    "express": "Express (demo, free)",
+    "success": "Demo order complete",
+    "order": "Your demo reference: {number}",
+    "noOrder": "No demo order reference was supplied.",
+    "fields": {
+      "name": "Full name",
+      "email": "Email",
+      "address": "Address",
+      "city": "City",
+      "postalCode": "Postal code",
+      "country": "Country",
+      "shipping": "Delivery"
+    }
+  },
+  "sizeGuide": {
+    "title": "Size guide",
+    "demo": "Illustrative demo body measurements only. These are not measurements or fit guarantees for the photographed garments. One-size accessories have no fitted size chart.",
+    "units": "Measurement unit",
+    "cm": "cm",
+    "in": "in",
+    "caption": "Example body measurements ({unit})",
+    "size": "Size",
+    "chest": "Chest",
+    "waist": "Waist"
   }
 }

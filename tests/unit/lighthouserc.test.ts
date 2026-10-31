@@ -2,10 +2,10 @@ import { createRequire } from 'node:module';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-type Assertion = [string, Record<string, number>];
+type Assertion = [string, Record<string, number>] | 'off';
 type Config = {
   ci: {
-    collect: { startServerCommand?: string; url: string[] };
+    collect: { startServerCommand?: string; url: string[]; numberOfRuns: number };
     assert: { aggregationMethod: string; assertions: Record<string, Assertion> };
   };
 };
@@ -13,10 +13,12 @@ type Config = {
 const require = createRequire(import.meta.url);
 const CONFIG_PATH = require.resolve('../../lighthouserc.cjs');
 
-function load(baseUrl: string | undefined): Config {
+function load(baseUrl: string | undefined, target?: string): Config {
   delete require.cache[CONFIG_PATH];
   if (baseUrl === undefined) delete process.env['LHCI_BASE_URL'];
   else process.env['LHCI_BASE_URL'] = baseUrl;
+  if (target === undefined) delete process.env['LHCI_TARGET'];
+  else process.env['LHCI_TARGET'] = target;
   return require(CONFIG_PATH) as Config;
 }
 
@@ -28,6 +30,8 @@ const ROUTES = [
   '/th/collections/foundations',
   '/en/products/essential-tee',
   '/th/products/essential-tee',
+  '/en/looks/the-essential-look',
+  '/th/looks/the-essential-look',
 ];
 
 const MACHINE_DEPENDENT = [
@@ -44,10 +48,13 @@ const DETERMINISTIC = [
 
 describe('lighthouserc.cjs (ADR-0004 amendment)', () => {
   const original = process.env['LHCI_BASE_URL'];
+  const originalTarget = process.env['LHCI_TARGET'];
   afterEach(() => {
     delete require.cache[CONFIG_PATH];
     if (original === undefined) delete process.env['LHCI_BASE_URL'];
     else process.env['LHCI_BASE_URL'] = original;
+    if (originalTarget === undefined) delete process.env['LHCI_TARGET'];
+    else process.env['LHCI_TARGET'] = originalTarget;
   });
 
   it('without LHCI_BASE_URL serves the build locally and only warns on machine-dependent metrics', () => {
@@ -77,5 +84,30 @@ describe('lighthouserc.cjs (ADR-0004 amendment)', () => {
       expect(ci.assert.assertions['total-blocking-time']?.[1]).toEqual({ maxNumericValue: 200 });
       expect(ci.assert.assertions['categories:performance']?.[1]).toEqual({ minScore: 0.95 });
     }
+  });
+  it('exempts only intentional Preview indexing while retaining the other SEO release checks', () => {
+    const { ci } = load('https://example.vercel.app', 'preview');
+    expect(ci.collect.numberOfRuns).toBe(5);
+    expect(ci.assert.assertions['categories:seo']?.[0]).toBe('warn');
+    expect(ci.assert.assertions['is-crawlable']).toBe('off');
+    for (const id of [
+      'document-title',
+      'meta-description',
+      'http-status-code',
+      'link-text',
+      'crawlable-anchors',
+      'image-alt',
+      'hreflang',
+      'canonical',
+    ])
+      expect(ci.assert.assertions[id]).toEqual(['error', { minScore: 1 }]);
+    for (const id of MACHINE_DEPENDENT) expect(ci.assert.assertions[id]?.[0]).toBe('error');
+    expect(ci.assert.assertions['categories:best-practices']).toEqual([
+      'error',
+      { minScore: 0.95 },
+    ]);
+    expect(
+      load('https://example.vercel.app', 'production').ci.assert.assertions['categories:seo'],
+    ).toEqual(['error', { minScore: 0.95 }]);
   });
 });

@@ -39,6 +39,19 @@ One agent may play several roles sequentially, but each task has a single **owne
 
 **Separation of duties:** the agent that wrote the change SHOULD NOT be its only reviewer. Use a fresh agent for review where possible.
 
+### 3.1 Model assignment (Claude Code)
+
+| Who | Model | Model ID | Does |
+|---|---|---|---|
+| **Subagents** (Planner, Frontend builder, Logic builder, Content/i18n editor, QA / a11y, Perf engineer, first-pass Reviewer) | Sonnet 5.5 | `claude-sonnet-5-5` | All delegated work in §3 |
+| **Main agent** (orchestrator + final reviewer) | Opus 5.5 | `claude-opus-5-5` | Splits tasks, delegates, and gives the **final review** before a task is reported done |
+
+- Enforced in config: each role is a subagent in `.claude/agents/` (`planner`, `frontend-builder`, `logic-builder`, `content-editor`, `qa-a11y`, `perf-engineer`, `reviewer`) with `model: claude-sonnet-5-5`, and `.claude/settings.json` sets `CLAUDE_CODE_SUBAGENT_MODEL=claude-sonnet-5-5` so built-in agents (general-purpose, Explore, Plan) default to Sonnet too.
+- The main agent spawns these roles by name and never passes a `model` override, because an override beats the pinned model. Do not use the `fork` agent type for delegated work: forks always run on the parent's model (Opus).
+- A subagent does not declare a task done. It ends with the handoff report (§8) and returns it to the main agent.
+- The main agent (Opus 5.5) does the final review of each handoff against RULES §16. It reads the diff, re-runs or checks the verification evidence, and returns the work to a Sonnet subagent with specific findings when something fails. Only the main agent reports a task as done to the owner.
+- The main agent does not delegate the final review.
+
 ## 4. Ownership boundaries (avoid collisions)
 
 - Only the **Logic builder** changes `src/lib/**`, `src/store/**`, `src/data/schema.ts`.
@@ -54,7 +67,8 @@ One agent may play several roles sequentially, but each task has a single **owne
 4. **Implement** in small steps. Use tokens, primitives and helpers that already exist.
 5. **Verify locally** (see §6). Fix root causes, never symptoms.
 6. **Self-review** against the RULES §16 checklist.
-7. **Hand off** with the report in §8.
+7. **Hand off** with the report in §8 to the main agent (Opus 5.5).
+8. **Final review** by the main agent (§3.1). If it fails, the work goes back to step 4 with the findings.
 
 Keep changes scoped. Drive-by refactors and unrelated fixes go in separate tasks.
 

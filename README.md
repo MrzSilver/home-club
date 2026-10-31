@@ -98,12 +98,13 @@ Brand, products and copy are fictional. Imagery is placeholder/illustrative unti
 
 ## Status
 
-Latest phase-exit evidence: [2026-10-29 deployed audit](./docs/p1-exit-audit.md). P1 functionality
-and main CI pass; the strict deployed Lighthouse gate still has one LCP miss (Thai Foundations:
-2513.533 ms against 2500 ms). The owner confirmed the screen-reader smoke test passed.
-The owner chose to resolve performance before phase exit; P2 has not started.
+P1 T01–T11 are implemented: Home, Collection filters/sort, product gallery and stock-aware variants, plus a persisted cart with drawer and full page, in Thai/English and THB/USD, with product/cart axe coverage, Lighthouse targets and the CI JavaScript-budget gate. See [P1 validation](./docs/p1-validation.md). The [2026-10-29 deployed audit](./docs/p1-exit-audit.md) had one LCP miss (Thai Foundations: 2513.533 ms against 2500 ms); the LCP image-priority fix is merged (PR #6) and the [2026-10-31 re-measurement](./docs/p1-exit-audit.md#re-measurement-after-the-fix--2026-10-31) passes every deployed gate (Thai Foundations LCP 2435.372 ms). The owner confirmed the P1 screen-reader smoke test passed.
 
-P1 T01–T10 are implemented: Home, Collection filters/sort, product gallery and stock-aware variants, plus a persisted cart with drawer and full page, in Thai/English and THB/USD. T11 adds product/cart axe coverage, product Lighthouse targets and the CI JavaScript-budget gate. See [P1 validation](./docs/p1-validation.md) for measured results and phase-exit limitations. Search, Look builder and checkout remain P2 (see [PRD.md §6](./PRD.md)).
+P2 is implemented and its phase-exit checks have evidence; the owner moved the project to P3 on 2026-10-31. P2 includes the four-slot Look
+Builder, atomic cart addition and grouped discounts, Vibes, three bilingual MDX Journal articles,
+keyboard-operated Search, demo Checkout, size guide and related products. Home and navigation
+link these flows. See [P2 validation](./docs/p2-validation.md) for verification and
+phase-exit evidence (deployed Lighthouse passed; screen-reader smoke and Thai copy approved by the owner). The P3 plan is on the `feat/p3-seo-builders` branch.
 
 ## Author
 

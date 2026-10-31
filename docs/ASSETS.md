@@ -160,3 +160,11 @@ The product, colour and hex lists live in `scripts/placeholder-manifest.mjs`; a 
 (`tests/unit/data/invariants.test.ts`) checks that they match `src/data/products.ts` and that every image
 referenced by the data exists with the recorded width and height. Current photography and its
 licence records supersede the historical product placeholders (RULES 14.3).
+
+## Phase 2 reuse and editorial content — 2026-10-29
+
+Look/Vibes/Journal teasers reuse the product and category images already recorded above;
+no additional photographs or image sources were introduced. Six EN/TH MDX files under
+`src/content/journal` are original AI-assisted demo editorial copy authored for this project
+on 2026-10-29, with no third-party excerpts. Thai copy requires owner review. Size-guide figures
+are labeled illustrative body measurements and do not describe the photographed garments.
