@@ -39,7 +39,7 @@ describe('Footer (FR-003)', () => {
     expect(within(footer).getByText(en.footer.demoNotice)).toBeInTheDocument();
   });
 
-  it('has a labelled footer navigation with Home, Shop all and the four categories as real links', async () => {
+  it('has a labelled footer navigation with Home, Shop all, the four categories and the case study as real links', async () => {
     await renderFooter('en');
 
     const nav = screen.getByRole('navigation', { name: en.footer.navLabel });
@@ -54,6 +54,7 @@ describe('Footer (FR-003)', () => {
       '/en/collections/performance',
       '/en/collections/lifestyle',
       '/en/collections/accessories',
+      '/en/case-study',
     ]);
   });
 

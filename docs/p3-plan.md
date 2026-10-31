@@ -150,6 +150,11 @@ T1 and T4 share `src/lib/seo.ts`; T2/T4/T5 all touch route `page.tsx` files. Eac
   - Added to the axe sweep (via T7's manifest). It is left out of `lighthouserc.cjs`: that file applies one set of assertions to every URL, so an informational entry would need a config change. The perf-engineer measures the case-study route separately in step A and the report is stored and cited like the others. Joining it to the gated routes with the same thresholds is the alternative if the owner prefers.
 - Files: `src/app/[locale]/[currency]/case-study/page.tsx`, `src/components/content/`, `messages/*`, footer links, `docs/`. Dependencies: T4, owner inputs E4, E5. Verification: e2e, axe, build, screenshots 375/1280 en/th.
 - Out of scope: new charts or libraries; use plain tables. Placeholders for repo/live URLs only with `TODO(#issue)`.
+- **Done (2026-10-31).** Step A: `docs/p3-deployed-audit.json` and `docs/p3-validation.md` (Preview of a3a65a2; every
+  error assertion passed). Steps B and C: `/[locale]/case-study`, server components only (`src/components/case-study`),
+  numbers read and Zod-validated at build from the three `docs/p*-deployed-audit.json` files (`src/content/case-study.ts`,
+  `@docs/*` tsconfig alias). The P1 LCP miss and its P2 fix are stated from the data. Footer link, sitemap entry,
+  home OG card. Screenshots: `docs/screenshots/p3/`. All new TH copy needs owner review.
 
 ### T7. Accessibility pass and E2E completion
 

@@ -45,7 +45,9 @@
         "product": "{name}, a product from Home Club Foundation",
         "article": "Journal article: {name}"
       }
-    }
+    },
+    "caseStudyTitle": "Case study",
+    "caseStudyDescription": "How the Home Club Foundation demo store was built: goals, constraints, stack choices, trade-offs, and performance and accessibility evidence. Nothing is sold."
   },
   "home": {
     "hero": {
@@ -152,7 +154,8 @@
       "note": "Placeholders: this demo store has no legal pages."
     },
     "demoNotice": "Demo store — nothing is sold. No payment is taken.",
-    "copyright": "© {year} Home Club Foundation. A demo project."
+    "copyright": "© {year} Home Club Foundation. A demo project.",
+    "caseStudy": "Case study"
   },
   "catalogue": {
     "card": {
@@ -336,5 +339,145 @@
     "size": "Size",
     "chest": "Chest",
     "waist": "Waist"
+  },
+  "caseStudy": {
+    "eyebrow": "Case study",
+    "title": "How this demo store was built",
+    "lead": "A fictional clothing brand, a complete store, and the decisions behind it. Written for anyone judging the craft, in about two minutes.",
+    "intro": {
+      "heading": "What this is",
+      "p1": "Home Club Foundation is a made-up brand of quiet everyday essentials. The store is a demo and a portfolio project: nothing is sold, no payment is taken and no personal data is kept.",
+      "p2": "Products, prices and copy are fictional. The imagery is placeholder material and is not a claim about real products."
+    },
+    "problem": {
+      "heading": "Problem and goals",
+      "intro": "The aim was to show what a careful, bilingual online store looks like when it is built the way a client would want it built. Five goals guided the work.",
+      "goals": {
+        "look": "Look and feel like a real, premium clothing store, on a phone and on a desktop.",
+        "speed": "Stay fast: Lighthouse scores of 95 or more on mobile for the home, collection and product pages.",
+        "look2": "Prove product logic with an Assemble your look builder that prices sets and handles stock correctly.",
+        "i18n": "Prove internationalisation: full Thai and English, locale-aware URLs, and prices in baht or dollars.",
+        "explain": "Be explainable: this page records the decisions, the trade-offs and the measured results."
+      }
+    },
+    "constraints": {
+      "heading": "Constraints",
+      "intro": "Six constraints shaped most of the choices below.",
+      "items": {
+        "bilingual": {
+          "title": "Thai and English as equals",
+          "body": "Thai is written natively, not translated word for word. Thai text is never uppercased or letter-spaced, and it has its own line heights so that tone marks are not clipped."
+        },
+        "money": {
+          "title": "One money rule",
+          "body": "Prices are whole cents in US dollars. Baht is derived from them in a single place, at a fixed demo exchange rate that is not live data. No price is ever calculated with floating-point numbers."
+        },
+        "static": {
+          "title": "Static pages with prices in the first HTML",
+          "body": "Every page is generated ahead of time. The visitor’s currency is chosen by a hidden route segment that the proxy selects from a cookie, so pages never need to be rendered per request."
+        },
+        "csp": {
+          "title": "A strict content security policy",
+          "body": "Scripts come from the site itself and eval is never allowed in production. Keeping pages static means inline scripts are permitted, a trade-off recorded in a decision note."
+        },
+        "budgets": {
+          "title": "JavaScript budgets",
+          "body": "Each route has a limit on the JavaScript it loads. The limits were rebased once on the size of the framework itself, which no application change can remove."
+        },
+        "a11y": {
+          "title": "Accessibility as a release gate",
+          "body": "The target is WCAG 2.2 AA. A change that adds a serious accessibility violation does not ship."
+        }
+      }
+    },
+    "stack": {
+      "heading": "Stack and why",
+      "intro": "Each choice is the simplest tool that met the constraints. Every one is covered by a decision note in the repository.",
+      "items": {
+        "next": "Server Components by default, so most of the store is plain HTML and only small islands ship JavaScript.",
+        "typescript": "Strict mode catches invalid prices, stock and routes before they reach a page.",
+        "tailwind": "Design tokens as CSS variables keep colour, spacing and type consistent without one-off values.",
+        "intl": "Locale-prefixed URLs, ICU messages and plurals, and typed message keys.",
+        "zustand": "A small cart store whose saved data is checked with Zod, so stale or corrupt storage resets instead of breaking the page.",
+        "radix": "Drawers and dialogs use a vetted primitive for focus trapping, and load only when opened.",
+        "vitest": "Unit tests for money, stock, looks and catalogue rules, plus a check that both languages have the same message keys.",
+        "playwright": "End-to-end journeys and an axe accessibility sweep, run against the production build.",
+        "lighthouse": "Lighthouse CI turns the performance budgets into a check rather than a promise."
+      }
+    },
+    "tradeoffs": {
+      "heading": "Trade-offs",
+      "intro": "Choices that cost something, stated plainly.",
+      "items": {
+        "currency": {
+          "title": "The currency segment doubles the static output",
+          "body": "Rendering every page once per currency keeps prices in the first HTML and every page static, at the cost of twice as many generated pages."
+        },
+        "filters": {
+          "title": "Filters are read in the browser",
+          "body": "Reading filters on the server would make collection pages dynamic. A small client island applies them instead, so the first view is always the default one."
+        },
+        "csp": {
+          "title": "Inline scripts are allowed",
+          "body": "A per-request nonce would be stricter, but it forces every page to be rendered on demand. The policy still forbids eval and is backed by tests."
+        },
+        "og": {
+          "title": "Share cards use Latin letters only",
+          "body": "The image renderer drops some Thai tone marks, which changes the meaning of words. Share cards therefore avoid Thai text; the pages themselves are unaffected."
+        },
+        "images": {
+          "title": "Placeholder and AI-generated imagery",
+          "body": "Photographs are illustrative and some product angles are AI-generated. Each is logged with its source in the asset register and should be replaced before any public marketing use."
+        }
+      }
+    },
+    "performance": {
+      "heading": "Performance evidence",
+      "intro": "These figures come from stored Lighthouse reports in the repository. Nothing on this page is typed in by hand.",
+      "caption": "Lighthouse results for {run}",
+      "columns": {
+        "page": "Page",
+        "performance": "Performance",
+        "accessibility": "Accessibility",
+        "bestPractices": "Best practices",
+        "seo": "Search (SEO)",
+        "lcp": "Largest contentful paint (LCP)",
+        "tbt": "Total blocking time (TBT)",
+        "cls": "Cumulative layout shift (CLS)"
+      },
+      "source": "Source: {file}",
+      "measured": "Measured on {date}, median of {runs} mobile runs.",
+      "notMeasured": "Not measured",
+      "noteLocal": "Local and deployed runs differ. A local run on a slow machine under-reports speed, so the deployed result is the one that counts for the performance gate (see the decision note on JavaScript budgets).",
+      "notePreview": "Preview deployments are marked noindex on purpose, so the search score on a Preview is not the Production picture.",
+      "gatePassed": "Every budget assertion passed.",
+      "gateMiss": "This run missed a budget: {metric} on {route} was {actual} against a limit of {limit}.",
+      "gateFixed": "The {phase} run passed it at {actual}.",
+      "missSummary": "Phase {n} missed a budget: {metric} on {route} was {actual} against a limit of {limit}. The run is listed under earlier runs.",
+      "phase": "phase {n}",
+      "earlier": "Earlier runs",
+      "run": {
+        "p3": "phase 3, on a Vercel Preview",
+        "p2": "phase 2, on a Vercel Preview",
+        "p1": "phase 1, on the live site"
+      }
+    },
+    "quality": {
+      "heading": "Accessibility and quality",
+      "intro": "What is checked, and how.",
+      "items": {
+        "axe": "An axe sweep runs on every route in both languages.",
+        "keyboard": "Every feature can be used with the keyboard alone, with a visible focus ring.",
+        "tests": "Unit tests cover the business rules, and end-to-end tests cover the main shopping journeys on a phone and a desktop viewport."
+      },
+      "screenReader": "In phase 2 the owner reported a screen-reader smoke test of the look builder, search and checkout. It was done by a person, not by an automated tool."
+    },
+    "links": {
+      "heading": "Links",
+      "source": "Source code",
+      "live": "Live site",
+      "assets": "Asset sources",
+      "newTab": "opens in a new tab"
+    }
   }
 }

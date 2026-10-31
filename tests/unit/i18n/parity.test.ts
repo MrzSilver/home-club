@@ -141,6 +141,7 @@ describe('message catalogues: en and th stay in step (FR-070)', () => {
     expect(Object.keys(en).sort()).toEqual([
       'a11y',
       'cart',
+      'caseStudy',
       'catalogue',
       'checkout',
       'common',

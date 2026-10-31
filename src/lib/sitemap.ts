@@ -9,7 +9,14 @@ import { absoluteUrl } from '@/lib/seo';
 
 // The indexable public pages (PRD SEO NFR). Not listed on purpose: /cart, /checkout, /checkout/success
 // and /search (all noindex). Add a route here (one line) when a new indexable page ships.
-const STATIC_ROUTES: readonly string[] = ['', '/shop', '/looks', '/vibes', '/journal'];
+const STATIC_ROUTES: readonly string[] = [
+  '',
+  '/shop',
+  '/looks',
+  '/vibes',
+  '/journal',
+  '/case-study',
+];
 
 /** An article and the languages it is published in. The MDX files live on disk, so the caller lists them. */
 export type SitemapArticle = { slug: string; locales: readonly Locale[] };

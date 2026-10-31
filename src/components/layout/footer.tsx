@@ -42,6 +42,7 @@ export async function Footer({
   const links = [
     ...primaryLinks({ home: nav('links.home'), shopAll: nav('links.shopAll') }),
     ...categoryLinks(locale),
+    { href: '/case-study', label: t('caseStudy') },
   ];
 
   return (

@@ -4,9 +4,9 @@ import { LOOKS } from '@/data/looks';
 import { PRODUCTS } from '@/data/products';
 import { VIBE_ENTRIES } from '@/data/vibes';
 
-// Static pages (home, shop, looks, vibes, journal) + the data-driven pages + 3 journal articles, in 2 locales.
+// Static pages (home, shop, looks, vibes, journal, case study) + the data-driven pages + 3 journal articles, in 2 locales.
 const EXPECTED_URLS =
-  (5 + CATEGORY_ENTRIES.length + PRODUCTS.length + LOOKS.length + VIBE_ENTRIES.length + 3) * 2;
+  (6 + CATEGORY_ENTRIES.length + PRODUCTS.length + LOOKS.length + VIBE_ENTRIES.length + 3) * 2;
 
 const BLOCKED = ['cart', 'checkout', 'search'].flatMap((page) =>
   ['en', 'th'].map((locale) => `/${locale}/${page}`),

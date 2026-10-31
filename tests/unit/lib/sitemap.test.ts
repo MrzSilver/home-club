@@ -13,8 +13,8 @@ const ARTICLES: readonly SitemapArticle[] = [
   { slug: 'one-set-many-days', locales: ['en', 'th'] },
 ];
 
-// Home, shop, looks index, vibes index, journal index, then the 4 collections.
-const FIXED_ROUTES = 5 + 4;
+// Home, shop, looks index, vibes index, journal index, case study, then the 4 collections.
+const FIXED_ROUTES = 6 + 4;
 
 describe('sitemapEntries (SEO NFR, FR-071)', () => {
   const entries = sitemapEntries(ARTICLES, SITE);
@@ -53,12 +53,15 @@ describe('sitemapEntries (SEO NFR, FR-071)', () => {
     for (const vibe of VIBE_ENTRIES) expect(urls.has(`${SITE}/en/vibes/${vibe.id}`)).toBe(true);
   });
 
-  it.each(['/cart', '/checkout', '/checkout/success', '/search', '/case-study'])(
-    'leaves out %s',
-    (rest) => {
-      expect(entries.some((entry) => entry.url.includes(rest))).toBe(false);
-    },
-  );
+  it('lists the case study in both locales (FR-062)', () => {
+    const urls = new Set(entries.map((entry) => entry.url));
+    expect(urls.has(`${SITE}/en/case-study`)).toBe(true);
+    expect(urls.has(`${SITE}/th/case-study`)).toBe(true);
+  });
+
+  it.each(['/cart', '/checkout', '/checkout/success', '/search'])('leaves out %s', (rest) => {
+    expect(entries.some((entry) => entry.url.includes(rest))).toBe(false);
+  });
 
   it('uses absolute public URLs with no currency segment', () => {
     for (const entry of entries) {

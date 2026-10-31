@@ -20,7 +20,7 @@
     "jsx": "react-jsx",
     "incremental": true,
     "plugins": [{ "name": "next" }],
-    "paths": { "@/*": ["./src/*"], "@messages/*": ["./messages/*"] }
+    "paths": { "@/*": ["./src/*"], "@messages/*": ["./messages/*"], "@docs/*": ["./docs/*"] }
   },
   "include": [
     "next-env.d.ts",
