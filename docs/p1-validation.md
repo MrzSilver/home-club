@@ -1,5 +1,8 @@
 # P1 implementation and validation — 2026-10-28
 
+Latest status and deployed measurements: [Phase 1 exit audit — 2026-10-29](./p1-exit-audit.md).
+The historical baseline below is retained for comparison.
+
 Task: finish P1 T09–T11 — FR-001, FR-030–033, FR-050–051, FR-070–073.
 
 Status: **partial phase exit**. P1 functionality and automated validation are implemented. The Home performance score and several local LCP measurements remain below the release targets; this report does not mark P1 fully closed.

@@ -50,7 +50,8 @@ export function ProductCardPreview({
               width={primary.width}
               height={primary.height}
               sizes={sizes}
-              preload={priority}
+              loading={priority ? 'eager' : undefined}
+              fetchPriority={priority ? 'high' : undefined}
               className={imageClass}
             />
           )}
@@ -61,6 +62,8 @@ export function ProductCardPreview({
               width={alternate.width}
               height={alternate.height}
               sizes={sizes}
+              // The hidden hover view must not compete with the visible LCP photograph.
+              fetchPriority="low"
               className={`${imageClass} opacity-0 transition-opacity duration-slow ease-standard group-hover:opacity-100 motion-reduce:transition-none`}
             />
           )}
