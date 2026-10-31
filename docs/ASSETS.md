@@ -177,10 +177,10 @@ locale. They contain only typography, the brand colours from `tokens.css` and pr
 catalogue data; **no photograph and no third-party image is used**, and nothing in them is AI-generated.
 Nothing is committed under `public/`.
 
-| Font file (read at build from `node_modules/@fontsource`) | Source | Licence |
-| --- | --- | --- |
-| `jost/files/jost-latin-500-normal.woff` | Jost by Owen Earl, via `@fontsource/jost` | OFL-1.1 |
-| `inter/files/inter-latin-400-normal.woff` | Inter by Rasmus Andersson, via `@fontsource/inter` | OFL-1.1 |
+| Font file (read at build from `node_modules/@fontsource`) | Source                                             | Licence |
+| --------------------------------------------------------- | -------------------------------------------------- | ------- |
+| `jost/files/jost-latin-500-normal.woff`                   | Jost by Owen Earl, via `@fontsource/jost`          | OFL-1.1 |
+| `inter/files/inter-latin-400-normal.woff`                 | Inter by Rasmus Andersson, via `@fontsource/inter` | OFL-1.1 |
 
 The fonts are the same families already self-hosted for the site (see ADR-0001); the licence field of each
 package is `OFL-1.1`. The `.woff` files are embedded in the rendered PNGs only, not distributed.
