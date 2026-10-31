@@ -94,6 +94,12 @@ T1 and T4 share `src/lib/seo.ts`; T2/T4/T5 all touch route `page.tsx` files. Eac
   - Both paths bypass the proxy (they have a dot; assert this in e2e). Static, no dynamic APIs.
   - Output uses the production `NEXT_PUBLIC_SITE_URL`, never `localhost` in a Vercel Production build (see Risks).
 - Files: `src/app/sitemap.ts`, `src/app/robots.ts`, `tests/e2e/seo-sitemap.spec.ts` (new). Dependencies: T1. Verification: build, e2e.
+- **Done (2026-10-31).** Sitemap (60 URLs) and robots are static (○) and bypass the proxy. E5 guard in `lib/env.ts`:
+  with `VERCEL_ENV=production` the build fails unless `NEXT_PUBLIC_SITE_URL` is a non-localhost https origin
+  (checked both ways with a local production build). SPEC §10 robots wording and §11 env guard updated.
+  Owner action: set `NEXT_PUBLIC_SITE_URL` in Vercel Production before the next production deploy.
+  Follow-up: `tests/unit/components/mobile-nav.test.tsx` ("dialog" not found) failed once under full-suite load in
+  two separate runs and passes alone; needs an issue and a root-cause look (RULES §12.4), not a retry.
 
 ### T4. Metadata completion and Open Graph (text)
 
