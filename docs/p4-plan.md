@@ -177,3 +177,17 @@ Budget rule for every code task: `/en/shop` app JS is 39.9/40 KiB (ADR-0004). No
 - **T1 eager boundary**: with that headroom the error panel is imported eagerly. A lazily loaded panel would render nothing exactly when
   chunk loading fails (the most likely runtime error after a deploy).
 - **E8**: `global-error.tsx` is not shipped (SPEC §13a).
+
+## P4 exit status (2026-11-01)
+
+T1-T8 and T10 done and in PR #10 (CI `verify` green). T9: the deployed Lighthouse run on PR #10's Vercel Preview passed every
+assertion (`docs/p4-deployed-audit.json`, `docs/p4-validation.md`), and the case study now shows it as the latest run. Open items for the owner:
+
+- Merge PR #10 (the agent's merge was blocked by the review guard; merging is the owner's call).
+- After the merge, the Production record: dispatch the Lighthouse workflow with the Production URL and `target=production` (or run
+  `LHCI_BASE_URL=https://home-club-eight.vercel.app pnpm lhci` with `HC_AUDIT_TARGET` unset) and store it as the Production audit.
+- Thin LCP margins: `/th/products/essential-tee` median 2476 ms of 2500 (P3: 2462); single runs reach about 2590 ms. A perf follow-up for
+  LCP headroom on Thai pages is recommended before relying on a Production pass.
+- Thai copy review: `errorPage.*`, `cart.recovery.*`, `search.clear`, `search.shopAll`, `cart.removeFor`, `caseStudy.performance.run.p4`.
+- Screen-reader smoke on the new states (error page, cart notice, search empty) and the Rich Results / OG validators on Production.
+- `VibesGrid` does not yet match DESIGN §5.8 (label on scrim, trailing arrow); design-parity follow-up, not P4 motion scope.

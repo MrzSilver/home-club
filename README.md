@@ -121,7 +121,7 @@ every route and locale with the five SPEC §14 journeys. See the [P3 plan](./doc
 [P3 validation](./docs/p3-validation.md). The open owner items (production site URL, validators on Production,
 screen-reader smoke, Thai copy review) are listed under "P3 exit status" in the plan.
 
-P4 (Polish) is in progress on `feat/p4-polish`: route error boundary, empty and error states, motion polish, the assets register, and the final deployed Lighthouse report. See the [P4 plan](./docs/p4-plan.md). The site stays on https://home-club-eight.vercel.app (no custom domain).
+P4 (Polish) adds a localized route error boundary, the empty and error states of SPEC §13a (cart recovery notice, image fallback, search recovery), the cart drawer slide, the assets register with its unit test, the MIT licence and a hand-dispatched deployed Lighthouse workflow; its deployed Lighthouse run passed every budget (`docs/p4-deployed-audit.json`). See the [P4 plan](./docs/p4-plan.md). The site stays on https://home-club-eight.vercel.app (no custom domain).
 
 ## Author
 
