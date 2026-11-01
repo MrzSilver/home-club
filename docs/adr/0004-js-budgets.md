@@ -84,7 +84,7 @@ React/Next is out of the question (RULES §17).
     assertion is an `error`. Unset (sandbox, local, the `verify` job in `ci.yml`): `pnpm start` serves the build;
     accessibility, best-practices and SEO scores and CLS stay `error` (deterministic), while performance score, LCP
     and TBT are `warn` (informational).
-  - `.github/workflows/lighthouse-preview.yml` runs on `deployment_status` (state `success`, environment `Preview`),
+  - `.github/workflows/lighthouse-preview.yml` ran on `deployment_status` (state `success`, environment `Preview`; replaced by `workflow_dispatch`, see the 2026-11-01 amendment below),
     checks out the deployed SHA and runs `pnpm lhci` with `LHCI_BASE_URL` set to the deployment's `target_url`. It is
     the real release gate for those three metrics; make it a required check on `main` once the repository exists.
   - Builders still run `pnpm lhci` locally, report the per-metric medians every task and must not regress them
@@ -101,7 +101,7 @@ Automation" secret and store it as the `VERCEL_AUTOMATION_BYPASS_SECRET` reposit
 `lighthouserc.cjs` then sends it as the `x-vercel-protection-bypass` header.
 
 Amendment (2026-10-29, owner decision): Preview deployments stay `noindex`; full SEO is verified on
-Production. The preview workflow sets `LHCI_TARGET=preview`, and only then `lighthouserc.cjs` turns
+Production. The preview run sets `HC_AUDIT_TARGET=preview`, and only then `lighthouserc.cjs` turns
 off `is-crawlable`, lowers the overall `categories:seo` score to `warn` (still reported), and requires
 every other SEO audit (`document-title`, `meta-description`, `http-status-code`, `link-text`,
 `crawlable-anchors`, `image-alt`, `hreflang`, `canonical`) at score 1 as an `error`. Performance,
@@ -110,3 +110,14 @@ accessibility and best-practices stay `error`. Before Lighthouse runs,
 `X-Robots-Tag: noindex`, so the exemption cannot hide an accidental noindex or a protection login
 page. `vercel.json` sets `VERCEL_PREVIEW_FEEDBACK_ENABLED=0` so the Vercel toolbar is not injected
 into the audited Preview pages.
+
+Amendment (2026-11-01, owner decision E6): the `deployment_status` trigger never fired, because Vercel creates no
+GitHub Deployments, so `lighthouse-preview.yml` had never run. It now triggers on `workflow_dispatch` with a required
+`url` input (the deployment origin, validated in a shell step as https with no path) and a `target` choice
+(`preview` | `production`). `preview` runs `scripts/check-preview-headers.mjs` first and then the Preview
+assertions above; `production` skips the preflight and keeps every assertion, SEO included, an error. No
+threshold changed. The gate is therefore manual: it is enforced when someone dispatches it, and the report goes in
+the phase validation doc. The workflow checks out the dispatched ref, so choose the branch that was deployed.
+The target variable was renamed from `LHCI_TARGET` to `HC_AUDIT_TARGET`: lhci reads every `LHCI_*` variable as
+its own option, and `LHCI_TARGET` collided with `--target` (upload), which logged `Invalid values: Argument:
+target`. The previous mentions in this ADR and in the P1-P3 audit notes describe the old name.

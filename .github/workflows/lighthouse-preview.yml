@@ -1,10 +1,25 @@
-name: Lighthouse (Vercel preview)
+name: Lighthouse (deployed URL)
 
-# The real performance gate (ADR-0004 amendment): Lighthouse runs against the deployed Vercel preview,
-# where timings are realistic. The verify job in ci.yml also runs `pnpm lhci` against a local server,
-# but there performance score, LCP and TBT are warnings only.
+# The real performance gate (ADR-0004 amendment): Lighthouse runs against a deployed Vercel URL, where
+# timings are realistic. Vercel creates no GitHub Deployments, so a deployment_status trigger never fired;
+# this workflow is started by hand (Actions > Run workflow) with the deployment origin. The verify job in
+# ci.yml also runs `pnpm lhci` against a local server, but there performance score, LCP and TBT are
+# warnings only.
 on:
-  deployment_status:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'Vercel deployment origin to audit, e.g. https://home-club-git-x.vercel.app (https *.vercel.app, no path)'
+        required: true
+        type: string
+      target:
+        description: 'preview keeps the intentional noindex; production runs every SEO audit as an error'
+        required: true
+        type: choice
+        options:
+          - preview
+          - production
+        default: preview
 
 permissions:
   contents: read
@@ -14,21 +29,23 @@ env:
 
 jobs:
   lighthouse:
-    # Only a successful Preview deployment; production and failed deployments are skipped.
-    if: >-
-      github.event.deployment_status.state == 'success' &&
-      startsWith(github.event.deployment.environment, 'Preview')
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    env:
-      LHCI_TARGET: preview
-      LHCI_BASE_URL: ${{ github.event.deployment_status.target_url }}
-      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
     steps:
-      # The deployed commit, so lighthouserc.cjs and the budgets match what was deployed.
+      # Inputs reach the shell only through env, never through ${{ }} inside the script.
+      - name: Validate the deployment origin
+        env:
+          INPUT_URL: ${{ inputs.url }}
+        run: |
+          # Only Vercel deployments: the bypass secret is sent to this origin. Add the custom domain here if one is set up.
+          if [[ ! "$INPUT_URL" =~ ^https://([A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?\.)+vercel\.app/?$ ]]; then
+            echo "url must be an https *.vercel.app origin with no path, query or whitespace" >&2
+            exit 1
+          fi
+
+      # The dispatched ref (choose the branch or tag that was deployed), so lighthouserc.cjs and the
+      # budgets match the audited build.
       - uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.deployment.sha }}
 
       - uses: pnpm/action-setup@v6
 
@@ -41,22 +58,29 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Require public Preview response and intentional noindex
+        if: ${{ inputs.target == 'preview' }}
+        env:
+          LHCI_BASE_URL: ${{ inputs.url }}
+          HC_AUDIT_TARGET: preview
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: node scripts/check-preview-headers.mjs
 
       # Preview keeps noindex; all non-indexing SEO audits and performance remain errors.
-      - name: Lighthouse CI against the preview
-        run: pnpm lhci
+      # Production has no exemption: every assertion is an error.
+      - name: Lighthouse CI against the deployment
         env:
-          LHCI_BASE_URL: ${{ github.event.deployment_status.target_url }}
-          # Vercel protects previews by default; this secret (Project → Settings → Deployment
-          # Protection → Protection Bypass for Automation) lets Lighthouse through. Optional.
+          LHCI_BASE_URL: ${{ inputs.url }}
+          HC_AUDIT_TARGET: ${{ inputs.target }}
+          # Vercel protects previews by default; this secret (Project > Settings > Deployment
+          # Protection > Protection Bypass for Automation) lets Lighthouse through. Optional.
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: pnpm lhci
 
       - name: Upload Lighthouse reports
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
-          name: lighthouse-preview-reports
+          name: lighthouse-${{ inputs.target }}-reports
           path: .lighthouseci
           if-no-files-found: ignore
           retention-days: 14

@@ -1,8 +1,8 @@
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
-if (process.env.LHCI_TARGET !== 'preview' || !process.env.LHCI_BASE_URL) {
-  throw new Error('Preview preflight requires LHCI_TARGET=preview and LHCI_BASE_URL');
+if (process.env.HC_AUDIT_TARGET !== 'preview' || !process.env.LHCI_BASE_URL) {
+  throw new Error('Preview preflight requires HC_AUDIT_TARGET=preview and LHCI_BASE_URL');
 }
 const config = require('../lighthouserc.cjs');
 
