@@ -2,7 +2,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 
 import p1 from '@docs/p1-deployed-audit.json';
-import p3 from '@docs/p3-deployed-audit.json';
+import p4 from '@docs/p4-deployed-audit.json';
 
 const LOCALES = ['en', 'th'] as const;
 const NEW_TAB = { en: 'opens in a new tab', th: /แท็บใหม่/ } as const;
@@ -30,17 +30,17 @@ for (const locale of LOCALES) {
       }
     });
 
-    test(`P3 table has one body row per route and the first row matches the stored audit (FR-062, ${locale})`, async ({
+    test(`P4 table has one body row per route and the first row matches the stored audit (FR-062, ${locale})`, async ({
       page,
     }) => {
       await page.goto(`/${locale}/case-study`);
-      const table = page.getByTestId('audit-p3');
+      const table = page.getByTestId('audit-p4');
       await expect(table.locator('caption')).toBeVisible();
-      await expect(table.locator('tbody tr')).toHaveCount(p3.routes.length);
-      expect(p3.routes).toHaveLength(8);
+      await expect(table.locator('tbody tr')).toHaveCount(p4.routes.length);
+      expect(p4.routes).toHaveLength(8);
 
-      const first = p3.routes[0];
-      if (!first) throw new Error('p3 audit has no routes');
+      const first = p4.routes[0];
+      if (!first) throw new Error('p4 audit has no routes');
       const cells = table.locator('tbody tr').first().locator('th, td');
       await expect(cells.nth(0)).toHaveText(first.route);
       await expect(cells.nth(1)).toHaveText(String(Math.round(first.performance * 100)));

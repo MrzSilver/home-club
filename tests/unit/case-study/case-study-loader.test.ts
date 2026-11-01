@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import p1 from '@docs/p1-deployed-audit.json';
 import p2 from '@docs/p2-deployed-audit.json';
 import p3 from '@docs/p3-deployed-audit.json';
+import p4 from '@docs/p4-deployed-audit.json';
 
 // A loose view of an audit file, so a test can break one on purpose.
 type Audit = {
@@ -14,12 +15,18 @@ type Audit = {
 };
 type Loader = typeof CaseStudy;
 
-/** Loads the module fresh with the given audit files standing in for the three stored reports. */
-async function loadWith(files: { p1?: unknown; p2?: unknown; p3?: unknown }): Promise<Loader> {
+/** Loads the module fresh with the given audit files standing in for the four stored reports. */
+async function loadWith(files: {
+  p1?: unknown;
+  p2?: unknown;
+  p3?: unknown;
+  p4?: unknown;
+}): Promise<Loader> {
   vi.resetModules();
   vi.doMock('@docs/p1-deployed-audit.json', () => ({ default: files.p1 ?? p1 }));
   vi.doMock('@docs/p2-deployed-audit.json', () => ({ default: files.p2 ?? p2 }));
   vi.doMock('@docs/p3-deployed-audit.json', () => ({ default: files.p3 ?? p3 }));
+  vi.doMock('@docs/p4-deployed-audit.json', () => ({ default: files.p4 ?? p4 }));
   return import('@/content/case-study');
 }
 
@@ -29,18 +36,19 @@ afterEach(() => {
   vi.doUnmock('@docs/p1-deployed-audit.json');
   vi.doUnmock('@docs/p2-deployed-audit.json');
   vi.doUnmock('@docs/p3-deployed-audit.json');
+  vi.doUnmock('@docs/p4-deployed-audit.json');
   vi.resetModules();
 });
 
 describe('case-study audit loader (FR-062)', () => {
-  it('parses the three stored reports with the gated P3 run as the latest (FR-062)', async () => {
+  it('parses the four stored reports with the gated P3 run as the latest (FR-062)', async () => {
     const { loadAuditReports } = await import('@/content/case-study');
     const { latest, earlier } = loadAuditReports();
-    expect(latest.id).toBe('p3');
-    expect(earlier.map((report) => report.id)).toEqual(['p2', 'p1']);
-    expect(latest.file).toBe('docs/p3-deployed-audit.json');
+    expect(latest.id).toBe('p4');
+    expect(earlier.map((report) => report.id)).toEqual(['p3', 'p2', 'p1']);
+    expect(latest.file).toBe('docs/p4-deployed-audit.json');
     expect(latest.url).toBe(
-      'https://github.com/MrzSilver/home-club/blob/main/docs/p3-deployed-audit.json',
+      'https://github.com/MrzSilver/home-club/blob/main/docs/p4-deployed-audit.json',
     );
     expect(latest.routes.length).toBeGreaterThan(0);
   });
@@ -76,9 +84,11 @@ describe('case-study audit loader (FR-062)', () => {
   it('leaves a miss unfixed when no later run covers the route (FR-062)', async () => {
     const noRoute = clone(p2);
     noRoute.routes = noRoute.routes.filter((row) => row.route !== '/th/collections/foundations');
-    const later = clone(p3);
-    later.routes = later.routes.filter((row) => row.route !== '/th/collections/foundations');
-    const { loadAuditReports } = await loadWith({ p2: noRoute, p3: later });
+    const laterP3 = clone(p3);
+    laterP3.routes = laterP3.routes.filter((row) => row.route !== '/th/collections/foundations');
+    const laterP4 = clone(p4);
+    laterP4.routes = laterP4.routes.filter((row) => row.route !== '/th/collections/foundations');
+    const { loadAuditReports } = await loadWith({ p2: noRoute, p3: laterP3, p4: laterP4 });
     const failure = loadAuditReports().earlier.find((r) => r.id === 'p1')?.failures[0];
     expect(failure?.fixed).toBeUndefined();
   });
@@ -101,40 +111,59 @@ describe('case-study audit loader (FR-062)', () => {
     expect(earlier.find((r) => r.id === 'p2')?.failures[0]?.fixed?.id).toBe('p3');
   });
 
+  it('names the P4 run as the fix for a P3 miss that P4 passed (FR-062)', async () => {
+    const failing = clone(p3);
+    failing.gate = 'failed';
+    failing.failedAssertions = [
+      {
+        route: '/en/shop',
+        id: 'largest-contentful-paint',
+        maxNumericValue: 2500,
+        actualNumericValue: 2700,
+      },
+    ];
+    const { loadAuditReports } = await loadWith({ p3: failing });
+    const failure = loadAuditReports().earlier.find((r) => r.id === 'p3')?.failures[0];
+    const p4Row = p4.routes.find((row) => row.route === '/en/shop');
+    expect(failure).toMatchObject({ route: '/en/shop', metric: 'lcp', actual: 2700 });
+    expect(failure?.fixed?.id).toBe('p4');
+    expect(failure?.fixed?.actual).toBe(p4Row?.lcpMs);
+  });
+
   it('rejects a file with an assertion id it does not know, so a miss cannot be hidden (FR-062)', async () => {
-    const bad = clone(p3);
+    const bad = clone(p4);
     bad.gate = 'failed';
     bad.failedAssertions = [
       { route: '/en', id: 'speed-index', maxNumericValue: 1, actualNumericValue: 2 },
     ];
-    const { loadAuditReports } = await loadWith({ p3: bad });
+    const { loadAuditReports } = await loadWith({ p4: bad });
     expect(() => loadAuditReports()).toThrow();
   });
 
   it('rejects a file without a gate result (FR-062)', async () => {
-    const bad = clone(p3);
+    const bad = clone(p4);
     delete bad.gate;
-    const { loadAuditReports } = await loadWith({ p3: bad });
+    const { loadAuditReports } = await loadWith({ p4: bad });
     expect(() => loadAuditReports()).toThrow();
   });
 
   it('rejects a file with no routes (FR-062)', async () => {
-    const bad = clone(p3);
+    const bad = clone(p4);
     bad.routes = [];
-    const { loadAuditReports } = await loadWith({ p3: bad });
+    const { loadAuditReports } = await loadWith({ p4: bad });
     expect(() => loadAuditReports()).toThrow();
   });
 
   it('rejects a score outside 0 to 1 and a malformed date (FR-062)', async () => {
-    const badScore = clone(p3);
+    const badScore = clone(p4);
     const [first] = badScore.routes;
     if (first) first.performance = 95;
-    const scoreLoader = await loadWith({ p3: badScore });
+    const scoreLoader = await loadWith({ p4: badScore });
     expect(() => scoreLoader.loadAuditReports()).toThrow();
 
-    const badDate = clone(p3);
+    const badDate = clone(p4);
     badDate.auditDate = '31/10/2026';
-    const dateLoader = await loadWith({ p3: badDate });
+    const dateLoader = await loadWith({ p4: badDate });
     expect(() => dateLoader.loadAuditReports()).toThrow();
   });
 

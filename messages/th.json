@@ -470,6 +470,7 @@
       "phase": "เฟส {n}",
       "earlier": "ผลการวัดก่อนหน้า",
       "run": {
+        "p4": "เฟส 4 บน Vercel Preview",
         "p3": "เฟส 3 บน Vercel Preview",
         "p2": "เฟส 2 บน Vercel Preview",
         "p1": "เฟส 1 บนเว็บจริง"
