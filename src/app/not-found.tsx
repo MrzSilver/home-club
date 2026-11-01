@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import type { ReactElement } from 'react';
 
 import { Container } from '@/components/ui/container';
@@ -13,6 +12,8 @@ import '@/styles/globals.css';
 // `dynamicParams = false`. It cannot know the visitor's language, so it shows both: the English block
 // and the Thai block each carry their own `lang`, and `<html lang>` is the default locale. It works
 // without JavaScript. Next.js adds `noindex` and the 404 status.
+// Plain anchors on purpose: next/link would ship a second copy of the link runtime (~3 KiB gzip) to
+// every route, because the root not-found boundary is part of every page's client reference graph.
 export const metadata: Metadata = {
   title: { absolute: `${en.seo.notFoundTitle} / ${th.seo.notFoundTitle}` },
 };
@@ -27,18 +28,20 @@ export default function RootNotFound(): ReactElement {
               <h1 className="text-h1 uppercase-latin">{en.notFound.title}</h1>
               <p className="mt-4 max-w-prose text-body text-muted">{en.notFound.body}</p>
               <p className="mt-6">
-                <Link href="/en" className="text-body underline underline-offset-4">
+                {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- plain anchor on purpose, see the note above the metadata export */}
+                <a href="/en" className="text-body underline underline-offset-4">
                   {en.notFound.backHome}
-                </Link>
+                </a>
               </p>
             </section>
             <section lang="th" className="mt-12">
               <h2 className="text-h2">{th.notFound.title}</h2>
               <p className="mt-4 max-w-prose text-body text-muted">{th.notFound.body}</p>
               <p className="mt-6">
-                <Link href="/th" className="text-body underline underline-offset-4">
+                {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- plain anchor on purpose, see the note above the metadata export */}
+                <a href="/th" className="text-body underline underline-offset-4">
                   {th.notFound.backHome}
-                </Link>
+                </a>
               </p>
             </section>
           </Container>
