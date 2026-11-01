@@ -14,8 +14,9 @@
 const LOCAL_URL = 'http://localhost:3000';
 const remote = (process.env.LHCI_BASE_URL ?? '').trim().replace(/\/+$/, '');
 const BASE_URL = remote === '' ? LOCAL_URL : remote;
-// Owner decision, 2026-10-29: keep Preview noindex and verify full SEO on Production.
-const preview = remote !== '' && process.env.LHCI_TARGET === 'preview';
+// Owner decision, 2026-10-29: keep Preview noindex and verify full SEO on Production. The variable is not
+// called LHCI_TARGET because lhci reads every LHCI_* variable as its own option (target = upload target).
+const preview = remote !== '' && process.env.HC_AUDIT_TARGET === 'preview';
 const PREVIEW_SEO_AUDITS = [
   'document-title',
   'meta-description',

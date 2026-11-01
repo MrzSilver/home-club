@@ -146,6 +146,7 @@ describe('message catalogues: en and th stay in step (FR-070)', () => {
       'checkout',
       'common',
       'content',
+      'errorPage',
       'footer',
       'home',
       'look',

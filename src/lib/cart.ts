@@ -4,6 +4,27 @@ import { clampQty } from '@/lib/stock';
 export type StockIndex = Readonly<Record<string, number>>;
 /** Stock reconciliation for lines already validated at the storage boundary. */
 export function normalizeCart(lines: readonly CartLine[], stock: StockIndex): CartLine[] {
+  return reconcileCart(lines, stock).lines;
+}
+
+/** Same as `normalizeCart`, and reports whether any line was dropped, clamped or merged. */
+export function reconcileCart(
+  lines: readonly CartLine[],
+  stock: StockIndex,
+): { lines: CartLine[]; changed: boolean } {
+  const reconciled = reconcileLines(lines, stock);
+  const changed =
+    reconciled.length !== lines.length ||
+    reconciled.some((line, index) => {
+      const original = lines[index];
+      return (
+        original?.sku !== line.sku || original.qty !== line.qty || original.lookId !== line.lookId
+      );
+    });
+  return { lines: reconciled, changed };
+}
+
+function reconcileLines(lines: readonly CartLine[], stock: StockIndex): CartLine[] {
   const quantities = new Map<string, CartLine>();
   const reserved = new Map<string, number>();
   for (const line of lines) {

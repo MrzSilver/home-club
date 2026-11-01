@@ -80,11 +80,11 @@ describe.each([
 ] as const)('audit table in %s (FR-062)', (locale, messages) => {
   it('has a caption, column and row headers, and one row per audited route', async () => {
     await renderServer(AuditTable({ locale, report: latest }));
-    const table = screen.getByTestId('audit-p3');
+    const table = screen.getByTestId('audit-p4');
     expect(table).toHaveAccessibleName(
       messages.caseStudy.performance.caption.replace(
         '{run}',
-        messages.caseStudy.performance.run.p3,
+        messages.caseStudy.performance.run.p4,
       ),
     );
     const columns = within(table).getAllByRole('columnheader');
@@ -116,7 +116,7 @@ describe.each([
     expect(link).toHaveAttribute('href', latest.url);
     expect(link).toHaveAttribute('target', '_blank');
     expect(screen.getByText(messages.caseStudy.performance.notePreview)).toBeInTheDocument();
-    expect(screen.getByTestId('audit-p3')).toHaveAttribute('aria-describedby', 'audit-p3-note');
+    expect(screen.getByTestId('audit-p4')).toHaveAttribute('aria-describedby', 'audit-p4-note');
   });
 
   it('omits the Preview note for a run on the live site', async () => {
@@ -175,7 +175,8 @@ describe('performance section (FR-062)', () => {
     expect(details).not.toHaveAttribute('open');
     expect(within(details as HTMLElement).getByTestId('audit-p2')).toBeInTheDocument();
     expect(within(details as HTMLElement).getByTestId('audit-p1')).toBeInTheDocument();
-    expect(within(details as HTMLElement).queryByTestId('audit-p3')).not.toBeInTheDocument();
+    expect(within(details as HTMLElement).getByTestId('audit-p3')).toBeInTheDocument();
+    expect(within(details as HTMLElement).queryByTestId('audit-p4')).not.toBeInTheDocument();
     expect(screen.getByTestId('audit-miss-summary')).toBeInTheDocument();
   });
 });

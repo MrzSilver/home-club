@@ -29,7 +29,7 @@ export function CheckoutForm({ currency }: { currency: Currency }): ReactElement
   if (!lines.length)
     return (
       <div className="space-y-4">
-        <p>{t('empty')}</p>
+        <p role="status">{t('empty')}</p>
         <Link href="/shop" className={buttonClasses()}>
           {t('shop')}
         </Link>

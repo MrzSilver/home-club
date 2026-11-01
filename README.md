@@ -29,20 +29,21 @@ pnpm dev                     # http://localhost:3000
 
 ## Scripts
 
-| Command                             | What it does                                                                                  |
-| ----------------------------------- | --------------------------------------------------------------------------------------------- |
-| `pnpm dev`                          | Start the dev server                                                                          |
-| `pnpm build` / `pnpm start`         | Production build / serve it                                                                   |
-| `pnpm typecheck`                    | TypeScript, no emit                                                                           |
-| `pnpm lint`                         | ESLint (includes accessibility rules)                                                         |
-| `pnpm format` / `pnpm format:check` | Prettier                                                                                      |
-| `pnpm test` / `pnpm test:watch`     | Unit and component tests (Vitest, files in `tests/unit`)                                      |
-| `pnpm test:coverage`                | Unit tests with coverage thresholds (`src/lib` lines ≥ 90, global lines ≥ 75)                 |
-| `pnpm test:e2e`                     | End-to-end journeys (Playwright, `tests/e2e`; builds and starts the production server itself) |
-| `pnpm test:a11y`                    | Accessibility sweep (axe, tests tagged `@a11y`)                                               |
-| `pnpm bundle:check`                 | Enforce total and application JavaScript gzip budgets against a fresh production build        |
-| `pnpm lhci`                         | Lighthouse CI against budgets (needs a prior `pnpm build`; see below for the preview gate)    |
-| `pnpm check`                        | typecheck + lint + test + build                                                               |
+| Command                             | What it does                                                                                                             |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `pnpm dev`                          | Start the dev server                                                                                                     |
+| `pnpm build` / `pnpm start`         | Production build / serve it                                                                                              |
+| `pnpm typecheck`                    | TypeScript, no emit                                                                                                      |
+| `pnpm lint`                         | ESLint (includes accessibility rules)                                                                                    |
+| `pnpm format` / `pnpm format:check` | Prettier                                                                                                                 |
+| `pnpm test` / `pnpm test:watch`     | Unit and component tests (Vitest, files in `tests/unit`)                                                                 |
+| `pnpm test:coverage`                | Unit tests with coverage thresholds (`src/lib` lines ≥ 90, global lines ≥ 75)                                            |
+| `pnpm test:e2e`                     | End-to-end journeys (Playwright, `tests/e2e`; builds and starts the production server itself)                            |
+| `pnpm test:a11y`                    | Accessibility sweep (axe, tests tagged `@a11y`)                                                                          |
+| `pnpm images:generate`              | Historical: regenerate the superseded procedural product placeholders (`scripts/generate-placeholders.mjs`; not shipped) |
+| `pnpm bundle:check`                 | Enforce total and application JavaScript gzip budgets against a fresh production build                                   |
+| `pnpm lhci`                         | Lighthouse CI against budgets (needs a prior `pnpm build`; see below for the preview gate)                               |
+| `pnpm check`                        | typecheck + lint + test + build                                                                                          |
 
 ### Browsers for e2e and Lighthouse
 
@@ -56,7 +57,7 @@ pnpm dev                     # http://localhost:3000
 
   Reports are written to `.lighthouseci/` (git-ignored).
 
-- Where the gates run (ADR-0004 amendment): locally, performance score, LCP and TBT are warnings (they depend on the machine); accessibility, best-practices, SEO and CLS stay errors. Set `LHCI_BASE_URL=https://<deployment>` to audit a deployment instead of a local server; then every assertion is an error. The `lighthouse-preview` workflow does exactly that for each successful Vercel Preview deployment and is the real performance gate.
+- Where the gates run (ADR-0004 amendment): locally, performance score, LCP and TBT are warnings (they depend on the machine); accessibility, best-practices, SEO and CLS stay errors. Set `LHCI_BASE_URL=https://<deployment>` to audit a deployment instead of a local server; then every assertion is an error. The `lighthouse-preview` workflow does exactly that, but only when started by hand (Actions, Run workflow): give it the deployment origin (`url`, https, no path) and a `target` of `preview` (keeps the intentional noindex, with a header preflight) or `production` (full SEO). It does not run on its own, because Vercel creates no GitHub Deployments. To reproduce it locally, also set `HC_AUDIT_TARGET=preview` for a Preview URL; leave it unset for Production. It is the real performance gate when you run it.
 
 - If `pnpm typecheck` complains about missing `.next/types` or `next-env.d.ts` (both are git-ignored and generated), run `pnpm exec next typegen`; CI does the same before typechecking.
 
@@ -99,7 +100,9 @@ Short-lived branches, Conventional Commits with requirement IDs, small PRs, all 
 
 ## Assets and licensing
 
-Brand, products and copy are fictional. Imagery is placeholder/illustrative until replaced with rights-cleared assets; every asset is tracked in `docs/ASSETS.md`. Source code licence: to be decided by the owner (add a `LICENSE` file before publishing).
+Brand, products and copy are fictional. Imagery is illustrative: recoloured Pexels photographs plus AI-generated back and side views, disclosed in the gallery. Every asset, its licence and its status (`ship-ok (demo)` or `replace-before-marketing`) is tracked in [`docs/ASSETS.md`](./docs/ASSETS.md), which also holds the "Before public marketing" checklist; a unit test fails if an image under `public/images` is not logged there.
+
+The source code is licensed under the [MIT License](./LICENSE). The licence covers code only; images, fonts and other media keep the licences recorded in `docs/ASSETS.md`.
 
 ## Status
 
@@ -111,12 +114,14 @@ keyboard-operated Search, demo Checkout, size guide and related products. Home a
 link these flows. See [P2 validation](./docs/p2-validation.md) for verification and
 phase-exit evidence (deployed Lighthouse passed; screen-reader smoke and Thai copy approved by the owner).
 
-P3 (Proof) is implemented on `feat/p3-seo-builders` (PR #8, stacked on #7). It adds per-page metadata with canonical,
+P3 (Proof) is merged (PR #8, 2026-10-31). It adds per-page metadata with canonical,
 hreflang, Open Graph and Twitter tags; JSON-LD (`Organization`, `Product`/`Offer`, `BreadcrumbList`, `Article`);
 `sitemap.xml` and `robots.txt`; localised Open Graph images; the bilingual case-study page; and an axe sweep over
 every route and locale with the five SPEC §14 journeys. See the [P3 plan](./docs/p3-plan.md) and
 [P3 validation](./docs/p3-validation.md). The open owner items (production site URL, validators on Production,
 screen-reader smoke, Thai copy review) are listed under "P3 exit status" in the plan.
+
+P4 (Polish) adds a localized route error boundary, the empty and error states of SPEC §13a (cart recovery notice, image fallback, search recovery), the cart drawer slide, the assets register with its unit test, the MIT licence and a hand-dispatched deployed Lighthouse workflow; its deployed Lighthouse run passed every budget (`docs/p4-deployed-audit.json`). See the [P4 plan](./docs/p4-plan.md). The site stays on https://home-club-eight.vercel.app (no custom domain).
 
 ## Author
 

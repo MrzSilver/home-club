@@ -104,7 +104,7 @@ describe('Product and cart behavior (FR-030–033, FR-050–051)', () => {
       expect(screen.getByTestId('cart-subtotal')).toHaveTextContent(
         locale === 'en' ? '$98.00' : 'US$98.00',
       );
-      fireEvent.click(screen.getByRole('button', { name: /Remove Essential|นำ เสื้อ/ }));
+      fireEvent.click(screen.getByRole('button', { name: /Remove Essential|นำออก เสื้อ/ }));
       await waitFor(() => expect(screen.queryByTestId('cart-subtotal')).not.toBeInTheDocument());
     },
   );

@@ -51,7 +51,7 @@ Precedence when documents disagree: **RULES > PRD > SPEC > DESIGN > README**.
 1. Tailwind with design tokens from [DESIGN.md](./DESIGN.md). MUST NOT use raw hex colours, arbitrary pixel values, or inline `style` for design values (dynamic swatch colours from data excepted).
 2. No `!important`. No global CSS beyond `globals.css` and `tokens.css`.
 3. Mobile-first: base styles are mobile; enhance with `sm:`/`md:`/`lg:`.
-4. Respect `prefers-reduced-motion`; animate only `opacity` and `transform`.
+4. Respect `prefers-reduced-motion`; animate only `opacity`, `transform` and colour (`color`, `background-color`, `border-color`, for hover and focus tone shifts). Never animate layout properties.
 
 ## 6. Internationalisation
 

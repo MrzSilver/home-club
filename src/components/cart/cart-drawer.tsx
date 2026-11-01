@@ -26,7 +26,7 @@ export function CartDrawer({
             event.preventDefault();
             returnFocusRef.current?.focus();
           }}
-          className="fixed inset-y-0 end-0 z-50 flex w-full max-w-120 flex-col overflow-y-auto bg-canvas text-ink shadow-float"
+          className="drawer-panel-end fixed inset-y-0 end-0 z-50 flex w-full max-w-120 flex-col overflow-y-auto bg-canvas text-ink shadow-float"
         >
           <div className="sticky top-0 z-10 flex min-h-16 items-center justify-between border-b border-line bg-canvas px-4">
             <Dialog.Title className="text-h2">{t('title')}</Dialog.Title>

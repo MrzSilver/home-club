@@ -1,0 +1,168 @@
+{
+  "auditDate": "2026-11-01",
+  "commit": "7f1a6e2",
+  "target": "Vercel Preview (HC_AUDIT_TARGET=preview)",
+  "baseUrl": "https://home-club-git-feat-p4-polish-silversvs-projects.vercel.app",
+  "lighthouseVersion": "12.6.1",
+  "fetchTimeFirst": "2026-11-01T06:58:24.691Z",
+  "formFactor": "mobile",
+  "aggregation": "median",
+  "runsPerUrl": 5,
+  "totalRuns": 40,
+  "gate": "passed",
+  "failedAssertions": [],
+  "warnings": ["categories.seo"],
+  "warningNote": "categories.seo is a warning only on Preview because Preview is intentionally noindex (ADR-0004 amendment); every other SEO audit is an error and passed.",
+  "preflight": "8 URLs returned 200 with X-Robots-Tag: noindex",
+  "measuredFrom": "agent workstation (Windows) via lhci autorun with the Playwright Chromium (CHROME_PATH), not the GitHub workflow",
+  "seoFailingAudits": {
+    "/en": ["is-crawlable"],
+    "/th": ["is-crawlable"],
+    "/en/shop": ["is-crawlable"],
+    "/th/collections/foundations": ["is-crawlable"],
+    "/en/products/essential-tee": ["is-crawlable"],
+    "/th/products/essential-tee": ["is-crawlable"],
+    "/en/looks/the-essential-look": ["is-crawlable"],
+    "/th/looks/the-essential-look": ["is-crawlable"]
+  },
+  "canonicalHreflangScores": {
+    "/en": {
+      "canonical": 1,
+      "hreflang": 1,
+      "canonicalDisplay": null
+    },
+    "/th": {
+      "canonical": 1,
+      "hreflang": 1,
+      "canonicalDisplay": null
+    },
+    "/en/shop": {
+      "canonical": 1,
+      "hreflang": 1,
+      "canonicalDisplay": null
+    },
+    "/th/collections/foundations": {
+      "canonical": 1,
+      "hreflang": 1,
+      "canonicalDisplay": null
+    },
+    "/en/products/essential-tee": {
+      "canonical": 1,
+      "hreflang": 1,
+      "canonicalDisplay": null
+    },
+    "/th/products/essential-tee": {
+      "canonical": 1,
+      "hreflang": 1,
+      "canonicalDisplay": null
+    },
+    "/en/looks/the-essential-look": {
+      "canonical": 1,
+      "hreflang": 1,
+      "canonicalDisplay": null
+    },
+    "/th/looks/the-essential-look": {
+      "canonical": 1,
+      "hreflang": 1,
+      "canonicalDisplay": null
+    }
+  },
+  "routes": [
+    {
+      "route": "/en",
+      "runs": 5,
+      "performance": 0.97,
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 0.69,
+      "lcpMs": 2420.0195,
+      "tbtMs": 95,
+      "cls": 0,
+      "lcpRunsMs": [2420.0195, 2369.047, 2283.8455, 2431.4785, 2435.958]
+    },
+    {
+      "route": "/th",
+      "runs": 5,
+      "performance": 0.97,
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 0.69,
+      "lcpMs": 2435.8244999999997,
+      "tbtMs": 92,
+      "cls": 0,
+      "lcpRunsMs": [2320.0834999999997, 2437.4165000000003, 2284.547, 2435.8244999999997, 2436.3135]
+    },
+    {
+      "route": "/en/shop",
+      "runs": 5,
+      "performance": 0.97,
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 0.69,
+      "lcpMs": 2285.2664999999997,
+      "tbtMs": 100,
+      "cls": 0,
+      "lcpRunsMs": [2298.7495, 2438.4094999999998, 2285.2664999999997, 2285.0185, 2283]
+    },
+    {
+      "route": "/th/collections/foundations",
+      "runs": 5,
+      "performance": 0.96,
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 0.69,
+      "lcpMs": 2441.064,
+      "tbtMs": 93,
+      "cls": 0,
+      "lcpRunsMs": [2430.077, 2441.064, 2587.5335, 2582.614, 2434.7985]
+    },
+    {
+      "route": "/en/products/essential-tee",
+      "runs": 5,
+      "performance": 0.97,
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 0.69,
+      "lcpMs": 2433.011,
+      "tbtMs": 79,
+      "cls": 0,
+      "lcpRunsMs": [2440.452, 2431.025, 2430.045, 2437.452, 2433.011]
+    },
+    {
+      "route": "/th/products/essential-tee",
+      "runs": 5,
+      "performance": 0.96,
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 0.69,
+      "lcpMs": 2476.2415,
+      "tbtMs": 91.99999999999977,
+      "cls": 0,
+      "lcpRunsMs": [2590.619, 2437.313, 2433.4685, 2589.209, 2476.2415]
+    },
+    {
+      "route": "/en/looks/the-essential-look",
+      "runs": 5,
+      "performance": 0.97,
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 0.69,
+      "lcpMs": 2439.8855,
+      "tbtMs": 81,
+      "cls": 0,
+      "lcpRunsMs": [2301.194, 2439.8855, 2451.632, 2442.828, 2433.8435]
+    },
+    {
+      "route": "/th/looks/the-essential-look",
+      "runs": 5,
+      "performance": 0.97,
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 0.69,
+      "lcpMs": 2433.7505,
+      "tbtMs": 92,
+      "cls": 0,
+      "lcpRunsMs": [2591.0325000000003, 2442.1775, 2431.2635, 2433.4425, 2433.7505]
+    }
+  ]
+}

@@ -4,38 +4,53 @@ import type { CartLine } from '@/data/schema';
 import {
   addCartLine,
   addCartLinesAtomically,
-  normalizeCart,
+  reconcileCart,
   setCartLineQty,
   type StockIndex,
 } from '@/lib/cart';
 
+/** Transient, in-memory notice about what hydration had to repair. Never persisted. */
+export type CartRecovery = 'reset' | 'adjusted';
+
 export type CartState = {
   lines: CartLine[];
   hydrated: boolean;
+  recovery: CartRecovery | null;
   add: (sku: string, qty: number) => boolean;
   addMany: (lines: readonly CartLine[]) => boolean;
   setQty: (sku: string, qty: number, lookId?: string) => void;
   remove: (sku: string, lookId?: string) => void;
   clear: () => void;
+  dismissRecovery: () => void;
 };
-type SavedCart = { lines: CartLine[] };
+// `recovery` only travels from storage.getItem into the store; partialize never writes it back.
+type SavedCart = { lines: CartLine[]; recovery?: CartRecovery };
 
 // Access, JSON decoding and writes can all fail (private browsing, corrupt data, full storage).
 export function browserCartStorage(stock: StockIndex = {}): PersistStorage<SavedCart> {
   return {
     getItem: async (name) => {
+      // Unavailable storage is not corrupt data: carry on silently with an empty cart.
+      let raw: string | null;
       try {
-        const raw = localStorage.getItem(name);
-        if (raw === null) return null;
+        raw = localStorage.getItem(name);
+      } catch {
+        return null;
+      }
+      if (raw === null) return null;
+      try {
         // Empty carts need no validation code on first load. Persisted data is still validated
         // before it can reach the store or the badge.
         const { parseSavedCart } = await import('@/lib/cart-schema');
         const parsed = parseSavedCart(JSON.parse(raw));
-        return parsed === null
-          ? null
-          : { ...parsed, state: { lines: normalizeCart(parsed.state.lines, stock) } };
+        if (parsed === null) return { state: { lines: [], recovery: 'reset' }, version: 1 };
+        const { lines, changed } = reconcileCart(parsed.state.lines, stock);
+        return {
+          ...parsed,
+          state: { lines, ...(changed ? { recovery: 'adjusted' as const } : {}) },
+        };
       } catch {
-        return null;
+        return { state: { lines: [], recovery: 'reset' }, version: 1 };
       }
     },
     setItem: (name, value) => {
@@ -64,6 +79,7 @@ export function createCartStore(stock: StockIndex, storage = browserCartStorage(
       (set, get) => ({
         lines: [],
         hydrated: false,
+        recovery: null,
         add: (sku, qty) => {
           if (
             !get().hydrated ||
@@ -73,23 +89,28 @@ export function createCartStore(stock: StockIndex, storage = browserCartStorage(
             qty < 1
           )
             return false;
-          set({ lines: addCartLine(get().lines, sku, qty, stock) });
+          set({ lines: addCartLine(get().lines, sku, qty, stock), recovery: null });
           return true;
         },
         addMany: (additions) => {
           if (!get().hydrated) return false;
           const lines = addCartLinesAtomically(get().lines, additions, stock);
           if (lines === null) return false;
-          set({ lines });
+          set({ lines, recovery: null });
           return true;
         },
         setQty: (sku, qty, lookId) =>
           set({
             lines: setCartLineQty(get().lines, sku, qty, stock, lookId),
+            recovery: null,
           }),
         remove: (sku, lookId) =>
-          set({ lines: get().lines.filter((line) => line.sku !== sku || line.lookId !== lookId) }),
-        clear: () => set({ lines: [] }),
+          set({
+            lines: get().lines.filter((line) => line.sku !== sku || line.lookId !== lookId),
+            recovery: null,
+          }),
+        clear: () => set({ lines: [], recovery: null }),
+        dismissRecovery: () => set({ recovery: null }),
       }),
       {
         name: 'hc:cart:v1',

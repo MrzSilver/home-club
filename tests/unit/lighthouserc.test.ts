@@ -17,8 +17,8 @@ function load(baseUrl: string | undefined, target?: string): Config {
   delete require.cache[CONFIG_PATH];
   if (baseUrl === undefined) delete process.env['LHCI_BASE_URL'];
   else process.env['LHCI_BASE_URL'] = baseUrl;
-  if (target === undefined) delete process.env['LHCI_TARGET'];
-  else process.env['LHCI_TARGET'] = target;
+  if (target === undefined) delete process.env['HC_AUDIT_TARGET'];
+  else process.env['HC_AUDIT_TARGET'] = target;
   return require(CONFIG_PATH) as Config;
 }
 
@@ -48,13 +48,13 @@ const DETERMINISTIC = [
 
 describe('lighthouserc.cjs (ADR-0004 amendment)', () => {
   const original = process.env['LHCI_BASE_URL'];
-  const originalTarget = process.env['LHCI_TARGET'];
+  const originalTarget = process.env['HC_AUDIT_TARGET'];
   afterEach(() => {
     delete require.cache[CONFIG_PATH];
     if (original === undefined) delete process.env['LHCI_BASE_URL'];
     else process.env['LHCI_BASE_URL'] = original;
-    if (originalTarget === undefined) delete process.env['LHCI_TARGET'];
-    else process.env['LHCI_TARGET'] = originalTarget;
+    if (originalTarget === undefined) delete process.env['HC_AUDIT_TARGET'];
+    else process.env['HC_AUDIT_TARGET'] = originalTarget;
   });
 
   it('without LHCI_BASE_URL serves the build locally and only warns on machine-dependent metrics', () => {

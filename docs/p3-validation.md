@@ -136,6 +136,8 @@ Failures, none caused by T7 changes (test code under them is unmodified, `src/` 
 
 ### Flaky unit test
 
+Tracked as issue #9 (https://github.com/MrzSilver/home-club/issues/9).
+
 `tests/unit/components/mobile-nav.test.tsx` timed out in `findByRole('dialog')` only in full-suite runs. Cause:
 `MobileNav` loads its drawer with `import('@/components/layout/mobile-nav-panel')` on first open; in the first
 test of the file that import is cold, so Vite transforms the Radix Dialog graph inside the test, and with 62

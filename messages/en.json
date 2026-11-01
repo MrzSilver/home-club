@@ -106,6 +106,12 @@
     "body": "The page may have moved, or the address may be mistyped.",
     "backHome": "Back to the home page"
   },
+  "errorPage": {
+    "title": "Something went wrong",
+    "body": "This page hit a problem. Try again, or go back to the home page.",
+    "retry": "Try again",
+    "backHome": "Back to the home page"
+  },
   "nav": {
     "homeLink": "Home Club Foundation, home page",
     "menu": {
@@ -235,7 +241,12 @@
     "lookDiscount": "{name}: you save {amount}",
     "lookIncomplete": "Set discount removed: all four pieces are needed.",
     "total": "Total",
-    "checkout": "Checkout (demo)"
+    "checkout": "Checkout (demo)",
+    "recovery": {
+      "reset": "Your saved cart could not be read, so it was cleared.",
+      "adjusted": "Some items in your saved cart changed because stock or availability changed.",
+      "dismiss": "Dismiss"
+    }
   },
   "product": {
     "gallery": "Product images",
@@ -299,7 +310,9 @@
     "submit": "Search",
     "hint": "Search by product name, category or tag.",
     "empty": "No matches. Try another word.",
-    "count": "{count, plural, one {# result} other {# results}}"
+    "count": "{count, plural, one {# result} other {# results}}",
+    "clear": "Clear search",
+    "shopAll": "Shop all"
   },
   "checkout": {
     "title": "Checkout",
@@ -457,6 +470,7 @@
       "phase": "phase {n}",
       "earlier": "Earlier runs",
       "run": {
+        "p4": "phase 4, on a Vercel Preview",
         "p3": "phase 3, on a Vercel Preview",
         "p2": "phase 2, on a Vercel Preview",
         "p1": "phase 1, on the live site"

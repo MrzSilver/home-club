@@ -3,6 +3,7 @@ import { z } from 'zod';
 import p1Raw from '@docs/p1-deployed-audit.json';
 import p2Raw from '@docs/p2-deployed-audit.json';
 import p3Raw from '@docs/p3-deployed-audit.json';
+import p4Raw from '@docs/p4-deployed-audit.json';
 
 const REPO_URL = 'https://github.com/MrzSilver/home-club';
 
@@ -77,7 +78,7 @@ export type AuditFailure = {
 };
 
 export type AuditReport = {
-  id: 'p3' | 'p2' | 'p1';
+  id: 'p4' | 'p3' | 'p2' | 'p1';
   /** File under `docs/`, shown as the source and linked on GitHub. */
   file: string;
   url: string;
@@ -126,16 +127,19 @@ function failuresOf(parsed: Parsed, later: AuditReport[]): AuditFailure[] {
   });
 }
 
-/** The gated P3 Preview run first, then the earlier phases. Parsed at build; a bad file fails the build. */
+/** The gated P4 Preview run first, then the earlier phases. Parsed at build; a bad file fails the build. */
 export function loadAuditReports(): { latest: AuditReport; earlier: AuditReport[] } {
   const p1 = auditSchema.parse(p1Raw);
   const p2 = auditSchema.parse(p2Raw);
   const p3 = auditSchema.parse(p3Raw);
+  const p4 = auditSchema.parse(p4Raw);
+  const r4 = load('p4', p4);
   const r3 = load('p3', p3);
   const r2 = load('p2', p2);
   const r1 = load('p1', p1);
-  r3.failures = failuresOf(p3, []);
-  r2.failures = failuresOf(p2, [r3]);
-  r1.failures = failuresOf(p1, [r2, r3]);
-  return { latest: r3, earlier: [r2, r1] };
+  r4.failures = failuresOf(p4, []);
+  r3.failures = failuresOf(p3, [r4]);
+  r2.failures = failuresOf(p2, [r3, r4]);
+  r1.failures = failuresOf(p1, [r2, r3, r4]);
+  return { latest: r4, earlier: [r3, r2, r1] };
 }
