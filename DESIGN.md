@@ -139,7 +139,7 @@ Five image tiles in a horizontally scrollable row on mobile (scroll-snap, visibl
 Labels above fields, 48 px control height, `field` border, radius `md`, error text below with icon, `aria-describedby` wired. Never rely on placeholder as label.
 
 ### 5.10 Cart drawer
-Right-side drawer (full-width sheet on mobile), line items with thumbnail, name, colour/size, a labelled quantity select bounded by stock, and remove. A sticky subtotal area links to `/cart`; checkout and look discounts arrive in P2. Focus is trapped; `Esc` closes and returns focus to the initiating control. Empty carts offer a Shop link.
+Right-side drawer (full-width sheet on mobile), line items with thumbnail, name, colour/size, a labelled quantity select bounded by stock, and remove. A sticky subtotal area links to `/cart`; checkout and look discounts arrive in P2. Focus is trapped; `Esc` closes and returns focus to the initiating control. Empty carts offer a Shop link. The panel slides in from the end edge (`--dur-slow` in, `--dur-base` out, opacity and transform only, as the menu drawer does from the start edge); under `prefers-reduced-motion` every drawer panel fades in at most 100 ms and does not move.
 
 ### 5.11 Notices
 "Demo store — no payment taken" banner: `surface` background, `ink` text, icon, non-dismissible on checkout, dismissible elsewhere.
@@ -159,7 +159,7 @@ Line icons, 1.5 px stroke, 20/24 px grid, `currentColor`. One library (`lucide-r
 - Allowed: fade, small translate (≤ 12 px), image scale ≤ 1.03, drawer slide, carousel cross-fade.
 - Not allowed: parallax, scroll-jacking, auto-playing video, infinite loops.
 - `prefers-reduced-motion: reduce` → no transforms, fades ≤ 100 ms, carousel never advances on its own.
-- Animate only `opacity` and `transform`.
+- Animate only `opacity`, `transform` and colour (`color`, `background-color`, `border-color`; RULES §5.4). Never animate layout properties.
 
 ## 8. Layout notes per page (from the mock-up)
 

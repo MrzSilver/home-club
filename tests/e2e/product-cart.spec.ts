@@ -15,6 +15,9 @@ for (const locale of ['en', 'th'] as const) {
           remove: 'Remove',
           color: 'Colour',
           black: 'Black',
+          reset: 'Your saved cart could not be read, so it was cleared.',
+          adjusted: 'Some items in your saved cart changed because stock or availability changed.',
+          dismiss: 'Dismiss',
         }
       : {
           add: 'เพิ่มลงตะกร้า',
@@ -27,6 +30,10 @@ for (const locale of ['en', 'th'] as const) {
           remove: 'นำออก',
           color: 'สี',
           black: 'ดำ',
+          reset: 'อ่านตะกร้าที่บันทึกไว้ไม่ได้ จึงล้างตะกร้าให้ใหม่',
+          adjusted:
+            'สินค้าบางรายการในตะกร้าที่บันทึกไว้เปลี่ยนไป เพราะจำนวนสินค้าหรือการจำหน่ายมีการเปลี่ยนแปลง',
+          dismiss: 'ปิดข้อความ',
         };
   test.describe(`product and cart /${locale} (FR-030–033, FR-050–051)`, () => {
     test('browse to product, choose stock, add, change quantity, reload and remove', async ({
@@ -64,7 +71,7 @@ for (const locale of ['en', 'th'] as const) {
         .click();
       await page.getByRole('link', { name: copy.view, exact: true }).click();
       await expect(page).toHaveURL(new RegExp(`/${locale}/cart$`));
-      await expect(page.getByRole('combobox')).toHaveValue('2');
+      await expect(page.getByRole('main').getByRole('combobox')).toHaveValue('2');
       await page.reload();
       await expect(page.getByRole('combobox')).toHaveValue('2');
       await expect(page.getByTestId('cart-subtotal')).toHaveAttribute(
@@ -72,7 +79,7 @@ for (const locale of ['en', 'th'] as const) {
         locale === 'en' ? 'USD' : 'THB',
       );
       await page
-        .getByRole('button', { name: new RegExp(locale === 'en' ? '^Remove ' : '^นำ .+ ออก$') })
+        .getByRole('button', { name: new RegExp(locale === 'en' ? '^Remove ' : '^นำออก ') })
         .click();
       await expect(page.getByRole('status')).toContainText(copy.empty);
       expect(problems).toEqual([]);
@@ -197,7 +204,13 @@ for (const locale of ['en', 'th'] as const) {
           localStorage.setItem('hc:cart:v1', 'not-json');
       });
       await page.goto(`/${locale}/cart`);
-      await expect(page.getByRole('status')).toContainText(copy.empty);
+      await expect(page.getByRole('status').filter({ hasText: copy.empty })).toBeVisible();
+      await expect(page.getByRole('status').filter({ hasText: copy.reset })).toBeVisible();
+      await page.getByRole('button', { name: copy.dismiss, exact: true }).click();
+      await expect(page.getByText(copy.reset)).toHaveCount(0);
+      await expect(
+        page.getByRole('link', { name: /Continue shopping|เลือกซื้อสินค้าต่อ/ }),
+      ).toBeFocused();
       await page.evaluate(() =>
         localStorage.setItem(
           'hc:cart:v1',
@@ -214,10 +227,45 @@ for (const locale of ['en', 'th'] as const) {
       );
       await page.reload();
       await expect(page.getByRole('combobox')).toHaveValue('3');
+      await expect(page.getByRole('status').filter({ hasText: copy.adjusted })).toBeVisible();
       expect(
         await page.evaluate(() => JSON.parse(localStorage.getItem('hc:cart:v1') ?? 'null')),
       ).toEqual({ version: 1, state: { lines: [{ sku: 'essential-tee-sand-XS', qty: 3 }] } });
     });
+    test(
+      'recovery notice is accessible on /cart and dismiss keeps focus in the cart',
+      { tag: '@a11y' },
+      async ({ page }) => {
+        await page.addInitScript(() => {
+          localStorage.setItem(
+            'hc:cart:v1',
+            JSON.stringify({
+              version: 1,
+              state: { lines: [{ sku: 'essential-tee-sand-XS', qty: 99 }] },
+            }),
+          );
+        });
+        await page.goto(`/${locale}/cart`);
+        const notice = page.getByRole('status').filter({ hasText: copy.adjusted });
+        await expect(notice).toBeVisible();
+        const results = await new AxeBuilder({ page })
+          .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+          .analyze();
+        expect(
+          results.violations.filter(
+            (item) => item.impact === 'critical' || item.impact === 'serious',
+          ),
+        ).toEqual([]);
+        const dismiss = page.getByRole('button', { name: copy.dismiss, exact: true });
+        const box = await dismiss.boundingBox();
+        expect(box?.width).toBeGreaterThanOrEqual(44);
+        expect(box?.height).toBeGreaterThanOrEqual(44);
+        await dismiss.focus();
+        await page.keyboard.press('Enter');
+        await expect(notice).toHaveCount(0);
+        expect(await page.evaluate(() => document.activeElement?.tagName)).not.toBe('BODY');
+      },
+    );
     test(
       'populated drawer is accessible and traps/returns keyboard focus',
       { tag: '@a11y' },

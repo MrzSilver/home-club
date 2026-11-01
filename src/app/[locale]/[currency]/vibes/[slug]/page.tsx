@@ -10,7 +10,7 @@ import { PRODUCTS } from '@/data/products';
 import { resolveRouteParams } from '@/i18n/params';
 import { withOgImage } from '@/components/og/og-metadata';
 import { pageMetadata } from '@/lib/seo';
-import Image from 'next/image';
+import { SafeImage } from '@/components/ui/safe-image';
 
 type Props = { params: Promise<{ locale: string; currency: string; slug: string }> };
 export const dynamicParams = false;
@@ -52,7 +52,7 @@ export default async function VibePage({ params }: Props): Promise<ReactElement>
             <p>{vibe.description[locale]}</p>
           </div>
           {image ? (
-            <Image
+            <SafeImage
               src={image.src}
               alt={image.alt[locale]}
               width={image.width}

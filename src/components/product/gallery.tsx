@@ -1,5 +1,5 @@
 'use client';
-import Image from 'next/image';
+import { SafeImage } from '@/components/ui/safe-image';
 import { useTranslations } from 'next-intl';
 import { useRef, useState, type ReactElement } from 'react';
 import type { Locale, ProductImage } from '@/data/schema';
@@ -30,7 +30,7 @@ export function Gallery({
       >
         {images.map((image, index) => (
           <div key={image.src} className="relative aspect-gallery w-full shrink-0 snap-center">
-            <Image
+            <SafeImage
               src={`${image.src}?v=angles-20261029`}
               alt={image.alt[locale]}
               width={image.width}
@@ -65,7 +65,7 @@ export function Gallery({
             }}
             className={`flex w-20 shrink-0 flex-col items-center gap-2 rounded-sm border p-1 ${activeIndex === index ? 'border-ink bg-surface' : 'border-field'}`}
           >
-            <Image
+            <SafeImage
               src={`${image.src}?v=angles-20261029`}
               alt=""
               width={image.width}

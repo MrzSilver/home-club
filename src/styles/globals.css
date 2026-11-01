@@ -347,6 +347,15 @@
     }
   }
 
+  .drawer-panel-end {
+    &[data-state='open'] {
+      animation: slide-in-end var(--dur-slow) var(--ease-standard);
+    }
+    &[data-state='closed'] {
+      animation: slide-out-end var(--dur-base) var(--ease-standard);
+    }
+  }
+
   /* English labels are uppercase; Thai keeps normal case (RULES 6.5). */
   .uppercase-latin:lang(en) {
     text-transform: uppercase;
@@ -422,6 +431,18 @@
   }
 }
 
+@keyframes slide-in-end {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes slide-out-end {
+  to {
+    transform: translateX(100%);
+  }
+}
+
 /*
  * Deliberately outside any cascade layer: unlayered rules beat every utility, so Thai can never be
  * uppercased or letter-spaced even if a component says `uppercase` or `tracking-*` (RULES 6.5).
@@ -457,5 +478,16 @@
     transition-delay: 0s;
     transition-property:
       opacity, color, background-color, border-color, text-decoration-color, fill, stroke;
+  }
+
+  /* Drawer panels fade instead of sliding: no transform, and the node still stays mounted for the exit. */
+  .drawer-panel-start,
+  .drawer-panel-end {
+    &[data-state='open'] {
+      animation-name: fade-in;
+    }
+    &[data-state='closed'] {
+      animation-name: fade-out;
+    }
   }
 }

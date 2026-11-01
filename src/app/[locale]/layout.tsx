@@ -73,7 +73,10 @@ export default async function LocaleLayout({
           out of the client bundle: a client component that needs strings receives just those
           (`messages={pick(...)}` on its own provider, or props).
         */}
-        <NextIntlClientProvider locale={locale} messages={{ cart: messages.cart }}>
+        <NextIntlClientProvider
+          locale={locale}
+          messages={{ cart: messages.cart, errorPage: messages.errorPage }}
+        >
           <CartProvider products={products} looks={LOOKS} locale={locale}>
             <SkipLink label={t('skipToContent')} />
             <Header locale={locale} />

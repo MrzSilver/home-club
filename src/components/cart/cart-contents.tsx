@@ -1,7 +1,8 @@
 'use client';
 import { useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import type { ReactElement } from 'react';
+import { useRef, type ReactElement } from 'react';
+import { CartRecoveryNotice } from '@/components/cart/cart-recovery-notice';
 import { useCart, useCartContext } from '@/components/cart/cart-context';
 import { buttonClasses } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
@@ -26,11 +27,19 @@ export function CartContents({ onNavigate }: { onNavigate?: () => void }): React
     if (product === undefined || variant === undefined) return [];
     return [{ ...line, product, variant, unit: convertFromUsdCents(product.priceCents, currency) }];
   });
+  const recovery = useCart((state) => state.recovery);
+  const dismissRecovery = useCart((state) => state.dismissRecovery);
+  const container = useRef<HTMLDivElement>(null);
   const totals = priceLookCart(lines, products, looks, currency);
   if (!hydrated) return <p role="status">{t('loading')}</p>;
+  const notice =
+    recovery === null ? null : (
+      <CartRecoveryNotice recovery={recovery} onDismiss={dismissRecovery} container={container} />
+    );
   if (rows.length === 0)
     return (
-      <div className="space-y-4 py-8">
+      <div ref={container} className="space-y-4 py-8">
+        {notice}
         <p role="status">{t('empty')}</p>
         <Link href="/shop" onClick={onNavigate} className={buttonClasses()}>
           {t('continue')}
@@ -38,7 +47,8 @@ export function CartContents({ onNavigate }: { onNavigate?: () => void }): React
       </div>
     );
   return (
-    <div className="flex flex-col gap-6">
+    <div ref={container} className="flex flex-col gap-6">
+      {notice}
       <p role="status" className="text-small text-muted">
         {t('count', { count: rows.reduce((sum, row) => sum + row.qty, 0) })}
       </p>

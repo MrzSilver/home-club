@@ -1,5 +1,7 @@
 'use client';
-import { useState, type ReactElement, type Ref } from 'react';
+import { useRef, useState, type ReactElement, type Ref } from 'react';
+
+import { buttonClasses } from '@/components/ui/button';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import type { Locale } from '@/data/schema';
@@ -20,9 +22,10 @@ export function SearchBox({
 }): ReactElement {
   const t = useTranslations('search');
   const [query, setQuery] = useState(initialQuery);
+  const root = useRef<HTMLDivElement>(null);
   const results = searchProducts(entries, query.slice(0, 200), locale);
   return (
-    <div className="space-y-6">
+    <div ref={root} className="space-y-6">
       <form action={`/${locale}/search`} method="get" onSubmit={onNavigate}>
         <label className="block space-y-2">
           <span>{t('label')}</span>
@@ -41,7 +44,26 @@ export function SearchBox({
         </button>
       </form>
       <p role="status">{query.trim() ? t('count', { count: results.length }) : t('hint')}</p>
-      {query.trim() && !results.length ? <p>{t('empty')}</p> : null}
+      {query.trim() && !results.length ? (
+        <div className="space-y-4">
+          <p>{t('empty')}</p>
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              className={buttonClasses({ variant: 'secondary' })}
+              onClick={() => {
+                setQuery('');
+                root.current?.querySelector('input')?.focus();
+              }}
+            >
+              {t('clear')}
+            </button>
+            <Link href="/shop" onClick={onNavigate} className={buttonClasses()}>
+              {t('shopAll')}
+            </Link>
+          </div>
+        </div>
+      ) : null}
       <ul className="divide-y divide-line">
         {results.map((entry) => (
           <li key={entry.slug}>

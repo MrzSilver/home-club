@@ -32,8 +32,8 @@ Browser ──► Next.js (RSC + static) ──► src/data (typed catalogue)
 | Validation | Zod | Catalogue, cart rehydration, forms, env |
 | Forms | Native React forms + Zod mini validation | Demo checkout stays local; ADR-0010 |
 | Content | MDX (Journal) via a maintained MDX integration | Frontmatter validated by Zod |
-| Motion | Framer Motion (`motion`) | Sparingly; reduced-motion aware |
-| Icons | `lucide-react` (tree-shaken) or inline SVG | No icon fonts |
+| Motion | CSS transitions and keyframes with the motion tokens (DESIGN §7) | No motion library installed; reduced-motion aware |
+| Icons | Inline SVG components (`src/components/ui/icons/`) | No icon library or icon fonts |
 | Fonts | `next/font` (self-hosted) | See DESIGN §3 |
 | Unit tests | Vitest + Testing Library | |
 | E2E / a11y | Playwright + `@axe-core/playwright` | |
@@ -217,6 +217,7 @@ Seed catalogue: 12–16 products across 4 categories (see PRD §11). Initial set
 - Strict Zod mini validation rejects unsupported/malformed envelope versions, extra fields and invalid lines. The validator loads asynchronously only when storage contains a cart, with JIT disabled for the CSP. Invalid data resets safely; empty carts remove the key, and storage failures preserve in-memory use.
 - `add(sku, qty)` returns whether the add is accepted; `setQty`, `remove`, and `clear` clamp quantities with `lib/stock.ts` and discard stale or sold-out SKUs on rehydration. Duplicate SKUs merge within stock/max-10 limits.
 - A per-tree `CartProvider` gets a compact catalogue projection from the server. No seed catalogue or full data schema is imported into global client code. Persisted lines and the header badge are exposed only after hydration/validation; totals are never stored and are recomputed from current catalogue prices and the current currency segment.
+- Recovery notice (FR-051, SPEC 13a): when hydration clears an unreadable cart (`recovery: 'reset'`) or drops/clamps lines (`'adjusted'`), `CartContents` shows a dismissible `role="status"` notice (`cart.recovery.*`) above the lines or empty state, only after `hydrated`. The flag is in-memory, never persisted, and clears on dismiss or the next cart change; dismiss moves focus to the first control left in the cart.
 - Radix drawer content loads on interaction, traps focus and restores focus to the originating header/add control. `/cart` shares the line/subtotal UI. P2 checkout validates ephemeral example contact/address fields, clears the cart on success, and carries only a generated demo reference in the success URL. No payment, submission or PII persistence occurs.
 
 ### 7.2 Preferences (`store/preferences.ts`)
@@ -313,6 +314,12 @@ Tactics:
 ## 13a. Error and empty states
 
 Cart empty · Filters with zero results · Search with zero results · 404 · Image load failure (neutral placeholder with alt) · Out-of-stock variant · Look atomic-add failure · Corrupt persisted cart · Checkout validation errors. Each has copy in both locales and a primary recovery action.
+
+Search with zero results (page and overlay): the message is followed by a "Clear search" button (empties the field and refocuses it) and a "Shop all" link; the empty checkout message is a `role="status"`.
+
+Runtime render errors: `src/app/[locale]/error.tsx` is a localized client error boundary inside the locale layout (header and footer stay). It shows one focused `h1`, a "Try again" button calling `reset()` and a home link; the error is logged with `console.error` and never displayed. Strings come from the `errorPage` namespace via the layout provider's scoped `messages`. No `global-error.tsx` is shipped: it would need its own `<html>`, no provider, and both catalogue subsets, and it only covers errors thrown by the locale layout itself.
+
+Image failure: `components/ui/safe-image.tsx` wraps `next/image` on the product gallery, cart line, look slot and vibe page. On `error` (or a failure that finished before hydration, caught by a ref check) it swaps to a `bg-surface` box with the image's own classes, so size and aspect ratio do not change. A meaningful `alt` becomes `role="img"` + `aria-label` (announced once, plus a decorative icon); `alt=""` becomes an empty hidden box. Catalogue cards and tiles stay plain `next/image` on their `surface` backdrop (client budget; their pictures are decorative and the card keeps its 1:1 box and text name). No new strings.
 
 ## 14. Testing strategy
 

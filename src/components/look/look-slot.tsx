@@ -1,5 +1,5 @@
 'use client';
-import Image from 'next/image';
+import { SafeImage } from '@/components/ui/safe-image';
 import { useTranslations } from 'next-intl';
 import type { ReactElement } from 'react';
 import type { Locale, Look, Product, Slot } from '@/data/schema';
@@ -42,7 +42,7 @@ export function LookSlot({
     >
       <legend className="px-2 text-h3">{t(`slots.${slot}`)}</legend>
       {image ? (
-        <Image
+        <SafeImage
           src={`${image.src}?v=angles-20261029`}
           alt={image.alt[locale]}
           width={image.width}

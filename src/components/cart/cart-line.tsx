@@ -1,5 +1,5 @@
 'use client';
-import Image from 'next/image';
+import { SafeImage } from '@/components/ui/safe-image';
 import { useTranslations } from 'next-intl';
 import type { ReactElement } from 'react';
 import { useCart, useCartContext, type CartProduct } from '@/components/cart/cart-context';
@@ -34,7 +34,7 @@ export function CartLine({
   return (
     <li className="flex gap-4 py-6">
       {image ? (
-        <Image
+        <SafeImage
           src={`${image.src}?v=angles-20261029`}
           alt={image.alt[locale]}
           width={image.width}
