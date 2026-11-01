@@ -113,3 +113,82 @@ was added. The component-level unit tests cover "Try again".
 - Full `pnpm test:e2e` and `pnpm test:a11y` were not repeated on Build B (only the two specs named above, the
   filters-drawer axe test, the keyboard pass and coverage).
 - The cause of the one browser-tab crash is not diagnosed.
+
+## Deployed Lighthouse (T9)
+
+Measurement part of T9, run against the PR #10 Vercel Preview. This is a Preview record, not the Production record
+(see "Still to do after merge"). Raw data: `docs/p4-deployed-audit.json` (same shape as `docs/p3-deployed-audit.json`).
+
+- Date: 2026-11-01 (first fetch 2026-11-01T06:58:24Z). Commit: `7f1a6e26ad1814fba6d5e7245e9d267656604aef`
+  (`git rev-parse origin/feat/p4-polish`; the SHA the Preview is expected to serve, not read back from the deployment).
+- Target: `https://home-club-git-feat-p4-polish-silversvs-projects.vercel.app` (public, HTTP 200).
+- Env: `LHCI_BASE_URL=<that origin> HC_AUDIT_TARGET=preview`, `CHROME_PATH` = Playwright Chromium 1243.
+  `lighthouserc.cjs` unchanged. Preflight `node scripts/check-preview-headers.mjs`: "8 URLs return 200 and retain noindex".
+- Command: `pnpm lhci` (Lighthouse 12.6.1, mobile, 5 runs x 8 URLs = 40 runs, median aggregation). Exit code 0.
+  Measured from an agent workstation (Windows), not the GitHub workflow.
+
+### Per-route medians
+
+| Route                          | Perf | A11y | BP  | SEO  | LCP (ms) | TBT (ms) | CLS |
+| ------------------------------ | ---- | ---- | --- | ---- | -------- | -------- | --- |
+| `/en`                          | 0.97 | 1    | 1   | 0.69 | 2420     | 95       | 0   |
+| `/th`                          | 0.97 | 1    | 1   | 0.69 | 2436     | 92       | 0   |
+| `/en/shop`                     | 0.97 | 1    | 1   | 0.69 | 2285     | 100      | 0   |
+| `/th/collections/foundations`  | 0.96 | 1    | 1   | 0.69 | 2441     | 93       | 0   |
+| `/en/products/essential-tee`   | 0.97 | 1    | 1   | 0.69 | 2433     | 79       | 0   |
+| `/th/products/essential-tee`   | 0.96 | 1    | 1   | 0.69 | 2476     | 92       | 0   |
+| `/en/looks/the-essential-look` | 0.97 | 1    | 1   | 0.69 | 2440     | 81       | 0   |
+| `/th/looks/the-essential-look` | 0.97 | 1    | 1   | 0.69 | 2434     | 92       | 0   |
+
+### Assertions
+
+| Assertion (level on Preview)                                                                                                         | Result                                                                      |
+| ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| `categories:performance` >= 0.95 (error)                                                                                             | pass on all 8 (lowest 0.96)                                                 |
+| `categories:accessibility` >= 0.95 (error)                                                                                           | pass on all 8 (1)                                                           |
+| `categories:best-practices` >= 0.95 (error)                                                                                          | pass on all 8 (1)                                                           |
+| `largest-contentful-paint` <= 2500 ms (error)                                                                                        | pass on all 8 (highest 2476 ms)                                             |
+| `total-blocking-time` <= 200 ms (error)                                                                                              | pass on all 8 (highest 100 ms)                                              |
+| `cumulative-layout-shift` <= 0.1 (error)                                                                                             | pass on all 8 (0)                                                           |
+| `categories:seo` >= 0.95 (warn on Preview)                                                                                           | warning on all 8 (0.69, all five runs each): `is-crawlable` fails, expected |
+| document-title, meta-description, http-status-code, link-text, crawlable-anchors, image-alt, hreflang, canonical (error, minScore 1) | pass on all 8                                                               |
+
+Gate: passed, no failed assertions. The only warning is `categories.seo`, the intentional Preview noindex
+(ADR-0004 amendment); `is-crawlable` is the only failing SEO audit on every route. Canonical and hreflang scored 1
+on all 8 routes.
+
+### Comparison with the P3 thin margins (Preview, same 8 URLs, median of 5)
+
+| Item                                     | P3 (2026-10-31, `a3a65a2`) | P4 (this run) | Note                                                       |
+| ---------------------------------------- | -------------------------- | ------------- | ---------------------------------------------------------- |
+| `/th` performance                        | 0.95                       | 0.97          | margin to the 0.95 floor 0.00 -> 0.02                      |
+| `/th/products/essential-tee` LCP         | 2462 ms                    | 2476 ms       | still passes, but 24 ms (1%) under 2500 ms, slightly worse |
+| `/th/products/essential-tee` performance | 0.96                       | 0.96          | unchanged                                                  |
+
+LCP is the thin spot: seven of eight routes sit between 2420 and 2476 ms, and individual runs reach about 2590 ms
+(e.g. `/th/products/essential-tee` runs 2590, 2437, 2433, 2589, 2476 ms). The median passes; single runs do not
+always. Differences of this size between two runs on different days are within observed run-to-run spread, so they
+are not evidence of a regression or an improvement. The `/en/shop` JS margin (39.9/40 KiB) is a bundle check, not part
+of Lighthouse, and was not re-measured here.
+
+### Production spot check (no budget claims) - `https://home-club-eight.vercel.app`
+
+Production still runs the P3 code until PR #10 merges. Checked with `curl` on 2026-11-01.
+
+| Check                                  | Result                                                                                                                                                                                                |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/robots.txt`                          | `Allow: /`; disallows `/en                                                                                                                                                                            | th/cart`, `/checkout`, `/search`; `Sitemap: https://home-club-eight.vercel.app/sitemap.xml` |
+| `/sitemap.xml`                         | `<loc>` and hreflang alternates use `https://home-club-eight.vercel.app`; 0 occurrences of `localhost`                                                                                                |
+| Security headers on `/en`              | present: CSP (no `unsafe-eval`, `frame-ancestors 'none'`), HSTS, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` |
+| `x-robots-tag` on `/en`                | absent (indexable)                                                                                                                                                                                    |
+| `/en/products/essential-tee` canonical | `https://home-club-eight.vercel.app/en/products/essential-tee`                                                                                                                                        |
+| `/en/products/essential-tee` hreflang  | `en`, `th`, `x-default` (to `/en/...`) all on the production origin                                                                                                                                   |
+
+Not checked here: console and hydration errors on Home/Product/Look, and the owner-run validators (Rich Results,
+OG preview, Search Console).
+
+### Still to do after merge
+
+Re-run with `HC_AUDIT_TARGET` unset against `https://home-club-eight.vercel.app` (or dispatch the
+`lighthouse-preview` workflow with target=production) and store that as the Production record
+(`docs/p4-deployed-audit.json` is currently the Preview record; SEO and `is-crawlable` are errors on Production).
