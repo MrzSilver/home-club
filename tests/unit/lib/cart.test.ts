@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { normalizeCart, addCartLine } from '@/lib/cart';
+import { normalizeCart, addCartLine, reconcileCart } from '@/lib/cart';
 import { parseSavedCart } from '@/lib/cart-schema';
 
 const stock = { tee: 3, cap: 20, gone: 0 };
@@ -51,5 +51,38 @@ describe('cart invariants (FR-050, FR-051)', () => {
       ['tee', 0],
     ] as const)
       expect(addCartLine([], sku, qty, stock)).toEqual([]);
+  });
+});
+
+describe('reconcileCart (FR-051)', () => {
+  const stock = { tee: 3, sold: 0 };
+  it('reports unchanged for lines that need no repair', () => {
+    expect(reconcileCart([{ sku: 'tee', qty: 2 }], stock)).toEqual({
+      lines: [{ sku: 'tee', qty: 2 }],
+      changed: false,
+    });
+  });
+  it('reports unchanged for a valid cart mixing a look line and a regular line of the same SKU', () => {
+    const lines = [
+      { sku: 'tee', qty: 1 },
+      { sku: 'tee', qty: 1, lookId: 'weekend' },
+    ];
+    expect(reconcileCart(lines, stock)).toEqual({ lines, changed: false });
+  });
+  it('reports changed when a line is dropped, clamped or merged', () => {
+    expect(reconcileCart([{ sku: 'sold', qty: 1 }], stock).changed).toBe(true);
+    expect(reconcileCart([{ sku: 'tee', qty: 9 }], stock)).toEqual({
+      lines: [{ sku: 'tee', qty: 3 }],
+      changed: true,
+    });
+    expect(
+      reconcileCart(
+        [
+          { sku: 'tee', qty: 1 },
+          { sku: 'tee', qty: 1 },
+        ],
+        stock,
+      ).changed,
+    ).toBe(true);
   });
 });
